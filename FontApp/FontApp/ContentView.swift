@@ -7,7 +7,7 @@ struct ContentView: View {
                 MapScreen()
             }
             Tab(L10n.t("news.title"), systemImage: "newspaper") {
-                ComingSoonView(title: L10n.t("news.title"), systemImage: "newspaper")
+                NewsScreen()
             }
             Tab(L10n.t("zones.title"), systemImage: "globe.europe.africa") {
                 ComingSoonView(title: L10n.t("zones.title"), systemImage: "globe.europe.africa")
