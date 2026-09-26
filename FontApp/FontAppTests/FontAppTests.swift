@@ -167,3 +167,18 @@ struct ReloadThrottleTests {
         #expect(throttle.decide(following: false, now: t0.addingTimeInterval(1)) == .now)
     }
 }
+
+struct ReportThreadTests {
+    @Test func repliesFollowTheirParent() {
+        func report(_ id: UUID = UUID(), parent: UUID? = nil, minutesAgo: Double) -> ReportResponse {
+            ReportResponse(id: id, username: nil, message: "", isIncident: false, incidentKind: nil,
+                           createdAt: Date(timeIntervalSince1970: 1_000_000 - minutesAgo * 60), parentID: parent,
+                           resolvedAt: nil, resolvedBy: nil)
+        }
+        let old = UUID(), new = UUID()
+        let list = [report(new, minutesAgo: 1), report(parent: old, minutesAgo: 2), report(old, minutesAgo: 10)]
+        let threaded = FontDetailModel.threaded(list)
+        #expect(threaded.map(\.parentID) == [nil, nil, old])
+        #expect(threaded.first?.id == new)
+    }
+}

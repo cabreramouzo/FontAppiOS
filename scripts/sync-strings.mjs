@@ -25,7 +25,7 @@ const KEYS = [
   'source.tap', 'source.mountain', 'source.spring', 'source.well', 'source.fountain', 'source.other',
   'map.recenter', 'map.loading', 'map.rateLimited', 'map.rateLimitedBody', 'map.clusterCount',
   'detail.type', 'detail.drinkability', 'detail.unknownType', 'detail.unknownDrink',
-  'detail.description', 'detail.currentStatus', 'detail.lastReportedStatus',
+  'detail.description', 'detail.lastUpdate', 'detail.currentStatus', 'detail.lastReportedStatus',
   'detail.confirmedByOne', 'detail.confirmedByMany', 'detail.statusReviews', 'detail.beFirst',
   'detail.incidents', 'detail.noIncidents', 'detail.loading', 'detail.directions',
   'detail.noPhotoYet', 'detail.municipality', 'detail.region', 'detail.country', 'detail.stale',

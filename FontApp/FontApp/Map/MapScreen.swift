@@ -28,8 +28,16 @@ struct MapScreen: View {
         .onAppear(perform: locateOnce)
         .onChange(of: location.isAuthorized) { locateOnce() }
         .sheet(item: $selected) { font in
-            // Replaced by the full detail in the next step.
-            Text(L10n.fontName(font.name)).presentationDetents([.medium])
+            NavigationStack {
+                FontDetailView(fontID: font.id, preview: font)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button(role: .close) { selected = nil }
+                        }
+                    }
+            }
+            .presentationDetents([.medium, .large])
+            .presentationBackgroundInteraction(.enabled(upThrough: .medium))
         }
     }
 
