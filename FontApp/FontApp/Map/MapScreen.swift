@@ -22,7 +22,7 @@ struct MapScreen: View {
             },
             onSelect: { selected = $0 }
         )
-        .ignoresSafeArea(edges: .top)
+        .ignoresSafeArea(edges: [.top, .bottom])
         .overlay(alignment: .top) { banner }
         .overlay(alignment: .bottomLeading) { attribution }
         .onAppear(perform: locateOnce)
