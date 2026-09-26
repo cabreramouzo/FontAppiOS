@@ -154,3 +154,16 @@ struct TextTests {
         #expect(L10n.t("font.unnamed", bundle: bundle("es")) == "Fuente sin nombre")
     }
 }
+
+struct ReloadThrottleTests {
+    @Test func followingReloadsAtMostEverySixSeconds() {
+        let t0 = date("2026-09-27T12:00:00Z")
+        var throttle = ReloadThrottle()
+        #expect(throttle.decide(following: true, now: t0) == .now)
+        throttle.didRequest(at: t0)
+        #expect(throttle.decide(following: true, now: t0.addingTimeInterval(2)) == .at(t0.addingTimeInterval(6)))
+        #expect(throttle.decide(following: true, now: t0.addingTimeInterval(6)) == .now)
+        // A move by hand is an intention: always at once.
+        #expect(throttle.decide(following: false, now: t0.addingTimeInterval(1)) == .now)
+    }
+}

@@ -2,10 +2,11 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        Text(L10n.t("font.unnamed"))
+        MapScreen()
     }
 }
 
 #Preview {
     ContentView()
+        .environment(LocationService())
 }

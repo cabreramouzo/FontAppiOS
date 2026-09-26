@@ -39,11 +39,6 @@ nonisolated struct MapBox: Equatable, Sendable {
         guard self.minLat < self.maxLat, self.minLong < self.maxLong else { return nil }
     }
 
-    func contains(_ other: MapBox) -> Bool {
-        minLat <= other.minLat && maxLat >= other.maxLat
-            && minLong <= other.minLong && maxLong >= other.maxLong
-    }
-
     var queryItems: [URLQueryItem] {
         [
             URLQueryItem(name: "minLat", value: String(minLat)),
