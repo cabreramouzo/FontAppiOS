@@ -1,0 +1,59 @@
+{
+  "sourceLanguage": "ca",
+  "strings": {
+    "NSLocationWhenInUseUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp fa servir la teva ubicació per mostrar-te les fonts i les novetats que tens a prop."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp usa tu ubicación para mostrarte las fuentes y las novedades que tienes cerca."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp usa a túa localización para amosarche as fontes e as novidades que tes preto."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp-ek zure kokapena erabiltzen du inguruko iturriak eta berriak erakusteko."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp uses your location to show you the fountains and news near you."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp utilise ta position pour te montrer les fontaines et les nouveautés près de toi."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A FontApp usa a tua localização para te mostrar as fontes e as novidades perto de ti."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp usa la tua posizione per mostrarti le fontane e le novità vicino a te."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

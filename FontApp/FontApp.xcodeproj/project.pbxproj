@@ -187,10 +187,17 @@
 				};
 			};
 			buildConfigurationList = 044F28723068858800D0EF7B /* Build configuration list for PBXProject "FontApp" */;
-			developmentRegion = en;
+			developmentRegion = ca;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				ca,
+				es,
+				gl,
+				eu,
 				en,
+				fr,
+				"pt-PT",
+				it,
 				Base,
 			);
 			mainGroup = 044F286E3068858800D0EF7B;
@@ -397,6 +404,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "FontApp uses your location to show you the fountains and news near you.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,6 +436,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "FontApp uses your location to show you the fountains and news near you.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
