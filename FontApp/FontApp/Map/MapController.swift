@@ -46,11 +46,15 @@ final class MapController {
         return log2(360 / (degreesPerPoint * 256))
     }
 
-    func show(_ coordinate: CLLocationCoordinate2D, meters: Double = 600) {
+    /// Centres a point. `aboveSheet`: a half-height sheet is about to cover the bottom, so
+    /// the point goes in the middle of what stays visible.
+    func show(_ coordinate: CLLocationCoordinate2D, meters: Double = 600, aboveSheet: Bool = false) {
         guard let map = mapView else { return }
         map.setUserTrackingMode(.none, animated: false)
-        map.setRegion(MKCoordinateRegion(center: coordinate, latitudinalMeters: meters, longitudinalMeters: meters),
-                      animated: true)
+        let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: meters, longitudinalMeters: meters)
+        let bottom = aboveSheet ? map.bounds.height * 0.5 : 0
+        map.setVisibleMapRect(MKMapRect(region), edgePadding: UIEdgeInsets(top: 60, left: 20, bottom: bottom, right: 20),
+                              animated: true)
     }
 
     func show(_ rect: MKMapRect) {

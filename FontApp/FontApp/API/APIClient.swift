@@ -107,6 +107,16 @@ nonisolated struct APIClient: Sendable {
         return try await get("/activity", query: query)
     }
 
+    /// Fountains by name. The server requires a term and, for the public, caps the pages.
+    func searchFonts(_ term: String, per: Int = 20) async throws -> [FontSummary] {
+        struct Page: Decodable { let items: [FontSummary] }
+        let page: Page = try await get("/fonts", query: [
+            URLQueryItem(name: "search", value: term),
+            URLQueryItem(name: "per", value: String(per)),
+        ])
+        return page.items
+    }
+
     // MARK: Session
 
     /// Username **or email** and password, as HTTP Basic.

@@ -10,7 +10,7 @@ struct MapScreen: View {
     @State private var sheet: MapSheet?
 
     private enum MapSheet: String, Identifiable {
-        case layers, filters
+        case layers, filters, search
         var id: String { rawValue }
     }
     @State private var selected: FontSummary?
@@ -40,7 +40,13 @@ struct MapScreen: View {
                 .padding(.trailing, 12)
                 .padding(.top, 8)
         }
-        .overlay(alignment: .top) { banner.padding(.trailing, 72) }
+        .overlay(alignment: .topLeading) {
+            MapSearchCapsule { sheet = .search }
+                .padding(.leading, 12)
+                .padding(.trailing, 76)
+                .padding(.top, 8)
+        }
+        .overlay(alignment: .top) { banner.padding(.trailing, 72).padding(.top, 56) }
         .overlay(alignment: .bottomLeading) { attribution }
         .sheet(item: $sheet) { which in
             switch which {
@@ -48,6 +54,15 @@ struct MapScreen: View {
                 LayersSheet(controller: controller).presentationDetents([.medium, .large])
             case .filters:
                 FiltersSheet(filters: $filters).presentationDetents([.medium, .large])
+            case .search:
+                SearchScreen(
+                    onFountain: { font in
+                        controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                        meters: 400, aboveSheet: true)
+                        selected = font
+                    },
+                    onPlace: { controller.show($0) }
+                )
             }
         }
         .onAppear(perform: locateOnce)

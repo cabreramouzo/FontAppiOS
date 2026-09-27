@@ -85,6 +85,12 @@ const IOS_ONLY = {
     en: 'Search fountain or place', fr: 'Chercher une fontaine ou un lieu', pt: 'Procurar fonte ou local',
     it: 'Cerca fontana o luogo',
   },
+  'ios.search.fountains': {
+    ca: 'Fonts', es: 'Fuentes', gl: 'Fontes', eu: 'Iturriak', en: 'Fountains', fr: 'Fontaines', pt: 'Fontes', it: 'Fontane',
+  },
+  'ios.search.places': {
+    ca: 'Llocs', es: 'Lugares', gl: 'Lugares', eu: 'Lekuak', en: 'Places', fr: 'Lieux', pt: 'Locais', it: 'Luoghi',
+  },
   // Apple draws the base map and credits it; the fountains come from these sources.
   'ios.dataAttribution': {
     ca: 'Fonts: © OpenStreetMap (ODbL) · ICGC/ACA (CC BY 4.0)',
