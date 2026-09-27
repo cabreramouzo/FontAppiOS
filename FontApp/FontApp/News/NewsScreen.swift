@@ -4,6 +4,7 @@ import SwiftUI
 struct NewsScreen: View {
     @Environment(LocationService.self) private var location
     @State private var model = NewsModel()
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         NavigationStack {
@@ -56,24 +57,54 @@ struct NewsScreen: View {
     }
 
     private var list: some View {
-        List {
-            ForEach(model.items, id: \.self) { item in
-                NavigationLink(value: item.fontID) { ActivityRow(item: item) }
-            }
-            if model.canLoadMore {
-                Button {
-                    Task { await model.loadMore() }
-                } label: {
-                    HStack {
-                        Text(L10n.t("activity.loadMore"))
-                        if model.isLoadingMore { Spacer(); ProgressView() }
-                    }
-                    .frame(minHeight: 44)
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 16) {
+                Text(L10n.t("news.intro"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                if case .failed(let message) = model.state {
+                    Label(message, systemImage: "wifi.exclamationmark")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
                 }
-                .disabled(model.isLoadingMore)
+                if let first = model.items.first {
+                    NavigationLink(value: first.fontID) {
+                        ActivityCard(item: first, prominent: true)
+                    }
+                    .buttonStyle(.plain)
+                }
+                LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
+                    ForEach(Array(model.items.dropFirst()), id: \.self) { item in
+                        NavigationLink(value: item.fontID) {
+                            ActivityCard(item: item, prominent: dynamicTypeSize.isAccessibilitySize)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                if model.canLoadMore {
+                    Button {
+                        Task { await model.loadMore() }
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Text(L10n.t("activity.loadMore"))
+                            if model.isLoadingMore { ProgressView() }
+                            Spacer()
+                        }
+                        .frame(minHeight: 44)
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(model.isLoadingMore)
+                }
             }
+            .padding(16)
         }
-        .listStyle(.plain)
+        .background(Color(.systemGroupedBackground))
+    }
+
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 12, alignment: .top),
+              count: dynamicTypeSize.isAccessibilitySize ? 1 : 2)
     }
 
     @ViewBuilder private var emptyState: some View {
@@ -115,64 +146,108 @@ struct NewsScreen: View {
     }
 }
 
-private struct ActivityRow: View {
+/// Photo-led bulletin cards. Text determines height, so Dynamic Type never clips copy.
+private struct ActivityCard: View {
     let item: ActivityItem
+    var prominent = false
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            thumbnail
-            VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                if let kind = kindLabel {
+                    Label(kind, systemImage: kindIcon)
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 6)
+                        .background(item.kind == .report ? Color.orange.opacity(0.85) : Color.black.opacity(0.65),
+                                    in: Capsule())
+                }
+                Spacer(minLength: 0)
+            }
+            Spacer(minLength: prominent ? 72 : 40)
+            VStack(alignment: .leading, spacing: 8) {
+                if let status = WaterStatus(item.waterStatus) {
+                    Text("\(status.emoji) \(L10n.t(status.labelKey))")
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(.black.opacity(0.6), in: Capsule())
+                }
                 Text(L10n.fontName(item.fontName))
-                    .font(.headline)
-                    .lineLimit(2)
-                HStack(spacing: 6) {
-                    if let kind = kindLabel {
-                        Text(kind).font(.subheadline).foregroundStyle(.secondary)
-                    }
-                    if let status = WaterStatus(item.waterStatus) {
-                        StatusBadge(status: status).font(.caption)
-                    }
+                    .font(prominent ? .title2.bold() : .headline)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let text = item.text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty {
+                    Text(text)
+                        .font(.subheadline)
+                        .lineLimit(prominent ? 4 : 3)
                 }
-                if let text = item.text, !text.isEmpty {
-                    Text(text).font(.subheadline).lineLimit(3)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(item.author ?? L10n.t("activity.anon"))
+                    Text([RelativeTime.string(since: item.createdAt), item.region]
+                        .compactMap { $0 }.joined(separator: " · "))
                 }
-                Text(footer)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.85))
             }
         }
-        .padding(.vertical, 4)
+        .padding(prominent ? 18 : 13)
+        .frame(maxWidth: .infinity, minHeight: prominent ? 300 : 250, alignment: .leading)
+        .foregroundStyle(.white)
+        .background {
+            GeometryReader { geometry in
+                ZStack {
+                    fallback
+                    if let url = APIClient.shared.imageURL(item.image) {
+                        AsyncImage(url: url) { phase in
+                            if case .success(let image) = phase {
+                                image.resizable().scaledToFill()
+                            }
+                        }
+                    }
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .clipped()
+                .overlay {
+                    LinearGradient(colors: [.black.opacity(0.12), .black.opacity(0.65), .black.opacity(0.95)],
+                                   startPoint: .top, endPoint: .bottom)
+                }
+            }
+            .accessibilityHidden(true)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .overlay {
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(item.kind == .report ? Color.orange.opacity(0.7) : Color.white.opacity(0.12),
+                              lineWidth: 1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    /// A decorative drawing, never a pretend photograph of an undocumented fountain.
+    private var fallback: some View {
+        ZStack(alignment: .topTrailing) {
+            LinearGradient(colors: [Color(hex: 0x326C78), Color(hex: 0x183940)],
+                           startPoint: .topLeading, endPoint: .bottomTrailing)
+            Image(systemName: "water.waves")
+                .font(.system(size: prominent ? 140 : 90, weight: .ultraLight))
+                .foregroundStyle(.white.opacity(0.16))
+                .rotationEffect(.degrees(-20))
+                .padding(.top, 42)
+                .padding(.trailing, -15)
+        }
     }
 
     private var kindLabel: String? {
         item.kind == .other ? nil : L10n.lookup("activity.\(item.kind.rawValue)")
     }
 
-    private var footer: String {
-        [RelativeTime.string(since: item.createdAt), item.author ?? L10n.t("activity.anon"), item.region]
-            .compactMap { $0 }
-            .joined(separator: " · ")
-    }
-
-    private var thumbnail: some View {
-        Group {
-            if let url = APIClient.shared.imageURL(item.image) {
-                AsyncImage(url: url) { image in
-                    image.resizable().scaledToFill()
-                } placeholder: {
-                    Color(.secondarySystemFill)
-                }
-            } else {
-                Color(.secondarySystemFill)
-                    .overlay {
-                        Image(systemName: "drop.fill")
-                            .foregroundStyle(WaterStatus.color(for: item.waterStatus))
-                    }
-            }
+    private var kindIcon: String {
+        switch item.kind {
+        case .fontAdded: "plus.circle.fill"
+        case .review: "text.bubble.fill"
+        case .report: "exclamationmark.triangle.fill"
+        case .edit: "pencil"
+        case .other: "drop.fill"
         }
-        .frame(width: 72, height: 72)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .accessibilityHidden(true)
     }
 }
