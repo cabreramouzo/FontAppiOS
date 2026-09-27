@@ -15,6 +15,11 @@ struct SearchScreen: View {
     var body: some View {
         NavigationStack {
             List {
+                // Before typing, what is near, as Apple Maps does. The web's "near me"
+                // list lived in the filters sheet; here it is where one looks first.
+                if model.query.trimmingCharacters(in: .whitespaces).count < 2 {
+                    nearbySection
+                }
                 // A place that is exactly what was typed (a town) goes first; otherwise
                 // fountains, which is what the app is for.
                 if model.placesFirst {
@@ -42,6 +47,30 @@ struct SearchScreen: View {
                 ToolbarItem(placement: .topBarTrailing) { Button(role: .close) { dismiss() } }
             }
             .onChange(of: model.query) { model.queryChanged(near: location.location) }
+            .task { await model.loadNearby(from: location.location) }
+        }
+    }
+
+    @ViewBuilder private var nearbySection: some View {
+        if location.location == nil {
+            EmptyView()
+        } else if let nearby = model.nearby {
+            Section(L10n.t("map.nearbyTitle")) {
+                if nearby.isEmpty {
+                    Text(L10n.t("map.nearbyEmpty")).foregroundStyle(.secondary)
+                }
+                ForEach(nearby) { font in
+                    Button {
+                        dismiss()
+                        onFountain(font)
+                    } label: {
+                        NearbyRow(font: font, from: location.location)
+                    }
+                    .foregroundStyle(.primary)
+                }
+            }
+        } else {
+            Section(L10n.t("map.nearbyTitle")) { ProgressView() }
         }
     }
 
@@ -88,6 +117,35 @@ struct SearchScreen: View {
     }
 }
 
+/// A nearby fountain: unlike search results, `/fonts/near` carries the status, so the
+/// pin colour and its confidence are shown.
+private struct NearbyRow: View {
+    let font: FontSummary
+    let from: CLLocation?
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "mappin.circle.fill")
+                .font(.title2)
+                .foregroundStyle(.white, WaterStatus.color(for: font.lastWaterStatus))
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(L10n.fontName(font.name))
+                let level = Confidence.level(of: font.evidence)
+                Text([distance, "\(level.emoji) \(L10n.t(level.labelKey))"].compactMap { $0 }.joined(separator: " · "))
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+        }
+        .frame(minHeight: 44)
+    }
+
+    private var distance: String? {
+        guard let from else { return nil }
+        let meters = from.distance(from: CLLocation(latitude: font.latitude, longitude: font.longitude))
+        return Measurement(value: meters, unit: UnitLength.meters).formatted(.measurement(width: .abbreviated, usage: .road))
+    }
+}
+
 private struct FountainResultRow: View {
     let font: FontSummary
     let from: CLLocation?
@@ -128,6 +186,8 @@ final class SearchModel: NSObject, MKLocalSearchCompleterDelegate {
     private(set) var places: [MKLocalSearchCompletion] = []
     private(set) var error: String?
     private(set) var searchedQuery = ""
+    /// `nil` until loaded.
+    private(set) var nearby: [FontSummary]?
 
     @ObservationIgnored private let api: APIClient
     @ObservationIgnored private let completer = MKLocalSearchCompleter()
@@ -138,6 +198,17 @@ final class SearchModel: NSObject, MKLocalSearchCompleterDelegate {
         super.init()
         completer.delegate = self
         completer.resultTypes = [.address, .pointOfInterest]
+    }
+
+    func loadNearby(from location: CLLocation?) async {
+        guard let location, nearby == nil else { return }
+        let found = (try? await api.nearby(latitude: location.coordinate.latitude,
+                                           longitude: location.coordinate.longitude, quantity: 15))
+            ?? OfflineZones.shared.fonts(in: MapBox(minLat: location.coordinate.latitude - 0.03,
+                                                    maxLat: location.coordinate.latitude + 0.03,
+                                                    minLong: location.coordinate.longitude - 0.04,
+                                                    maxLong: location.coordinate.longitude + 0.04)!)
+        nearby = Self.sorted(found, from: location)
     }
 
     var placesFirst: Bool {

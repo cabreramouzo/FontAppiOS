@@ -17,7 +17,7 @@ struct MapScreen: View {
     @State private var toast: String?
 
     private enum MapSheet: Identifiable {
-        case layers, filters, search, offline
+        case layers, filters, search, offline, missions
         case route(RouteModel)
         /// The model travels with the case: a separate optional state is still nil in the
         /// first render of the sheet, which then shows empty.
@@ -29,6 +29,7 @@ struct MapScreen: View {
             case .filters: "filters"
             case .search: "search"
             case .offline: "offline"
+            case .missions: "missions"
             case .route: "route"
             case .newFont: "newFont"
             }
@@ -58,6 +59,7 @@ struct MapScreen: View {
         .overlay(alignment: .topTrailing) {
             MapControlColumn(controller: controller, activeFilters: filters.activeCount,
                              onLayers: { sheet = .layers }, onFilters: { sheet = .filters },
+                             onMissions: { sheet = .missions },
                              onOffline: { sheet = .offline },
                              onImportGPX: { if let route { sheet = .route(route) } else { importsGPX = true } },
                              onExportGPX: exportVisibleFountains,
@@ -109,6 +111,21 @@ struct MapScreen: View {
                            },
                            onForget: { self.route = nil })
                     .presentationDetents([.medium, .large])
+            case .missions:
+                MissionsSheet(
+                    onShow: { stop in
+                        controller.show(CLLocationCoordinate2D(latitude: stop.latitude, longitude: stop.longitude),
+                                        meters: 400, aboveSheet: true)
+                        openFountain(stop.id)
+                    },
+                    onShowRound: { stops in
+                        let rect = stops.reduce(MKMapRect.null) {
+                            $0.union(MKMapRect(origin: MKMapPoint(CLLocationCoordinate2D(latitude: $1.latitude, longitude: $1.longitude)),
+                                               size: MKMapSize(width: 0, height: 0)))
+                        }
+                        controller.show(rect)
+                    })
+                    .presentationDetents([.medium, .large])
             case .offline:
                 OfflineZonesSheet(controller: controller).presentationDetents([.medium, .large])
             case .search:
@@ -148,6 +165,19 @@ struct MapScreen: View {
             }
             .presentationDetents([.medium, .large])
             .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+        }
+    }
+
+    /// Opens a fountain known only by its id: from the loaded pins if it is one of them.
+    private func openFountain(_ id: UUID) {
+        if let font = model.fonts.first(where: { $0.id == id }) {
+            selected = font
+        } else {
+            Task {
+                if let detail = try? await APIClient.shared.font(id) {
+                    selected = FontSummary(detail)
+                }
+            }
         }
     }
 

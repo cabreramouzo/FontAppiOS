@@ -80,6 +80,17 @@ nonisolated struct FontDetail: Codable, Identifiable, Sendable {
     let statusConflict: Bool?
 }
 
+extension FontSummary {
+    /// A page as a summary, for opening it from lists that only carry an id.
+    nonisolated init(_ d: FontDetail) {
+        self.init(id: d.id, name: d.name, latitude: d.latitude, longitude: d.longitude, image: d.image,
+                  description: d.description, source: d.source, drinkable: d.drinkable, country: d.country,
+                  region: d.region, createdAt: d.createdAt, lastWaterStatus: d.lastWaterStatus,
+                  lastUpdate: d.lastUpdate, latestConfirmations: nil, recentStatusReporters: nil,
+                  recentStatusConflict: d.statusConflict)
+    }
+}
+
 extension FontDetail {
     /// What the map pin already knew, for when the full page cannot be loaded (no
     /// signal). Enough to show the status and to review or add a photo, which are the
@@ -219,4 +230,24 @@ nonisolated struct NewFont: Codable, Equatable, Sendable {
     var drinkable: Drinkable?
     /// Explicit confirmation after being shown a fountain within 25 m.
     var allowNearbyDuplicate: Bool?
+}
+
+/// A stop of a proposed round (`GET /missions`).
+nonisolated struct MissionTarget: Codable, Identifiable, Hashable, Sendable {
+    let id: UUID
+    let name: String?
+    let latitude: Double
+    let longitude: Double
+    let distanceKm: Double
+    /// Last check, or `nil` if nobody has ever been.
+    let lastCheck: Date?
+}
+
+/// Two rounds around a point, ordered by distance and not by drops, not overlapping.
+nonisolated struct Missions: Codable, Sendable {
+    let km: Double
+    /// Fountains without any photo.
+    let photoless: [MissionTarget]
+    /// Not checked for over half a year.
+    let stale: [MissionTarget]
 }

@@ -13,6 +13,7 @@ struct MapControlColumn: View {
     let activeFilters: Int
     let onLayers: () -> Void
     let onFilters: () -> Void
+    var onMissions: (() -> Void)?
     var onOffline: (() -> Void)?
     var onImportGPX: (() -> Void)?
     var onExportGPX: (() -> Void)?
@@ -26,6 +27,10 @@ struct MapControlColumn: View {
                     Divider().frame(width: 28)
                     ColumnButton(systemImage: "line.3.horizontal.decrease", label: L10n.t("map.filters"),
                                  badge: activeFilters, action: onFilters)
+                    if let onMissions {
+                        Divider().frame(width: 28)
+                        ColumnButton(systemImage: "figure.walk", label: L10n.t("mission.title"), action: onMissions)
+                    }
                     if let onOffline {
                         Divider().frame(width: 28)
                         ColumnButton(systemImage: "arrow.down.circle", label: L10n.t("ios.offline.title"), action: onOffline)

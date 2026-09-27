@@ -13,6 +13,9 @@
         }
       }
     },
+    "GPS Exchange Format" : {
+
+    },
     "NSCameraUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {

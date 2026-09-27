@@ -113,6 +113,13 @@ nonisolated struct APIClient: Sendable {
         try await get("/fonts/in-bounds", query: box.queryItems)
     }
 
+    func missions(latitude: Double, longitude: Double) async throws -> Missions {
+        try await get("/missions", query: [
+            URLQueryItem(name: "lat", value: String(latitude)),
+            URLQueryItem(name: "long", value: String(longitude)),
+        ])
+    }
+
     /// The nearest fountains, by distance.
     func nearby(latitude: Double, longitude: Double, quantity: Int = 10) async throws -> [FontSummary] {
         try await get("/fonts/near", query: [
