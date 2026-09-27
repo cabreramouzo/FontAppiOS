@@ -1,5 +1,6 @@
 import Foundation
 import MapKit
+import MapLibre
 import Observation
 
 /// A zone saved on the phone for use without signal.
@@ -9,10 +10,13 @@ nonisolated struct OfflineZone: Codable, Identifiable, Equatable, Sendable {
     let savedAt: Date
     let minLat: Double, maxLat: Double, minLong: Double, maxLong: Double
     var fonts: [FontSummary]
-    /// Map tiles saved with it, if any: which layer and which tiles.
+    /// Map saved with it, if any: which layer, and the size of its MapLibre offline pack
+    /// (the pack is found by this zone's id in its context).
     var tileLayer: MapLayer.RawValue?
+    /// Tiles saved by builds before MapLibre; kept only so old zones still decode.
     var tiles: [TileKey]
     var tileBytes: Int
+    var tileResources: Int? = nil
     /// Photo paths (as the API gives them) saved as files.
     var photos: [String]
     var photoBytes: Int
@@ -52,9 +56,12 @@ final class OfflineZones {
     static let photoKB = 489
     static func tileKB(_ layer: MapLayer) -> Int {
         switch layer {
-        case .icgc: 150
-        case .mtn, .pnoa: 22
-        default: 30
+        case .icgc: 75
+        case .world: 60
+        case .ignBase: 21
+        case .mtn: 13
+        case .pnoa: 20
+        case .openTopo: 30
         }
     }
 
@@ -62,17 +69,36 @@ final class OfflineZones {
     static let maxTiles = 2500
     static let extraZoomLevels = 2
 
+    /// What step two would download: the zoom on screen and two more.
+    struct TilePlan: Equatable {
+        /// MapLibre zoom levels (512 px), as the offline pack takes them.
+        let fromZoom: Int
+        let toZoom: Int
+        let tiles: Int
+        var estimatedBytes: Int
+    }
+
+    /// Vector tiles stop at the source's own maximum (MapLibre overzooms past it, which is
+    /// why vector zones are so light); raster ones are 256 px, one level deeper per zoom.
+    static func tilePlan(box: MapBox, zoom: Double, layer: MapLayer) -> TilePlan {
+        let first = max(0, Int(zoom.rounded(.down)))
+        let last = first + extraZoomLevels
+        let levels: [Int] = layer.isVector
+            ? Array(Set((first...last).map { min($0, layer.maxSourceZoom) })).sorted()
+            : Array(Set((first...last).map { min($0 + 1, layer.maxSourceZoom) })).sorted()
+        let count = levels.reduce(0) { $0 + TileKey.covering(box, zoom: $1).count }
+        return TilePlan(fromZoom: first, toZoom: last, tiles: count, estimatedBytes: count * tileKB(layer) * 1024)
+    }
+
     private(set) var zones: [OfflineZone] = []
 
     @ObservationIgnored private let directory: URL
     @ObservationIgnored private let api: APIClient
-    @ObservationIgnored private let tiles: TileStore
 
-    init(directory: URL? = nil, api: APIClient = .shared, tiles: TileStore = .shared) {
+    init(directory: URL? = nil, api: APIClient = .shared) {
         self.directory = directory
             ?? URL.applicationSupportDirectory.appending(path: "OfflineZones", directoryHint: .isDirectory)
         self.api = api
-        self.tiles = tiles
         try? FileManager.default.createDirectory(at: self.directory, withIntermediateDirectories: true)
         zones = (try? Data(contentsOf: indexURL)).flatMap { try? JSONDecoder().decode([OfflineZone].self, from: $0) } ?? []
     }
@@ -113,38 +139,56 @@ final class OfflineZones {
         return zone
     }
 
-    /// The tiles step two would download: this zoom and two more, capped.
-    static func tilePlan(box: MapBox, zoom: Double, layer: MapLayer) -> [TileKey] {
-        let first = max(0, min(Int(zoom.rounded(.down)), layer.maxZoom))
-        let last = min(first + extraZoomLevels, layer.maxZoom)
-        return (first...last).flatMap { TileKey.covering(box, zoom: $0) }
-    }
+    enum PackError: Error { case failed }
 
-    func saveTiles(_ plan: [TileKey], layer: MapLayer, for zoneID: UUID,
-                   progress: @escaping (Int) -> Void) async throws {
-        guard plan.count <= Self.maxTiles else { throw SaveError.tooMany }
-        var bytes = 0
-        var done = 0
-        // A few at a time: fast enough, and gentle with a free server.
-        try await withThrowingTaskGroup(of: Int.self) { group in
-            var iterator = plan.makeIterator()
-            for _ in 0..<6 {
-                guard let tile = iterator.next() else { break }
-                group.addTask { [tiles] in try await tiles.pin(layer: layer, z: tile.z, x: tile.x, y: tile.y) }
+    /// Downloads the zone's map as a MapLibre offline pack: tiles, and for vector styles
+    /// the fonts and icons too, so it draws complete without signal. `progress` is 0…1.
+    func saveTiles(_ plan: TilePlan, layer: MapLayer, for zoneID: UUID,
+                   progress: @escaping (Double) -> Void) async throws {
+        guard plan.tiles <= Self.maxTiles else { throw SaveError.tooMany }
+        guard let zone = zones.first(where: { $0.id == zoneID }) else { return }
+        let bounds = MLNCoordinateBounds(sw: CLLocationCoordinate2D(latitude: zone.minLat, longitude: zone.minLong),
+                                         ne: CLLocationCoordinate2D(latitude: zone.maxLat, longitude: zone.maxLong))
+        let region = MLNTilePyramidOfflineRegion(styleURL: layer.styleURL, bounds: bounds,
+                                                 fromZoomLevel: Double(plan.fromZoom), toZoomLevel: Double(plan.toZoom))
+        let context = Data(zoneID.uuidString.utf8)
+        let pack: MLNOfflinePack = try await withCheckedThrowingContinuation { continuation in
+            MLNOfflineStorage.shared.addPack(for: region, withContext: context) { pack, error in
+                if let pack { continuation.resume(returning: pack) } else { continuation.resume(throwing: error ?? PackError.failed) }
             }
-            while let size = try await group.next() {
-                bytes += size
-                done += 1
-                progress(done)
-                if let tile = iterator.next() {
-                    group.addTask { [tiles] in try await tiles.pin(layer: layer, z: tile.z, x: tile.x, y: tile.y) }
+        }
+        pack.resume()
+        let result: MLNOfflinePackProgress = try await withCheckedThrowingContinuation { continuation in
+            var observers: [any NSObjectProtocol] = []
+            var finished = false
+            func finish(_ outcome: Result<MLNOfflinePackProgress, any Error>) {
+                guard !finished else { return }
+                finished = true
+                observers.forEach(NotificationCenter.default.removeObserver)
+                continuation.resume(with: outcome)
+            }
+            observers.append(NotificationCenter.default.addObserver(
+                forName: .MLNOfflinePackProgressChanged, object: pack, queue: .main) { _ in
+                MainActor.assumeIsolated {
+                    let p = pack.progress
+                    if p.countOfResourcesExpected > 0 {
+                        progress(Double(p.countOfResourcesCompleted) / Double(p.countOfResourcesExpected))
+                    }
+                    if pack.state == .complete { finish(.success(p)) }
                 }
-            }
+            })
+            observers.append(NotificationCenter.default.addObserver(
+                forName: .MLNOfflinePackError, object: pack, queue: .main) { _ in
+                MainActor.assumeIsolated {
+                    pack.suspend()
+                    finish(.failure(PackError.failed))
+                }
+            })
         }
         update(zoneID) {
             $0.tileLayer = layer.rawValue
-            $0.tiles = plan
-            $0.tileBytes = bytes
+            $0.tileBytes = Int(result.countOfBytesCompleted)
+            $0.tileResources = Int(result.countOfResourcesCompleted)
         }
     }
 
@@ -175,9 +219,12 @@ final class OfflineZones {
         guard let zone = zones.first(where: { $0.id == zoneID }) else { return }
         zones.removeAll { $0.id == zoneID }
         save()
-        if let raw = zone.tileLayer, let layer = MapLayer(rawValue: raw) {
-            let stillUsed = Set(zones.filter { $0.tileLayer == raw }.flatMap(\.tiles))
-            await tiles.unpin(layer: layer, tiles: zone.tiles.filter { !stillUsed.contains($0) })
+        // MapLibre shares tiles between packs and frees only what no pack uses.
+        let context = Data(zoneID.uuidString.utf8)
+        for pack in MLNOfflineStorage.shared.packs ?? [] where pack.context == context {
+            await withCheckedContinuation { continuation in
+                MLNOfflineStorage.shared.removePack(pack) { _ in continuation.resume() }
+            }
         }
         let photosUsed = Set(zones.flatMap(\.photos))
         for path in zone.photos where !photosUsed.contains(path) {

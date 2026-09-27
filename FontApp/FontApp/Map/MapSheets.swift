@@ -1,3 +1,4 @@
+import MapLibre
 import SwiftUI
 
 /// Choosing the base map. A grid of cards, as in Apple Maps' own layer picker.
@@ -52,23 +53,42 @@ private struct LayerCard: View {
     }
 }
 
-/// A real tile of the layer, over Moià, so the choice is made by looking and not by name.
+/// A real render of the layer over Moià, so the choice is made by looking and not by
+/// name. MapLibre's snapshotter draws the style without showing a map.
 private struct LayerPreview: View {
     let layer: MapLayer
+    @State private var image: UIImage?
 
     var body: some View {
-        if let url = layer.tileURL(z: 14, x: 8286, y: 6060) {
-            AsyncImage(url: url) { image in
-                image.resizable().scaledToFill()
-            } placeholder: {
-                Color(.tertiarySystemFill)
-            }
-        } else {
-            ZStack {
-                Color(layer == .appleSatellite ? .systemGreen : .systemTeal).opacity(0.25)
-                Image(systemName: layer.systemImage).font(.largeTitle).foregroundStyle(.secondary)
+        ZStack {
+            Color(.tertiarySystemFill)
+            if let image {
+                Image(uiImage: image).resizable().scaledToFill()
+            } else {
+                ProgressView()
             }
         }
+        .task(id: layer) { image = await Self.snapshot(layer) }
+    }
+
+    @MainActor private static var cache: [MapLayer: UIImage] = [:]
+    @MainActor private static var running: [MapLayer: MLNMapSnapshotter] = [:]
+
+    @MainActor private static func snapshot(_ layer: MapLayer) async -> UIImage? {
+        if let cached = cache[layer] { return cached }
+        let camera = MLNMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 41.8105, longitude: 2.0977),
+                                  altitude: 0, pitch: 0, heading: 0)
+        let options = MLNMapSnapshotOptions(styleURL: layer.styleURL, camera: camera, size: CGSize(width: 180, height: 110))
+        options.zoomLevel = 14.5
+        let snapshotter = MLNMapSnapshotter(options: options)
+        // The snapshotter must stay alive until it answers.
+        running[layer] = snapshotter
+        let image: UIImage? = await withCheckedContinuation { continuation in
+            snapshotter.start { snapshot, _ in continuation.resume(returning: snapshot?.image) }
+        }
+        running[layer] = nil
+        if let image { cache[layer] = image }
+        return image
     }
 }
 

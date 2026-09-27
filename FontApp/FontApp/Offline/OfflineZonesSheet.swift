@@ -14,7 +14,7 @@ struct OfflineZonesSheet: View {
     enum Step: Equatable {
         case idle
         case savingFountains
-        case savingTiles(done: Int, of: Int)
+        case savingTiles(fraction: Double, of: Int)
         case savingPhotos(done: Int, of: Int)
         case failed(String)
     }
@@ -74,10 +74,10 @@ struct OfflineZonesSheet: View {
     @ViewBuilder private func tilesRow(for zone: OfflineZone) -> some View {
         let layer = controller.layer
         if zone.tileLayer != nil {
-            Label(L10n.t("zonaOff.tilesSaved", ["n": zone.tiles.count, "mb": megabytes(zone.tileBytes)]),
+            Label(L10n.t("zonaOff.tilesSaved", ["n": zone.tileResources ?? zone.tiles.count, "mb": megabytes(zone.tileBytes)]),
                   systemImage: "map.fill")
-        } else if case .savingTiles(let done, let total) = step {
-            ProgressView(value: Double(done), total: Double(total)) {
+        } else if case .savingTiles(let fraction, let total) = step {
+            ProgressView(value: fraction) {
                 Text(L10n.t("zonaOff.savingTiles", ["n": total]))
             }
         } else if !layer.canSaveOffline {
@@ -86,14 +86,13 @@ struct OfflineZonesSheet: View {
                 .font(.footnote).foregroundStyle(.secondary)
         } else if let box = zone.box {
             let plan = OfflineZones.tilePlan(box: box, zoom: controller.zoom, layer: layer)
-            if plan.count > OfflineZones.maxTiles {
+            if plan.tiles > OfflineZones.maxTiles {
                 Text(L10n.t("ios.offline.tooManyTiles")).font(.footnote).foregroundStyle(.secondary)
             } else {
                 Button {
                     saveTiles(plan, layer: layer, zone: zone)
                 } label: {
-                    Label(L10n.t("zonaOff.saveTiles", ["n": plan.count,
-                                                      "mb": megabytes(plan.count * OfflineZones.tileKB(layer) * 1024)]),
+                    Label(L10n.t("zonaOff.saveTiles", ["n": plan.tiles, "mb": megabytes(plan.estimatedBytes)]),
                           systemImage: "map")
                         .frame(minHeight: 44, alignment: .leading)
                 }
@@ -146,12 +145,12 @@ struct OfflineZonesSheet: View {
         }
     }
 
-    private func saveTiles(_ plan: [TileKey], layer: MapLayer, zone: OfflineZone) {
-        step = .savingTiles(done: 0, of: plan.count)
+    private func saveTiles(_ plan: OfflineZones.TilePlan, layer: MapLayer, zone: OfflineZone) {
+        step = .savingTiles(fraction: 0, of: plan.tiles)
         Task {
             do {
                 try await zones.saveTiles(plan, layer: layer, for: zone.id) { done in
-                    Task { @MainActor in step = .savingTiles(done: done, of: plan.count) }
+                    step = .savingTiles(fraction: done, of: plan.tiles)
                 }
                 step = .idle
             } catch {
@@ -199,7 +198,7 @@ private struct ZoneRow: View {
 
     private var details: String {
         var parts = [L10n.t("zonaOff.saved", ["n": zone.fonts.count])]
-        if !zone.tiles.isEmpty, let raw = zone.tileLayer, let layer = MapLayer(rawValue: raw) {
+        if let raw = zone.tileLayer, let layer = MapLayer(rawValue: raw) {
             parts.append("\(L10n.t(layer.labelKey)) · \(megabytes(zone.tileBytes)) MB")
         }
         if !zone.photos.isEmpty { parts.append("\(zone.photos.count) 📷") }

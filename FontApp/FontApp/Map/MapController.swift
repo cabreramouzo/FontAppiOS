@@ -1,11 +1,12 @@
 import MapKit
+import MapLibre
 import Observation
 
-/// Lets the SwiftUI controls act on the `MKMapView` (zoom to a result, read the visible
-/// box, host the system tracking and compass buttons) without the view owning them.
+/// Lets the SwiftUI controls act on the map (zoom to a result, read the visible box,
+/// follow the user) without the view owning them.
 @Observable
 final class MapController {
-    @ObservationIgnored weak var mapView: MKMapView?
+    @ObservationIgnored weak var mapView: MLNMapView?
 
     /// The layer on screen. Remembered between launches.
     var layer: MapLayer = MapLayer.saved {
@@ -13,53 +14,74 @@ final class MapController {
     }
 
     /// Mirrors the map's tracking mode, for the location button's icon.
-    var trackingMode: MKUserTrackingMode = .none
+    var trackingMode: MLNUserTrackingMode = .none
+
+    func attach(_ map: MLNMapView) {
+        mapView = map
+    }
 
     /// The location button: not following → follow → follow with heading → not following.
     func cycleTracking() {
         guard let map = mapView else { return }
-        let next: MKUserTrackingMode = switch map.userTrackingMode {
+        let next: MLNUserTrackingMode = switch map.userTrackingMode {
         case .none: .follow
         case .follow: .followWithHeading
         default: .none
         }
-        map.setUserTrackingMode(next, animated: true)
-    }
-
-    /// Bumped when the map view exists, so views that host system buttons for it rebuild.
-    private(set) var generation = 0
-
-    func attach(_ map: MKMapView) {
-        mapView = map
-        generation += 1
+        map.setUserTrackingMode(next, animated: true, completionHandler: nil)
     }
 
     var visibleBox: MapBox? {
         guard let map = mapView else { return nil }
-        return MapBox(region: map.region)
+        return MapBox(bounds: map.visibleCoordinateBounds)
     }
 
-    /// The web's zoom level of what is on screen (256 px tiles).
-    var zoom: Double {
-        guard let map = mapView, map.bounds.width > 0 else { return 0 }
-        let degreesPerPoint = map.region.span.longitudeDelta / Double(map.bounds.width)
-        return log2(360 / (degreesPerPoint * 256))
-    }
+    /// MapLibre's zoom: the web's (256 px tiles) minus one, since its tiles are 512 px.
+    var zoom: Double { mapView?.zoomLevel ?? 0 }
 
     /// Centres a point. `aboveSheet`: a half-height sheet is about to cover the bottom, so
     /// the point goes in the middle of what stays visible.
     func show(_ coordinate: CLLocationCoordinate2D, meters: Double = 600, aboveSheet: Bool = false) {
-        guard let map = mapView else { return }
-        map.setUserTrackingMode(.none, animated: false)
         let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: meters, longitudinalMeters: meters)
-        let bottom = aboveSheet ? map.bounds.height * 0.5 : 0
-        map.setVisibleMapRect(MKMapRect(region), edgePadding: UIEdgeInsets(top: 60, left: 20, bottom: bottom, right: 20),
-                              animated: true)
+        show(MLNCoordinateBounds(region), aboveSheet: aboveSheet)
     }
 
-    func show(_ rect: MKMapRect) {
-        guard let map = mapView, !rect.isNull else { return }
-        map.setUserTrackingMode(.none, animated: false)
-        map.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 80, left: 40, bottom: 120, right: 40), animated: true)
+    func show(_ rect: MKMapRect, aboveSheet: Bool = false) {
+        guard !rect.isNull else { return }
+        show(MLNCoordinateBounds(MKCoordinateRegion(rect)), aboveSheet: aboveSheet)
+    }
+
+    func show(_ bounds: MLNCoordinateBounds, aboveSheet: Bool = false) {
+        guard let map = mapView else { return }
+        map.setUserTrackingMode(.none, animated: false, completionHandler: nil)
+        let bottom = aboveSheet ? map.bounds.height * 0.5 : 120
+        map.setVisibleCoordinateBounds(bounds, edgePadding: UIEdgeInsets(top: 80, left: 30, bottom: bottom, right: 70),
+                                       animated: true, completionHandler: nil)
+    }
+}
+
+extension MLNCoordinateBounds {
+    nonisolated init(_ region: MKCoordinateRegion) {
+        self.init(sw: CLLocationCoordinate2D(latitude: region.center.latitude - region.span.latitudeDelta / 2,
+                                             longitude: region.center.longitude - region.span.longitudeDelta / 2),
+                  ne: CLLocationCoordinate2D(latitude: region.center.latitude + region.span.latitudeDelta / 2,
+                                             longitude: region.center.longitude + region.span.longitudeDelta / 2))
+    }
+}
+
+extension MapBox {
+    nonisolated init?(bounds: MLNCoordinateBounds) {
+        self.init(minLat: bounds.sw.latitude, maxLat: bounds.ne.latitude,
+                  minLong: bounds.sw.longitude, maxLong: bounds.ne.longitude)
+    }
+}
+
+extension MKCoordinateRegion {
+    /// The region a map shows, for code that speaks MapKit (the reload throttle, MapBox).
+    nonisolated init(_ bounds: MLNCoordinateBounds) {
+        self.init(center: CLLocationCoordinate2D(latitude: (bounds.sw.latitude + bounds.ne.latitude) / 2,
+                                                 longitude: (bounds.sw.longitude + bounds.ne.longitude) / 2),
+                  span: MKCoordinateSpan(latitudeDelta: bounds.ne.latitude - bounds.sw.latitude,
+                                         longitudeDelta: bounds.ne.longitude - bounds.sw.longitude))
     }
 }

@@ -635,9 +635,11 @@ struct OfflineZoneTests {
     @Test func theMapPlanIsThisZoomAndTwoMore() throws {
         let box = try #require(MapBox(minLat: 41.80, maxLat: 41.82, minLong: 2.09, maxLong: 2.11))
         let plan = OfflineZones.tilePlan(box: box, zoom: 15.4, layer: .icgc)
-        #expect(Set(plan.map(\.z)) == [15, 16, 17])
-        // Never past what the layer serves.
-        #expect(Set(OfflineZones.tilePlan(box: box, zoom: 17.2, layer: .icgc).map(\.z)) == [17, 18])
+        #expect(plan.fromZoom == 15 && plan.toZoom == 17)
+        // Vector sources overzoom: asking for deeper detail reuses the source's tiles.
+        let deeper = OfflineZones.tilePlan(box: box, zoom: 17.2, layer: .icgc)
+        #expect(deeper.fromZoom == 17 && deeper.toZoom == 19)
+        #expect(deeper.tiles == plan.tiles)
     }
 }
 

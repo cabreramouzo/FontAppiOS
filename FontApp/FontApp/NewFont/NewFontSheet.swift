@@ -1,4 +1,5 @@
 import MapKit
+import MapLibre
 import PhotosUI
 import SwiftUI
 
@@ -205,25 +206,21 @@ struct NewFontSheet: View {
 
 /// A small map with a pin fixed at its centre: moving the map moves the position. Same
 /// base map as the main one, so the ICGC or IGN detail used to find the spot is there.
-private struct PlacementMap: UIViewRepresentable {
+struct PlacementMap: UIViewRepresentable {
     @Binding var pin: CLLocationCoordinate2D
     let layer: MapLayer
 
     func makeCoordinator() -> Coordinator { Coordinator(pin: $pin) }
 
-    func makeUIView(context: Context) -> MKMapView {
-        let map = MKMapView()
+    func makeUIView(context: Context) -> MLNMapView {
+        let map = MLNMapView(frame: .zero, styleURL: layer.styleURL)
         map.delegate = context.coordinator
         map.showsUserLocation = true
-        map.pointOfInterestFilter = .excludingAll
-        map.isRotateEnabled = false
-        map.isPitchEnabled = false
-        if let template = layer.tileTemplate, !template.isEmpty {
-            map.addOverlay(LayerTileOverlay(layer: layer), level: .aboveLabels)
-        } else if layer == .appleSatellite {
-            map.preferredConfiguration = MKHybridMapConfiguration()
-        }
-        map.setRegion(MKCoordinateRegion(center: pin, latitudinalMeters: 250, longitudinalMeters: 250), animated: false)
+        map.allowsRotating = false
+        map.allowsTilting = false
+        map.logoView.isHidden = true
+        map.attributionButton.isHidden = true
+        map.setCenter(pin, zoomLevel: 17, animated: false)
         let marker = UIImageView(image: UIImage(systemName: "mappin",
                                                 withConfiguration: UIImage.SymbolConfiguration(pointSize: 34, weight: .bold)))
         marker.tintColor = UIColor(Color.staff)
@@ -238,7 +235,7 @@ private struct PlacementMap: UIViewRepresentable {
         return map
     }
 
-    func updateUIView(_ map: MKMapView, context: Context) {
+    func updateUIView(_ map: MLNMapView, context: Context) {
         // The photo's GPS button moves the pin from outside.
         let current = map.centerCoordinate
         if abs(current.latitude - pin.latitude) > 1e-6 || abs(current.longitude - pin.longitude) > 1e-6 {
@@ -246,18 +243,13 @@ private struct PlacementMap: UIViewRepresentable {
         }
     }
 
-    final class Coordinator: NSObject, MKMapViewDelegate {
+    final class Coordinator: NSObject, MLNMapViewDelegate {
         let pin: Binding<CLLocationCoordinate2D>
 
         init(pin: Binding<CLLocationCoordinate2D>) { self.pin = pin }
 
-        func mapView(_ map: MKMapView, regionDidChangeAnimated animated: Bool) {
+        func mapView(_ map: MLNMapView, regionDidChangeAnimated animated: Bool) {
             pin.wrappedValue = map.centerCoordinate
-        }
-
-        func mapView(_ map: MKMapView, rendererFor overlay: any MKOverlay) -> MKOverlayRenderer {
-            if let tiles = overlay as? MKTileOverlay { return MKTileOverlayRenderer(tileOverlay: tiles) }
-            return MKOverlayRenderer(overlay: overlay)
         }
     }
 }

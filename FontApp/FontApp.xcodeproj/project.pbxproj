@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		04A1B2C3D4E5F60718293A4D /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = 04A1B2C3D4E5F60718293A4C /* MapLibre */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		044F28873068858A00D0EF7B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04A1B2C3D4E5F60718293A4D /* MapLibre in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = FontApp;
 			packageProductDependencies = (
+				04A1B2C3D4E5F60718293A4C /* MapLibre */,
 			);
 			productName = FontApp;
 			productReference = 044F28773068858800D0EF7B /* FontApp.app */;
@@ -202,6 +208,9 @@
 			);
 			mainGroup = 044F286E3068858800D0EF7B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				04A1B2C3D4E5F60718293A4B /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 044F28783068858800D0EF7B /* Products */;
 			projectDirPath = "";
@@ -583,6 +592,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		04A1B2C3D4E5F60718293A4B /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/maplibre/maplibre-gl-native-distribution";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.31.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		04A1B2C3D4E5F60718293A4C /* MapLibre */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04A1B2C3D4E5F60718293A4B /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
+			productName = MapLibre;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 044F286F3068858800D0EF7B /* Project object */;
 }

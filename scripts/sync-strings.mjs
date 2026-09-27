@@ -73,9 +73,13 @@ const IOS_ONLY = {
     ca: 'Pujant la foto…', es: 'Subiendo la foto…', gl: 'Subindo a foto…', eu: 'Argazkia igotzen…',
     en: 'Uploading the photo…', fr: 'Envoi de la photo…', pt: 'A enviar a fotografia…', it: 'Caricamento della foto…',
   },
-  'ios.layer.apple': {
-    ca: 'Mapa d’Apple', es: 'Mapa de Apple', gl: 'Mapa de Apple', eu: 'Apple mapa',
-    en: 'Apple map', fr: 'Plan Apple', pt: 'Mapa da Apple', it: 'Mappa Apple',
+  'ios.layer.world': {
+    ca: 'Mapa (OpenStreetMap)', es: 'Mapa (OpenStreetMap)', gl: 'Mapa (OpenStreetMap)', eu: 'Mapa (OpenStreetMap)',
+    en: 'Map (OpenStreetMap)', fr: 'Carte (OpenStreetMap)', pt: 'Mapa (OpenStreetMap)', it: 'Mappa (OpenStreetMap)',
+  },
+  'ios.layer.ignBase': {
+    ca: 'Mapa base IGN (ES)', es: 'Mapa base IGN (ES)', gl: 'Mapa base IGN (ES)', eu: 'IGN oinarrizko mapa (ES)',
+    en: 'IGN base map (ES)', fr: 'Carte de base IGN (ES)', pt: 'Mapa base IGN (ES)', it: 'Mappa di base IGN (ES)',
   },
   'ios.filters.clear': {
     ca: 'Treu els filtres', es: 'Quitar filtros', gl: 'Quitar filtros', eu: 'Kendu iragazkiak',

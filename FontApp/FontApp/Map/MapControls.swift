@@ -1,4 +1,4 @@
-import MapKit
+import MapLibre
 import SwiftUI
 
 /// The buttons over the map, laid out like Apple Maps: a search capsule at the top, a
@@ -88,8 +88,8 @@ private struct ColumnButton: View {
     }
 }
 
-/// Location and compass. Location is drawn here, in glass like the rest, with MapKit's
-/// three modes; the compass is MapKit's own, which hides itself when north is up.
+/// Location, drawn in glass like the rest, with the map's three tracking modes. The
+/// compass is MapLibre's own, which hides itself when north is up.
 private struct SystemMapButtons: View {
     let controller: MapController
     @Environment(LocationService.self) private var location
@@ -111,12 +111,6 @@ private struct SystemMapButtons: View {
             .buttonStyle(.plain)
             .glassEffect(.regular.interactive(), in: Circle())
             .accessibilityLabel(L10n.t("map.recenter"))
-            MapKitButton(controller: controller, generation: controller.generation) { map in
-                let compass = MKCompassButton(mapView: map)
-                compass.compassVisibility = .adaptive
-                return compass
-            }
-            .frame(width: 48, height: 48)
         }
     }
 
@@ -126,35 +120,6 @@ private struct SystemMapButtons: View {
         case .followWithHeading: "location.north.line.fill"
         default: "location"
         }
-    }
-}
-
-private struct MapKitButton: UIViewRepresentable {
-    let controller: MapController
-    /// Rebuilds the button once the map view exists.
-    let generation: Int
-    let make: (MKMapView) -> UIView
-
-    func makeUIView(context: Context) -> UIView {
-        let container = UIView()
-        container.backgroundColor = .clear
-        install(in: container)
-        return container
-    }
-
-    func updateUIView(_ container: UIView, context: Context) {
-        if container.subviews.isEmpty { install(in: container) }
-    }
-
-    private func install(in container: UIView) {
-        guard let map = controller.mapView else { return }
-        let button = make(map)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(button)
-        NSLayoutConstraint.activate([
-            button.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            button.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-        ])
     }
 }
 

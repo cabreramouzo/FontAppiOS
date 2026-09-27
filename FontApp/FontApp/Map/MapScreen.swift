@@ -1,4 +1,5 @@
 import MapKit
+import MapLibre
 import SwiftUI
 import UniformTypeIdentifiers
 

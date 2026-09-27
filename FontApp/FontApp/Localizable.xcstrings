@@ -20618,55 +20618,108 @@
         }
       }
     },
-    "ios.layer.apple": {
+    "ios.layer.world": {
       "extractionState": "manual",
       "localizations": {
         "ca": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mapa d’Apple"
+            "value": "Mapa (OpenStreetMap)"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mapa de Apple"
+            "value": "Mapa (OpenStreetMap)"
           }
         },
         "gl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mapa de Apple"
+            "value": "Mapa (OpenStreetMap)"
           }
         },
         "eu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple mapa"
+            "value": "Mapa (OpenStreetMap)"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple map"
+            "value": "Map (OpenStreetMap)"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Plan Apple"
+            "value": "Carte (OpenStreetMap)"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mapa da Apple"
+            "value": "Mapa (OpenStreetMap)"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mappa Apple"
+            "value": "Mappa (OpenStreetMap)"
+          }
+        }
+      }
+    },
+    "ios.layer.ignBase": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa base IGN (ES)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa base IGN (ES)"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa base IGN (ES)"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IGN oinarrizko mapa (ES)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IGN base map (ES)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Carte de base IGN (ES)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa base IGN (ES)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mappa di base IGN (ES)"
           }
         }
       }
