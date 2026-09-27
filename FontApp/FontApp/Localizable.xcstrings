@@ -14364,6 +14364,1013 @@
         }
       }
     },
+    "zonaOff.delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esborra la zona desada"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar la zona guardada"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar a zona gardada"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ezabatu gordetako eremua"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete the saved area"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer la zone enregistrée"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apagar a zona guardada"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimina la zona salvata"
+          }
+        }
+      }
+    },
+    "zonaOff.empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En aquesta zona no hi ha cap font. Allunya el mapa i torna-ho a provar."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En esta zona no hay ninguna fuente. Aleja el mapa e inténtalo otra vez."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nesta zona non hai ningunha fonte. Afasta o mapa e téntao de novo."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eremu honetan ez dago iturririk. Urrundu mapa eta saiatu berriro."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "There are no fountains in this area. Zoom out and try again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il n’y a aucun point d’eau dans cette zone. Dézoomez et réessayez."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nesta zona não há nenhuma fonte. Afasta o mapa e tenta outra vez."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In questa zona non c’è nessuna fontana. Allontana la mappa e riprova."
+          }
+        }
+      }
+    },
+    "zonaOff.failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No s’han pogut desar. Comprova la connexió."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se han podido guardar. Comprueba la conexión."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non se puideron gardar. Comproba a conexión."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ezin izan dira gorde. Egiaztatu konexioa."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not save. Check your connection."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement impossible. Vérifiez la connexion."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível guardar. Verifica a ligação."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile salvare. Controlla la connessione."
+          }
+        }
+      }
+    },
+    "zonaOff.intro": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desa les fonts de la zona que estàs mirant per poder-les consultar sense cobertura."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guarda las fuentes de la zona que estás mirando para poder consultarlas sin cobertura."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garda as fontes da zona que estás a mirar para poder consultalas sen cobertura."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gorde begiratzen ari zaren eremuko iturriak, estaldurarik gabe kontsultatu ahal izateko."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save the fountains in the area you are looking at so you can check them with no signal."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrez les points d’eau de la zone affichée pour les consulter sans réseau."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guarda as fontes da zona que estás a ver para as poderes consultar sem rede."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva le fontane della zona che stai guardando per poterle consultare senza campo."
+          }
+        }
+      }
+    },
+    "zonaOff.note": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es desen les fonts sempre; les fotos i el mapa, si les demanes. Del mapa es desa el que estàs veient i dos nivells de zoom més: si t’allunyes molt o t’acostes massa, les caselles poden sortir en blanc."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las fuentes se guardan siempre; las fotos y el mapa, si los pides. Del mapa se guarda lo que estás viendo y dos niveles de zoom más: si te alejas mucho o te acercas demasiado, las casillas pueden salir en blanco."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As fontes gárdanse sempre; as fotos e o mapa, se os pides. Do mapa gárdase o que estás vendo e dous niveis de zoom máis: se te afastas moito ou te achegas de máis, as casas poden saír en branco."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iturriak beti gordetzen dira; argazkiak eta mapa, eskatzen badituzu. Mapatik ikusten ari zarena eta bi zoom maila gehiago gordetzen dira: asko urrunduz gero edo gehiegi hurbilduz gero, laukiak zuri ager daitezke."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The fountains are always saved; photos and the map only if you ask. Of the map it saves what you are looking at plus two zoom levels: zoom far out or far in and tiles may come out blank."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les points d’eau sont toujours enregistrés ; les photos et la carte seulement si vous le demandez. De la carte, ce que vous voyez et deux niveaux de zoom de plus : en vous éloignant beaucoup ou en zoomant trop, les tuiles peuvent rester blanches."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As fontes guardam-se sempre; as fotos e o mapa, se os pedires. Do mapa guarda-se o que estás a ver e mais dois níveis de zoom: se te afastares muito ou aproximares demasiado, os quadrados podem ficar em branco."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fontane si salvano sempre; foto e mappa solo se le chiedi. Della mappa si salva quello che stai guardando e due livelli di zoom in più: allontanandoti molto o avvicinandoti troppo, i riquadri possono restare bianchi."
+          }
+        }
+      }
+    },
+    "zonaOff.photosFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No s’han pogut desar les fotos. Comprova la connexió."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se han podido guardar las fotos. Comprueba la conexión."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non se puideron gardar as fotos. Comproba a conexión."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ezin izan dira argazkiak gorde. Egiaztatu konexioa."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The photos could not be saved. Check your connection."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les photos n’ont pas pu être enregistrées. Vérifiez la connexion."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível guardar as fotos. Verifica a ligação."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile salvare le foto. Controlla la connessione."
+          }
+        }
+      }
+    },
+    "zonaOff.photosSaved": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fotos desades · {mb} MB"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fotos guardadas · {mb} MB"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fotos gardadas · {mb} MB"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} argazki gordeta · {mb} MB"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} photos saved · {mb} MB"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} photos enregistrées · {mb} Mo"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fotos guardadas · {mb} MB"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} foto salvate · {mb} MB"
+          }
+        }
+      }
+    },
+    "zonaOff.photosSavedNoSize": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fotos desades"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fotos guardadas"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fotos gardadas"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} argazki gordeta"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} photos saved"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} photos enregistrées"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fotos guardadas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} foto salvate"
+          }
+        }
+      }
+    },
+    "zonaOff.replace": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desa aquesta zona (substitueix)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar esta zona (sustituye)"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gardar esta zona (substitúe)"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gorde eremu hau (ordezkatu)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save this area (replaces)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer cette zone (remplace)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar esta zona (substitui)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva questa zona (sostituisce)"
+          }
+        }
+      }
+    },
+    "zonaOff.save": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desa aquesta zona"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar esta zona"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gardar esta zona"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gorde eremu hau"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save this area"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer cette zone"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar esta zona"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva questa zona"
+          }
+        }
+      }
+    },
+    "zonaOff.savePhotos": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desa també les {n} fotos (uns {mb} MB)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar también las {n} fotos (unos {mb} MB)"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gardar tamén as {n} fotos (uns {mb} MB)"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gorde {n} argazkiak ere ({mb} MB inguru)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save the {n} photos too (about {mb} MB)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer aussi les {n} photos (environ {mb} Mo)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar também as {n} fotos (cerca de {mb} MB)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva anche le {n} foto (circa {mb} MB)"
+          }
+        }
+      }
+    },
+    "zonaOff.saveTiles": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desa també el mapa ({n} caselles, uns {mb} MB)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar también el mapa ({n} casillas, unos {mb} MB)"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gardar tamén o mapa ({n} casas, uns {mb} MB)"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gorde mapa ere ({n} lauki, {mb} MB inguru)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save the map too ({n} tiles, about {mb} MB)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer aussi la carte ({n} tuiles, environ {mb} Mo)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar também o mapa ({n} quadrados, cerca de {mb} MB)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva anche la mappa ({n} riquadri, circa {mb} MB)"
+          }
+        }
+      }
+    },
+    "zonaOff.saved": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fonts desades"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fuentes guardadas"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fontes gardadas"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} iturri gordeta"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fountains saved"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} points d’eau enregistrés"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fontes guardadas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} fontane salvate"
+          }
+        }
+      }
+    },
+    "zonaOff.saving": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desant…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardando…"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gardando…"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gordetzen…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A guardar…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvataggio…"
+          }
+        }
+      }
+    },
+    "zonaOff.savingPhotos": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desant {n} fotos…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardando {n} fotos…"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gardando {n} fotos…"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} argazki gordetzen…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving {n} photos…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement de {n} photos…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A guardar {n} fotos…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvataggio di {n} foto…"
+          }
+        }
+      }
+    },
+    "zonaOff.savingTiles": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desant {n} caselles del mapa…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardando {n} casillas del mapa…"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gardando {n} casas do mapa…"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maparen {n} lauki gordetzen…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving {n} map tiles…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement de {n} tuiles…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A guardar {n} quadrados do mapa…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvataggio di {n} riquadri…"
+          }
+        }
+      }
+    },
+    "zonaOff.tilesFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No s’ha pogut desar el mapa. Amb cobertura, torna-ho a provar."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido guardar el mapa. Con cobertura, inténtalo otra vez."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non se puido gardar o mapa. Con cobertura, téntao de novo."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ezin izan da mapa gorde. Estaldura duzunean, saiatu berriro."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The map could not be saved. Try again when you have signal."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La carte n’a pas pu être enregistrée. Réessayez avec du réseau."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível guardar o mapa. Com rede, tenta outra vez."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile salvare la mappa. Riprova quando hai campo."
+          }
+        }
+      }
+    },
+    "zonaOff.tilesSaved": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa desat: {n} caselles ({mb} MB)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa guardado: {n} casillas ({mb} MB)"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa gardado: {n} casas ({mb} MB)"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa gordeta: {n} lauki ({mb} MB)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Map saved: {n} tiles ({mb} MB)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Carte enregistrée : {n} tuiles ({mb} Mo)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa guardado: {n} quadrados ({mb} MB)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mappa salvata: {n} riquadri ({mb} MB)"
+          }
+        }
+      }
+    },
+    "zonaOff.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sense cobertura"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin cobertura"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sen cobertura"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estaldurarik gabe"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No signal"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sans réseau"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem rede"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senza campo"
+          }
+        }
+      }
+    },
     "zones.title": {
       "extractionState": "manual",
       "localizations": {
@@ -14996,6 +16003,218 @@
           "stringUnit": {
             "state": "translated",
             "value": "Luoghi"
+          }
+        }
+      }
+    },
+    "ios.offline.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sense cobertura"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin cobertura"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sen cobertura"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estaldurarik gabe"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hors ligne"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem rede"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senza copertura"
+          }
+        }
+      }
+    },
+    "ios.offline.saved": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zones desades"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zonas guardadas"
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zonas gardadas"
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gordetako eremuak"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved zones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zones enregistrées"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zonas guardadas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zone salvate"
+          }
+        }
+      }
+    },
+    "ios.offline.layerCannot": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El mapa «{layer}» no es pot desar. Tria ICGC o IGN a Capes per endur-te el mapa."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El mapa «{layer}» no se puede guardar. Elige ICGC o IGN en Capas para llevarte el mapa."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O mapa «{layer}» non se pode gardar. Escolle ICGC ou IGN en Capas para levar o mapa."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«{layer}» mapa ezin da gorde. Aukeratu ICGC edo IGN Geruzetan mapa eramateko."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The “{layer}” map can’t be saved. Choose ICGC or IGN in Layers to take the map with you."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La carte « {layer} » ne peut pas être enregistrée. Choisis ICGC ou IGN dans Calques pour emporter la carte."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O mapa «{layer}» não pode ser guardado. Escolhe ICGC ou IGN em Camadas para levares o mapa."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La mappa «{layer}» non si può salvare. Scegli ICGC o IGN in Livelli per portare con te la mappa."
+          }
+        }
+      }
+    },
+    "ios.offline.tooManyTiles": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La zona és massa gran per desar-ne el mapa. Apropa’t una mica i torna-ho a provar."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La zona es demasiado grande para guardar el mapa. Acércate un poco y vuelve a intentarlo."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A zona é grande de máis para gardar o mapa. Achégate un pouco e téntao de novo."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eremua handiegia da mapa gordetzeko. Hurbildu pixka bat eta saiatu berriro."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The zone is too big to save its map. Zoom in a little and try again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La zone est trop grande pour enregistrer la carte. Rapproche-toi un peu et réessaie."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A zona é demasiado grande para guardar o mapa. Aproxima-te um pouco e tenta de novo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La zona è troppo grande per salvare la mappa. Avvicinati un po’ e riprova."
           }
         }
       }

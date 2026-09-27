@@ -10,7 +10,7 @@ struct MapScreen: View {
     @State private var sheet: MapSheet?
 
     private enum MapSheet: String, Identifiable {
-        case layers, filters, search
+        case layers, filters, search, offline
         var id: String { rawValue }
     }
     @State private var selected: FontSummary?
@@ -36,6 +36,7 @@ struct MapScreen: View {
         .overlay(alignment: .topTrailing) {
             MapControlColumn(controller: controller, activeFilters: filters.activeCount,
                              onLayers: { sheet = .layers }, onFilters: { sheet = .filters },
+                             onOffline: { sheet = .offline },
                              staff: session.isStaff)
                 .padding(.trailing, 12)
                 .padding(.top, 8)
@@ -54,6 +55,8 @@ struct MapScreen: View {
                 LayersSheet(controller: controller).presentationDetents([.medium, .large])
             case .filters:
                 FiltersSheet(filters: $filters).presentationDetents([.medium, .large])
+            case .offline:
+                OfflineZonesSheet(controller: controller).presentationDetents([.medium, .large])
             case .search:
                 SearchScreen(
                     onFountain: { font in

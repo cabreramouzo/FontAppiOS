@@ -586,3 +586,31 @@ struct MapControlsTests {
         #expect(L10n.plain("map.addFont", bundle: es) == "Añadir fuente")
     }
 }
+
+struct OfflineZoneTests {
+    private func font(_ lat: Double, _ lon: Double) -> FontSummary {
+        FontSummary(id: UUID(), name: nil, latitude: lat, longitude: lon, image: nil, description: nil, source: nil,
+                    drinkable: nil, country: nil, region: nil, createdAt: nil, lastWaterStatus: nil, lastUpdate: nil,
+                    latestConfirmations: nil, recentStatusReporters: nil, recentStatusConflict: nil)
+    }
+
+    @Test func aZoneAnswersOnlyForWhatItCovers() throws {
+        let inside = font(41.81, 2.10)
+        let zone = OfflineZone(id: UUID(), name: "Moià", savedAt: .now, minLat: 41.80, maxLat: 41.82,
+                               minLong: 2.09, maxLong: 2.11, fonts: [inside], tileLayer: nil, tiles: [],
+                               tileBytes: 0, photos: [], photoBytes: 0)
+        let view = try #require(MapBox(minLat: 41.805, maxLat: 41.815, minLong: 2.095, maxLong: 2.105))
+        #expect(zone.fonts(in: view) == [inside])
+        // Far away: nothing, rather than fountains 900 km off sorted as if they were near.
+        let cadiz = try #require(MapBox(minLat: 36.5, maxLat: 36.6, minLong: -6.3, maxLong: -6.2))
+        #expect(zone.fonts(in: cadiz).isEmpty)
+    }
+
+    @Test func theMapPlanIsThisZoomAndTwoMore() throws {
+        let box = try #require(MapBox(minLat: 41.80, maxLat: 41.82, minLong: 2.09, maxLong: 2.11))
+        let plan = OfflineZones.tilePlan(box: box, zoom: 15.4, layer: .icgc)
+        #expect(Set(plan.map(\.z)) == [15, 16, 17])
+        // Never past what the layer serves.
+        #expect(Set(OfflineZones.tilePlan(box: box, zoom: 17.2, layer: .icgc).map(\.z)) == [17, 18])
+    }
+}

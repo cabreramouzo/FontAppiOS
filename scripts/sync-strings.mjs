@@ -19,7 +19,7 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
 const PREFIXES = ['layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
-  'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.']
+  'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.']
 const KEYS = [
   'font.unnamed', 'nav.map', 'nav.profile', 'zones.title', 'review.anon',
   'report.resolved', 'report.resolvedBy',
@@ -90,6 +90,34 @@ const IOS_ONLY = {
   },
   'ios.search.places': {
     ca: 'Llocs', es: 'Lugares', gl: 'Lugares', eu: 'Lekuak', en: 'Places', fr: 'Lieux', pt: 'Locais', it: 'Luoghi',
+  },
+  'ios.offline.title': {
+    ca: 'Sense cobertura', es: 'Sin cobertura', gl: 'Sen cobertura', eu: 'Estaldurarik gabe',
+    en: 'Offline', fr: 'Hors ligne', pt: 'Sem rede', it: 'Senza copertura',
+  },
+  'ios.offline.saved': {
+    ca: 'Zones desades', es: 'Zonas guardadas', gl: 'Zonas gardadas', eu: 'Gordetako eremuak',
+    en: 'Saved zones', fr: 'Zones enregistrées', pt: 'Zonas guardadas', it: 'Zone salvate',
+  },
+  'ios.offline.layerCannot': {
+    ca: 'El mapa «{layer}» no es pot desar. Tria ICGC o IGN a Capes per endur-te el mapa.',
+    es: 'El mapa «{layer}» no se puede guardar. Elige ICGC o IGN en Capas para llevarte el mapa.',
+    gl: 'O mapa «{layer}» non se pode gardar. Escolle ICGC ou IGN en Capas para levar o mapa.',
+    eu: '«{layer}» mapa ezin da gorde. Aukeratu ICGC edo IGN Geruzetan mapa eramateko.',
+    en: 'The “{layer}” map can’t be saved. Choose ICGC or IGN in Layers to take the map with you.',
+    fr: 'La carte « {layer} » ne peut pas être enregistrée. Choisis ICGC ou IGN dans Calques pour emporter la carte.',
+    pt: 'O mapa «{layer}» não pode ser guardado. Escolhe ICGC ou IGN em Camadas para levares o mapa.',
+    it: 'La mappa «{layer}» non si può salvare. Scegli ICGC o IGN in Livelli per portare con te la mappa.',
+  },
+  'ios.offline.tooManyTiles': {
+    ca: 'La zona és massa gran per desar-ne el mapa. Apropa’t una mica i torna-ho a provar.',
+    es: 'La zona es demasiado grande para guardar el mapa. Acércate un poco y vuelve a intentarlo.',
+    gl: 'A zona é grande de máis para gardar o mapa. Achégate un pouco e téntao de novo.',
+    eu: 'Eremua handiegia da mapa gordetzeko. Hurbildu pixka bat eta saiatu berriro.',
+    en: 'The zone is too big to save its map. Zoom in a little and try again.',
+    fr: 'La zone est trop grande pour enregistrer la carte. Rapproche-toi un peu et réessaie.',
+    pt: 'A zona é demasiado grande para guardar o mapa. Aproxima-te um pouco e tenta de novo.',
+    it: 'La zona è troppo grande per salvare la mappa. Avvicinati un po’ e riprova.',
   },
   // Apple draws the base map and credits it; the fountains come from these sources.
   'ios.dataAttribution': {

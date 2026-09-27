@@ -24,6 +24,7 @@ struct FontAppApp: App {
                 .environment(location)
                 .environment(session)
                 .environment(outbox)
+                .environment(OfflineZones.shared)
                 .task { await session.refresh() }
                 .onChange(of: session.userID) { _, userID in
                     outbox.sessionChanged(to: userID)

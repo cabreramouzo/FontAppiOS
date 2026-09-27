@@ -61,6 +61,11 @@ struct FontDetailView: View {
                 // adding a photo still work — they go to the outbox.
                 Section {
                     Label(offlineNote, systemImage: "wifi.slash")
+                    if OfflineZones.shared.font(font.id) != nil {
+                        // Without this, a page with no reviews looks like a fountain nobody
+                        // ever checked, which is the opposite of what is known.
+                        Text(L10n.t("offline.fromZone")).font(.footnote).foregroundStyle(.secondary)
+                    }
                     Button(L10n.t("activity.retry")) { Task { await model.load() } }
                         .frame(minHeight: 44)
                 }
@@ -78,7 +83,9 @@ struct FontDetailView: View {
                              onCamera: { showsCamera = true })
             } else {
                 Section {
-                    PhotoView(url: APIClient.shared.imageURL(font.image))
+                    // A photo saved with an offline zone is read from the phone.
+                    PhotoView(url: OfflineZones.shared.photoFile(for: font.image)
+                                ?? APIClient.shared.imageURL(font.image))
                         .listRowInsets(EdgeInsets())
                 }
             }
@@ -216,9 +223,18 @@ private struct PhotoView: View {
     var body: some View {
         if let url {
             AsyncImage(url: url) { phase in
-                if let image = phase.image {
+                switch phase {
+                case .success(let image):
                     image.resizable().scaledToFill()
-                } else {
+                case .failure:
+                    // Without signal and not saved, or a format iOS cannot draw: say so
+                    // instead of spinning for ever.
+                    Color(.secondarySystemFill).overlay {
+                        Label(L10n.t("photo.failed"), systemImage: "photo.badge.exclamationmark")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                default:
                     Color(.secondarySystemFill).overlay { ProgressView() }
                 }
             }

@@ -25,6 +25,9 @@ final class SessionStore {
             api.credentials.set(token)
             hasToken = true
             userID = UserDefaults.standard.string(forKey: userKey).flatMap(UUID.init(uuidString:))
+            // The last known account, so name and staff colours are there without signal.
+            user = UserDefaults.standard.data(forKey: accountKey)
+                .flatMap { try? JSONDecoder().decode(UserResponse.self, from: $0) }
         }
         observer = NotificationCenter.default.addObserver(
             forName: Credentials.rejected, object: nil, queue: .main
@@ -50,11 +53,13 @@ final class SessionStore {
     }
 
     private var userKey: String { "session.userID.\(keychain.account)" }
+    private var accountKey: String { "session.account.\(keychain.account)" }
 
     private func setUser(_ user: UserResponse) {
         self.user = user
         userID = user.id
         UserDefaults.standard.set(user.id.uuidString, forKey: userKey)
+        UserDefaults.standard.set(try? JSONEncoder().encode(user), forKey: accountKey)
     }
 
     /// Revokes the token on the server when possible, and forgets it here in any case:
@@ -77,5 +82,6 @@ final class SessionStore {
         user = nil
         userID = nil
         UserDefaults.standard.removeObject(forKey: userKey)
+        UserDefaults.standard.removeObject(forKey: accountKey)
     }
 }

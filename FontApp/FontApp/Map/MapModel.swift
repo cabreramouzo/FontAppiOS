@@ -15,6 +15,7 @@ final class MapModel {
     private(set) var errorMessage: String?
 
     @ObservationIgnored private let api: APIClient
+    @ObservationIgnored private let zones: OfflineZones
     @ObservationIgnored private let log = Logger(subsystem: "net.fontapp.FontApp", category: "map")
     @ObservationIgnored private var throttle = ReloadThrottle()
     @ObservationIgnored private var loadTask: Task<Void, Never>?
@@ -23,8 +24,9 @@ final class MapModel {
     @ObservationIgnored private var lastSpan: MKCoordinateSpan?
     @ObservationIgnored private var lastRequested: (box: MapBox, width: Int, height: Int)?
 
-    init(api: APIClient = .shared) {
+    init(api: APIClient = .shared, zones: OfflineZones = .shared) {
         self.api = api
+        self.zones = zones
     }
 
     /// Called when the map stops moving.
@@ -100,6 +102,14 @@ final class MapModel {
                     self.schedule(at: until) { $0.load(box: box, width: width, height: height) }
                 } else {
                     self.errorMessage = ErrorText.describe(error)
+                    // Without signal, a saved zone that covers this view shows its
+                    // fountains; without one, what was on screen stays (an emptied map
+                    // reads as "no fountains here").
+                    let saved = self.zones.fonts(in: box)
+                    if !saved.isEmpty {
+                        self.fonts = saved
+                        self.clusters = []
+                    }
                 }
             }
         }

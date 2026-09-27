@@ -45,4 +45,5 @@ struct ComingSoonView: View {
         .environment(LocationService())
         .environment(SessionStore())
         .environment(Outbox.shared)
+        .environment(OfflineZones.shared)
 }

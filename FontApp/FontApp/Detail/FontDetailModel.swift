@@ -31,7 +31,8 @@ final class FontDetailModel {
     init(fontID: UUID, summary: FontSummary? = nil, api: APIClient = .shared) {
         self.fontID = fontID
         self.api = api
-        fallback = summary.map(FontDetail.init(summary:))
+        // Opened from a list, not a pin: a saved zone may still know the fountain.
+        fallback = (summary ?? OfflineZones.shared.font(fontID)).map(FontDetail.init(summary:))
     }
 
     /// The fountain on screen, fully loaded or from the summary.

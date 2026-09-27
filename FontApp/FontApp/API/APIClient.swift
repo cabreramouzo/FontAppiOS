@@ -107,6 +107,12 @@ nonisolated struct APIClient: Sendable {
         return try await get("/activity", query: query)
     }
 
+    /// Every fountain in a box, as summaries (at most 3,000; the map's legacy endpoint).
+    /// For offline zones, where clusters would be of no use.
+    func fontsInBounds(_ box: MapBox) async throws -> [FontSummary] {
+        try await get("/fonts/in-bounds", query: box.queryItems)
+    }
+
     /// Fountains by name. The server requires a term and, for the public, caps the pages.
     func searchFonts(_ term: String, per: Int = 20) async throws -> [FontSummary] {
         struct Page: Decodable { let items: [FontSummary] }
