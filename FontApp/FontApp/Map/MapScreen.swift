@@ -1,5 +1,6 @@
 import MapKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct MapScreen: View {
     @Environment(LocationService.self) private var location
@@ -8,9 +9,13 @@ struct MapScreen: View {
     @State private var controller = MapController()
     @State private var filters = MapFilters()
     @State private var sheet: MapSheet?
+    @State private var route: RouteModel?
+    @State private var importsGPX = false
+    @State private var exported: SharedFile?
+    @State private var gpxMessage: String?
 
     private enum MapSheet: String, Identifiable {
-        case layers, filters, search, offline
+        case layers, filters, search, offline, route
         var id: String { rawValue }
     }
     @State private var selected: FontSummary?
@@ -30,13 +35,16 @@ struct MapScreen: View {
                 model.mapDidMove(region: region, size: size, following: following)
             },
             onSelect: { selected = $0 },
-            controller: controller
+            controller: controller,
+            route: route?.coordinates ?? []
         )
         .ignoresSafeArea(edges: [.top, .bottom])
         .overlay(alignment: .topTrailing) {
             MapControlColumn(controller: controller, activeFilters: filters.activeCount,
                              onLayers: { sheet = .layers }, onFilters: { sheet = .filters },
                              onOffline: { sheet = .offline },
+                             onImportGPX: { if route == nil { importsGPX = true } else { sheet = .route } },
+                             onExportGPX: exportVisibleFountains,
                              staff: session.isStaff)
                 .padding(.trailing, 12)
                 .padding(.top, 8)
@@ -55,6 +63,17 @@ struct MapScreen: View {
                 LayersSheet(controller: controller).presentationDetents([.medium, .large])
             case .filters:
                 FiltersSheet(filters: $filters).presentationDetents([.medium, .large])
+            case .route:
+                if let route {
+                    RouteSheet(route: route,
+                               onShow: { font in
+                                   controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                                   meters: 400, aboveSheet: true)
+                                   selected = font
+                               },
+                               onForget: { self.route = nil })
+                        .presentationDetents([.medium, .large])
+                }
             case .offline:
                 OfflineZonesSheet(controller: controller).presentationDetents([.medium, .large])
             case .search:
@@ -67,6 +86,18 @@ struct MapScreen: View {
                     onPlace: { controller.show($0) }
                 )
             }
+        }
+        .fileImporter(isPresented: $importsGPX,
+                      allowedContentTypes: [.gpx, .xml]) { result in
+            openGPX(result)
+        }
+        .sheet(item: $exported) { ActivityView(items: [$0.url]) }
+        .alert(gpxMessage ?? "", isPresented: Binding(get: { gpxMessage != nil }, set: { if !$0 { gpxMessage = nil } })) {
+            Button("OK", role: .cancel) {}
+        }
+        // A .gpx shared from another app (Wikiloc, Mail, AirDrop) opens here.
+        .onOpenURL { url in
+            if url.isFileURL { openGPX(.success(url)) }
         }
         .onAppear(perform: locateOnce)
         .onChange(of: location.isAuthorized) { locateOnce() }
@@ -82,6 +113,53 @@ struct MapScreen: View {
             }
             .presentationDetents([.medium, .large])
             .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+        }
+    }
+
+    /// Reads the GPX on the phone; the file itself is never sent anywhere.
+    private func openGPX(_ result: Result<URL, any Error>) {
+        guard case .success(let url) = result else { return }
+        let access = url.startAccessingSecurityScopedResource()
+        defer { if access { url.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: url) else {
+            gpxMessage = L10n.t("gpxIn.failed")
+            return
+        }
+        let points = GPX.read(data)
+        guard points.count >= 2 else {
+            gpxMessage = L10n.t("gpxIn.notATrack")
+            return
+        }
+        let model = RouteModel(name: url.deletingPathExtension().lastPathComponent, points: points)
+        route = model
+        sheet = .route
+        Task { await model.load() }
+    }
+
+    /// The fountains in view as waypoints for a GPS unit. At most 500, the ones nearest the
+    /// centre when there are more, and it says so.
+    private func exportVisibleFountains() {
+        guard let box = controller.visibleBox else { return }
+        Task {
+            let fonts: [FontSummary]
+            do {
+                fonts = try await APIClient.shared.fontsInBounds(box)
+            } catch {
+                fonts = OfflineZones.shared.fonts(in: box)
+            }
+            guard !fonts.isEmpty else {
+                gpxMessage = L10n.t("gpx.empty")
+                return
+            }
+            let chosen = GPX.nearestToCentre(fonts, of: box)
+            let text = GPX.build(chosen.map {
+                GPX.Waypoint(latitude: $0.latitude, longitude: $0.longitude, name: L10n.fontName($0.name),
+                             description: GPX.description(of: $0))
+            })
+            if fonts.count > chosen.count {
+                gpxMessage = L10n.t("gpx.doneCapped", ["n": chosen.count, "total": fonts.count])
+            }
+            exported = SharedFile.write(text, name: GPX.fileName())
         }
     }
 
@@ -135,4 +213,8 @@ private extension View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
     }
+}
+
+extension UTType {
+    static let gpx = UTType(importedAs: "com.topografix.gpx", conformingTo: .xml)
 }

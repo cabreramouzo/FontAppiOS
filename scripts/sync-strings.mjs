@@ -19,7 +19,7 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
 const PREFIXES = ['layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
-  'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.']
+  'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.', 'gpx.', 'gpxIn.']
 const KEYS = [
   'font.unnamed', 'nav.map', 'nav.profile', 'zones.title', 'review.anon',
   'report.resolved', 'report.resolvedBy',
@@ -118,6 +118,27 @@ const IOS_ONLY = {
     fr: 'La zone est trop grande pour enregistrer la carte. Rapproche-toi un peu et réessaie.',
     pt: 'A zona é demasiado grande para guardar o mapa. Aproxima-te um pouco e tenta de novo.',
     it: 'La zona è troppo grande per salvare la mappa. Avvicinati un po’ e riprova.',
+  },
+  'ios.gpx.import': {
+    ca: 'Aigua a la meva ruta (GPX)', es: 'Agua en mi ruta (GPX)', gl: 'Auga na miña ruta (GPX)',
+    eu: 'Ura nire ibilbidean (GPX)', en: 'Water on my route (GPX)', fr: 'De l’eau sur mon itinéraire (GPX)',
+    pt: 'Água no meu percurso (GPX)', it: 'Acqua sul mio percorso (GPX)',
+  },
+  'ios.gpx.export': {
+    ca: 'Baixa les fonts d’aquí en GPX', es: 'Descargar las fuentes de aquí en GPX', gl: 'Descargar as fontes de aquí en GPX',
+    eu: 'Deskargatu hemengo iturriak GPXn', en: 'Download the fountains here as GPX',
+    fr: 'Télécharger les fontaines d’ici en GPX', pt: 'Descarregar as fontes daqui em GPX',
+    it: 'Scarica le fontane di qui in GPX',
+  },
+  'ios.gpx.privacy': {
+    ca: 'El fitxer es llegeix al mòbil i no en surt. Al servidor només se li demanen les fonts de la zona.',
+    es: 'El fichero se lee en el móvil y no sale de él. Al servidor solo se le piden las fuentes de la zona.',
+    gl: 'O ficheiro lese no móbil e non sae del. Ao servidor só se lle piden as fontes da zona.',
+    eu: 'Fitxategia mugikorrean irakurtzen da eta ez da handik ateratzen. Zerbitzariari eremuko iturriak baino ez zaizkio eskatzen.',
+    en: 'The file is read on the phone and never leaves it. Only the fountains of the area are asked of the server.',
+    fr: 'Le fichier est lu sur le téléphone et n’en sort pas. On ne demande au serveur que les fontaines de la zone.',
+    pt: 'O ficheiro é lido no telemóvel e não sai dele. Ao servidor só se pedem as fontes da zona.',
+    it: 'Il file viene letto sul telefono e non ne esce. Al server si chiedono solo le fontane della zona.',
   },
   // Apple draws the base map and credits it; the fountains come from these sources.
   'ios.dataAttribution': {

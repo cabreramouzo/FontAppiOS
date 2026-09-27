@@ -2,24 +2,29 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(Outbox.self) private var outbox
+    @State private var tab = AppTab.map
+
+    enum AppTab: Hashable { case map, news, zones, me }
 
     var body: some View {
-        TabView {
-            Tab(L10n.t("nav.map"), systemImage: "map") {
+        TabView(selection: $tab) {
+            Tab(L10n.t("nav.map"), systemImage: "map", value: AppTab.map) {
                 MapScreen()
             }
-            Tab(L10n.t("news.title"), systemImage: "newspaper") {
+            Tab(L10n.t("news.title"), systemImage: "newspaper", value: AppTab.news) {
                 NewsScreen()
             }
-            Tab(L10n.t("zones.title"), systemImage: "globe.europe.africa") {
+            Tab(L10n.t("zones.title"), systemImage: "globe.europe.africa", value: AppTab.zones) {
                 ComingSoonView(title: L10n.t("zones.title"), systemImage: "globe.europe.africa")
             }
             // The count of contributions still on the phone, where they can be seen and sent.
-            Tab(L10n.t("nav.profile"), systemImage: "person.crop.circle") {
+            Tab(L10n.t("nav.profile"), systemImage: "person.crop.circle", value: AppTab.me) {
                 MeScreen()
             }
             .badge(outbox.items.count)
         }
+        // A GPX opened from another app is a route to show on the map.
+        .onOpenURL { url in if url.isFileURL { tab = .map } }
     }
 }
 

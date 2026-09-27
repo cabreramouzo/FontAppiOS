@@ -614,3 +614,71 @@ struct OfflineZoneTests {
         #expect(Set(OfflineZones.tilePlan(box: box, zoom: 17.2, layer: .icgc).map(\.z)) == [17, 18])
     }
 }
+
+struct GPXTests {
+    private func font(_ lat: Double, _ lon: Double, name: String? = nil) -> FontSummary {
+        FontSummary(id: UUID(), name: name, latitude: lat, longitude: lon, image: nil, description: nil, source: nil,
+                    drinkable: nil, country: nil, region: nil, createdAt: nil, lastWaterStatus: nil, lastUpdate: nil,
+                    latestConfirmations: nil, recentStatusReporters: nil, recentStatusConflict: nil)
+    }
+
+    @Test func readsTracksAndRoutesButNotLooseWaypoints() {
+        let xml = """
+        <?xml version="1.0"?><gpx xmlns="http://www.topografix.com/GPX/1/1">
+        <wpt lat="10" lon="-30"><name>home</name></wpt>
+        <trk><trkseg><trkpt lat="41.80" lon="2.10"><ele>700.5</ele></trkpt><trkpt lat="41.81" lon="2.10"/></trkseg></trk>
+        <rte><rtept lat="41.82" lon="2.10"></rtept></rte>
+        <trk><trkseg><trkpt lat="95" lon="2.10"/></trkseg></trk>
+        </gpx>
+        """
+        let points = GPX.read(Data(xml.utf8))
+        #expect(points.map(\.latitude) == [41.80, 41.81, 41.82])
+        #expect(points.first?.elevation == 700.5)
+        #expect(points[1].elevation == nil)
+    }
+
+    @Test func aFountainBesideTheRouteIsFoundByLongitude() throws {
+        // A north-south route; the fountain is 200 m EAST, so only the cosine of the
+        // latitude gets the distance right (at 41.8° a degree of longitude is ~83 km).
+        let route = [GPX.Point(latitude: 41.80, longitude: 2.10, elevation: nil),
+                     GPX.Point(latitude: 41.84, longitude: 2.10, elevation: nil)]
+        let east200 = font(41.82, 2.10 + 200 / 83_000)
+        let east400 = font(41.82, 2.10 + 400 / 83_000)
+        let found = GPX.fountains([east400, east200], along: route, corridor: 250)
+        #expect(found.map(\.font.id) == [east200.id])
+        let hit = try #require(found.first)
+        #expect((180...220).contains(hit.detour))
+        #expect(abs(hit.km - 2.22) < 0.05)
+    }
+
+    @Test func theBoxIsWidenedByDefault() throws {
+        // A straight east-west route has a box of zero height without the margin.
+        let route = [GPX.Point(latitude: 41.8, longitude: 2.0, elevation: nil),
+                     GPX.Point(latitude: 41.8, longitude: 2.1, elevation: nil)]
+        let box = try #require(GPX.box(of: route))
+        #expect(box.maxLat - box.minLat > 0.017)
+    }
+
+    @Test func driestCountsBothEnds() {
+        #expect(GPX.driest(fountainKms: [3, 4], lengthKm: 10) == GPX.DryStretch(fromKm: 4, toKm: 10))
+        #expect(GPX.driest(fountainKms: [6, 7], lengthKm: 8) == GPX.DryStretch(fromKm: 0, toKm: 6))
+        #expect(GPX.driest(fountainKms: [], lengthKm: 5) == GPX.DryStretch(fromKm: 0, toKm: 5))
+    }
+
+    @Test func writingEscapesWhatWouldBreakTheFile() {
+        let gpx = GPX.build([GPX.Waypoint(latitude: 41.8, longitude: 2.1, name: "Font d'en Pep & <Co>\u{0001}",
+                                          description: nil)])
+        #expect(gpx.contains("<name>Font d&apos;en Pep &amp; &lt;Co&gt;</name>"))
+        #expect(gpx.contains("<sym>Drinking Water</sym>"))
+        #expect(gpx.contains("lat=\"41.8000000\""))
+        let many = (0..<600).map { GPX.Waypoint(latitude: 0, longitude: Double($0) / 1000, name: "x", description: nil) }
+        #expect(GPX.build(many).components(separatedBy: "<wpt ").count - 1 == GPX.maxWaypoints)
+    }
+
+    @Test func simplifyingKeepsBothEnds() {
+        let points = (0...100).map { GPX.Point(latitude: 41.8 + Double($0) * 0.00001, longitude: 2.1, elevation: nil) }
+        let simple = GPX.simplified(points)
+        #expect(simple.first == points.first && simple.last == points.last)
+        #expect(simple.count < 10)
+    }
+}

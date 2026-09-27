@@ -36,8 +36,10 @@ struct MapControlColumn: View {
                             Button(L10n.t("ios.gpx.import"), systemImage: "square.and.arrow.down", action: onImportGPX)
                             Button(L10n.t("ios.gpx.export"), systemImage: "square.and.arrow.up", action: onExportGPX)
                         } label: {
-                            Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
-                                .font(.system(size: 18, weight: .medium))
+                            // Letters, not an icon: whoever carries a GPS unit on the
+                            // handlebars reads "GPX" at once (web decision, see CLAUDE.md).
+                            Text("GPX")
+                                .font(.system(size: 13, weight: .bold, design: .rounded))
                                 .frame(width: 48, height: 48)
                                 .contentShape(Rectangle())
                         }

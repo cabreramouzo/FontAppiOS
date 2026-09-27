@@ -38,6 +38,8 @@ struct FontMapView: UIViewRepresentable {
     let onMove: (MKCoordinateRegion, CGSize, Bool) -> Void
     let onSelect: (FontSummary) -> Void
     let controller: MapController
+    /// An imported GPX route, drawn over the map.
+    var route: [CLLocationCoordinate2D] = []
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
@@ -61,6 +63,7 @@ struct FontMapView: UIViewRepresentable {
         coordinator.parent = self
         map.showsUserLocation = showsUser
         coordinator.apply(controller.layer, to: map)
+        coordinator.show(route: route, on: map)
         if coordinator.followRequest != followRequest {
             coordinator.followRequest = followRequest
             if showsUser { coordinator.startFollowing(map) }
@@ -83,6 +86,8 @@ struct FontMapView: UIViewRepresentable {
         private var serverClusters: [MapCluster] = []
         private var shownLayer: MapLayer?
         private var tileOverlay: LayerTileOverlay?
+        private var routeLine: MKPolyline?
+        private var routeCount = 0
 
         init(_ parent: FontMapView) {
             self.parent = parent
@@ -110,6 +115,24 @@ struct FontMapView: UIViewRepresentable {
                 tileOverlay = overlay
                 map.addOverlay(overlay, level: .aboveLabels)
             }
+            // The route goes on top of whatever base map was just added.
+            if let routeLine {
+                map.removeOverlay(routeLine)
+                map.addOverlay(routeLine, level: .aboveLabels)
+            }
+        }
+
+        func show(route: [CLLocationCoordinate2D], on map: MKMapView) {
+            guard route.count != routeCount else { return }
+            routeCount = route.count
+            if let routeLine { map.removeOverlay(routeLine) }
+            routeLine = nil
+            guard route.count >= 2 else { return }
+            let line = MKPolyline(coordinates: route, count: route.count)
+            routeLine = line
+            map.addOverlay(line, level: .aboveLabels)
+            map.setVisibleMapRect(line.boundingMapRect,
+                                  edgePadding: UIEdgeInsets(top: 110, left: 30, bottom: map.bounds.height * 0.5, right: 70), animated: true)
         }
 
         func mapView(_ map: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
@@ -118,6 +141,14 @@ struct FontMapView: UIViewRepresentable {
 
         func mapView(_ map: MKMapView, rendererFor overlay: any MKOverlay) -> MKOverlayRenderer {
             if let tiles = overlay as? MKTileOverlay { return MKTileOverlayRenderer(tileOverlay: tiles) }
+            if let line = overlay as? MKPolyline {
+                let renderer = MKPolylineRenderer(polyline: line)
+                renderer.strokeColor = UIColor(Color(hex: 0xE11D48))
+                renderer.lineWidth = 5
+                renderer.lineCap = .round
+                renderer.lineJoin = .round
+                return renderer
+            }
             return MKOverlayRenderer(overlay: overlay)
         }
 
