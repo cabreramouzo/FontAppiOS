@@ -15,6 +15,9 @@ struct MapScreen: View {
     @State private var exported: SharedFile?
     @State private var gpxMessage: String?
     @State private var showsSignIn = false
+    /// "+" was tapped signed out: once signed in, the form opens by itself, which is
+    /// what was asked for, instead of leaving the person back on the map.
+    @State private var addAfterSignIn = false
     @State private var toast: String?
 
     private enum MapSheet: Identifiable {
@@ -92,7 +95,14 @@ struct MapScreen: View {
                     .transition(.opacity)
             }
         }
-        .sheet(isPresented: $showsSignIn) { SignInView() }
+        .sheet(isPresented: $showsSignIn, onDismiss: {
+            if addAfterSignIn, session.isSignedIn {
+                addAfterSignIn = false
+                startNewFont()
+            } else {
+                addAfterSignIn = false
+            }
+        }) { SignInView() }
         .sheet(item: $sheet) { which in
             switch which {
             case .layers:
@@ -185,6 +195,7 @@ struct MapScreen: View {
     /// "+" on the map. Without a session there is nothing to add yet: sign in first.
     private func startNewFont() {
         guard session.isSignedIn else {
+            addAfterSignIn = true
             showsSignIn = true
             return
         }

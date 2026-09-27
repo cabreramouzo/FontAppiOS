@@ -23,3 +23,17 @@ curl -X POST http://127.0.0.1:8080/users -H 'Content-Type: application/json' \
 ```
 
 Sign-ups are limited to 5 an hour per IP (429), also locally.
+
+## On a real iPhone
+
+A Debug build asks `127.0.0.1`, which on a phone is the phone itself: signing in fails
+with "No connection to the server" and the login stays on screen. The login sheet shows
+the server it uses (Debug builds only) for that reason. To test on a phone:
+
+1. Start the backend on the network, not only on loopback:
+   `swift run App serve --hostname 0.0.0.0` (in FontAppBE).
+2. In Xcode, Edit Scheme → Run → Arguments, add `-FontAppAPI http://<Mac's LAN IP>:8080`
+   (System Settings → Wi-Fi → Details shows the IP). Phone and Mac on the same Wi-Fi.
+3. iOS asks for local network access the first time; allow it.
+
+Don't point a Debug build at production to test writes: reviews and photos would be real.

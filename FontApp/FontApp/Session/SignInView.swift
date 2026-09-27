@@ -30,7 +30,16 @@ struct SignInView: View {
                         .submitLabel(.go)
                         .onSubmit(submit)
                 } footer: {
-                    Text(L10n.t("login.userOrEmailHint"))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(L10n.t("login.userOrEmailHint"))
+                        #if DEBUG
+                        // Which backend this build signs in to. A Debug build on a phone
+                        // talks to 127.0.0.1, the phone itself: without this line that
+                        // looks like "login does nothing" (see docs/local-testing.md).
+                        Text(verbatim: "Debug · \(APIClient.shared.baseURL.absoluteString)")
+                            .font(.caption.monospaced())
+                        #endif
+                    }
                 }
                 if let error {
                     Section { Text(error).foregroundStyle(.red) }
