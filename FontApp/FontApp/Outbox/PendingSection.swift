@@ -51,10 +51,18 @@ private struct PendingRow: View {
     let item: OutboxItem
     let mine: Bool
 
+    private var kindKey: String {
+        switch item.kind {
+        case .review: "offline.itemReview"
+        case .photo: "offline.itemPhoto"
+        case .font: "offline.itemFont"
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(L10n.t(item.kind == .review ? "offline.itemReview" : "offline.itemPhoto"))
+                Text(L10n.t(kindKey))
                     .font(.subheadline.weight(.semibold))
                 if let status = WaterStatus(item.review?.waterStatus) {
                     StatusBadge(status: status).font(.caption)

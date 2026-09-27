@@ -9,6 +9,10 @@ nonisolated struct OutboxItem: Codable, Identifiable, Equatable, Sendable {
         case review
         /// The first photo of a fountain that has none.
         case photo
+        /// A new fountain, with its photo and first status if it had them. The status goes
+        /// with it, not as its own item: a review of a fountain that does not exist yet
+        /// could not be sent.
+        case font
     }
 
     let id: UUID
@@ -30,6 +34,9 @@ nonisolated struct OutboxItem: Codable, Identifiable, Equatable, Sendable {
     /// read before compressing (it cannot be read again from the stored file).
     let photoFile: String?
     let photoMeta: PhotoMeta?
+    /// For `font`.
+    var newFont: NewFont? = nil
+    var firstStatus: String? = nil
 }
 
 /// The outbox: contributions saved on the phone and sent when there is signal.
@@ -97,6 +104,19 @@ final class Outbox {
         return append(OutboxItem(id: id, kind: .photo, fontID: fontID, fontName: fontName, userID: currentUserID,
                                  queuedAt: .now, attempts: 0, needsAuth: false, review: nil,
                                  photoFile: file, photoMeta: meta))
+    }
+
+    @discardableResult
+    func enqueueFont(_ font: NewFont, firstStatus: String?, jpeg: Data?, meta: PhotoMeta?) throws -> OutboxItem {
+        let id = UUID()
+        var file: String?
+        if let jpeg {
+            file = "\(id.uuidString).jpg"
+            try jpeg.write(to: directory.appending(path: file!), options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        }
+        return append(OutboxItem(id: id, kind: .font, fontID: id, fontName: font.name, userID: currentUserID,
+                                 queuedAt: .now, attempts: 0, needsAuth: false, review: nil,
+                                 photoFile: file, photoMeta: meta, newFont: font, firstStatus: firstStatus))
     }
 
     private func append(_ item: OutboxItem) -> OutboxItem {
@@ -182,6 +202,16 @@ final class Outbox {
             // If someone put a photo meanwhile, the server says 403: dropped after a few
             // tries, which is right — replacing is not for anyone.
             try await api.setFontPhoto(item.fontID, image: url, queuedOffline: true)
+        case .font:
+            guard var font = item.newFont else { return }
+            if let jpeg = photoData(of: item) {
+                font.image = try await api.uploadImage(jpeg, meta: item.photoMeta ?? PhotoMeta())
+            }
+            let created = try await api.createFont(font, queuedOffline: true)
+            // Best effort: the fountain exists now, and must not be queued again for this.
+            if let status = item.firstStatus {
+                try? await api.postStatus(on: created.id, status, queuedOffline: true)
+            }
         }
     }
 

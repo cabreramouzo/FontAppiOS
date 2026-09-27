@@ -19,7 +19,7 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
 const PREFIXES = ['layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
-  'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.', 'gpx.', 'gpxIn.']
+  'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.', 'gpx.', 'gpxIn.', 'newFont.', 'draft.']
 const KEYS = [
   'font.unnamed', 'nav.map', 'nav.profile', 'zones.title', 'review.anon',
   'report.resolved', 'report.resolvedBy',
@@ -139,6 +139,16 @@ const IOS_ONLY = {
     fr: 'Le fichier est lu sur le téléphone et n’en sort pas. On ne demande au serveur que les fontaines de la zone.',
     pt: 'O ficheiro é lido no telemóvel e não sai dele. Ao servidor só se pedem as fontes da zona.',
     it: 'Il file viene letto sul telefono e non ne esce. Al server si chiedono solo le fontane della zona.',
+  },
+  'ios.newFont.moveMap': {
+    ca: 'Mou el mapa fins que el punt quedi damunt la font.', es: 'Mueve el mapa hasta que el punto quede sobre la fuente.',
+    gl: 'Move o mapa ata que o punto quede enriba da fonte.', eu: 'Mugitu mapa puntua iturriaren gainean geratu arte.',
+    en: 'Move the map until the pin sits on the fountain.', fr: 'Déplace la carte jusqu’à ce que le repère soit sur la fontaine.',
+    pt: 'Move o mapa até o ponto ficar sobre a fonte.', it: 'Sposta la mappa finché il segnaposto è sulla fontana.',
+  },
+  'ios.newFont.itIsDifferent': {
+    ca: 'És una altra font', es: 'Es otra fuente', gl: 'É outra fonte', eu: 'Beste iturri bat da',
+    en: 'It’s a different fountain', fr: 'C’est une autre fontaine', pt: 'É outra fonte', it: 'È un’altra fontana',
   },
   // Apple draws the base map and credits it; the fountains come from these sources.
   'ios.dataAttribution': {

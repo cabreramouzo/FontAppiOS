@@ -206,3 +206,17 @@ nonisolated struct PhotoMeta: Codable, Equatable, Sendable {
     var latitude: Double?
     var longitude: Double?
 }
+
+/// A new fountain as the app sends it (`CreateFontDTO`).
+nonisolated struct NewFont: Codable, Equatable, Sendable {
+    /// `nil` when there is no proper name: the reader's "unnamed fountain" is not a name.
+    var name: String?
+    var latitude: Double
+    var longitude: Double
+    var image: String?
+    var description: String?
+    var source: WaterSource?
+    var drinkable: Drinkable?
+    /// Explicit confirmation after being shown a fountain within 25 m.
+    var allowNearbyDuplicate: Bool?
+}

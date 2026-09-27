@@ -113,6 +113,20 @@ nonisolated struct APIClient: Sendable {
         try await get("/fonts/in-bounds", query: box.queryItems)
     }
 
+    /// The nearest fountains, by distance.
+    func nearby(latitude: Double, longitude: Double, quantity: Int = 10) async throws -> [FontSummary] {
+        try await get("/fonts/near", query: [
+            URLQueryItem(name: "lat", value: String(latitude)),
+            URLQueryItem(name: "long", value: String(longitude)),
+            URLQueryItem(name: "quantity", value: String(quantity)),
+        ])
+    }
+
+    func createFont(_ font: NewFont, queuedOffline: Bool = false) async throws -> FontDetail {
+        try await send("POST", "/fonts", body: .json(try JSONEncoder().encode(font)),
+                       queuedOffline: queuedOffline, timeout: writeTimeout)
+    }
+
     /// Fountains by name. The server requires a term and, for the public, caps the pages.
     func searchFonts(_ term: String, per: Int = 20) async throws -> [FontSummary] {
         struct Page: Decodable { let items: [FontSummary] }
@@ -143,6 +157,13 @@ nonisolated struct APIClient: Sendable {
 
     /// `queuedOffline`: it was written without signal and sent later from the outbox.
     /// The server keeps the mark for moderation; nothing else hangs from it.
+    /// A first status with no chips' intent: the fountain's own first report.
+    func postStatus(on fontID: UUID, _ status: String, queuedOffline: Bool = false) async throws {
+        let body = try JSONEncoder().encode(["waterStatus": status])
+        let _: Ignored = try await send("POST", "/fonts/\(fontID.uuidString)/comments", body: .json(body),
+                                        queuedOffline: queuedOffline, timeout: writeTimeout)
+    }
+
     func postReview(on fontID: UUID, _ review: NewReview, queuedOffline: Bool = false) async throws -> CommentResponse {
         try await send("POST", "/fonts/\(fontID.uuidString)/comments",
                        body: .json(try JSONEncoder().encode(review)), queuedOffline: queuedOffline,

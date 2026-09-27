@@ -13,10 +13,26 @@ struct MapScreen: View {
     @State private var importsGPX = false
     @State private var exported: SharedFile?
     @State private var gpxMessage: String?
+    @State private var showsSignIn = false
+    @State private var toast: String?
 
-    private enum MapSheet: String, Identifiable {
-        case layers, filters, search, offline, route
-        var id: String { rawValue }
+    private enum MapSheet: Identifiable {
+        case layers, filters, search, offline
+        case route(RouteModel)
+        /// The model travels with the case: a separate optional state is still nil in the
+        /// first render of the sheet, which then shows empty.
+        case newFont(NewFontModel)
+
+        var id: String {
+            switch self {
+            case .layers: "layers"
+            case .filters: "filters"
+            case .search: "search"
+            case .offline: "offline"
+            case .route: "route"
+            case .newFont: "newFont"
+            }
+        }
     }
     @State private var selected: FontSummary?
     @State private var followRequest = 0
@@ -43,7 +59,7 @@ struct MapScreen: View {
             MapControlColumn(controller: controller, activeFilters: filters.activeCount,
                              onLayers: { sheet = .layers }, onFilters: { sheet = .filters },
                              onOffline: { sheet = .offline },
-                             onImportGPX: { if route == nil { importsGPX = true } else { sheet = .route } },
+                             onImportGPX: { if let route { sheet = .route(route) } else { importsGPX = true } },
                              onExportGPX: exportVisibleFountains,
                              staff: session.isStaff)
                 .padding(.trailing, 12)
@@ -57,23 +73,42 @@ struct MapScreen: View {
         }
         .overlay(alignment: .top) { banner.padding(.trailing, 72).padding(.top, 56) }
         .overlay(alignment: .bottomLeading) { attribution }
+        .overlay(alignment: .bottomTrailing) {
+            AddFountainButton(staff: session.isStaff, action: startNewFont)
+                .padding(.trailing, 16)
+                .padding(.bottom, 64)
+        }
+        .overlay(alignment: .bottom) {
+            if let toast {
+                Text(toast)
+                    .font(.subheadline)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .glassEffect(.regular, in: Capsule())
+                    .padding(.bottom, 130)
+                    .transition(.opacity)
+            }
+        }
+        .sheet(isPresented: $showsSignIn) { SignInView() }
         .sheet(item: $sheet) { which in
             switch which {
             case .layers:
                 LayersSheet(controller: controller).presentationDetents([.medium, .large])
             case .filters:
                 FiltersSheet(filters: $filters).presentationDetents([.medium, .large])
-            case .route:
-                if let route {
-                    RouteSheet(route: route,
-                               onShow: { font in
-                                   controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
-                                                   meters: 400, aboveSheet: true)
-                                   selected = font
-                               },
-                               onForget: { self.route = nil })
-                        .presentationDetents([.medium, .large])
+            case .newFont(let model):
+                NewFontSheet(model: model, layer: controller.layer) { created in
+                    show(toast: L10n.t(created ? "toast.fontCreated" : "offline.savedFont"))
                 }
+            case .route(let route):
+                RouteSheet(route: route,
+                           onShow: { font in
+                               controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                               meters: 400, aboveSheet: true)
+                               selected = font
+                           },
+                           onForget: { self.route = nil })
+                    .presentationDetents([.medium, .large])
             case .offline:
                 OfflineZonesSheet(controller: controller).presentationDetents([.medium, .large])
             case .search:
@@ -116,6 +151,29 @@ struct MapScreen: View {
         }
     }
 
+    /// "+" on the map. Without a session there is nothing to add yet: sign in first.
+    private func startNewFont() {
+        guard session.isSignedIn else {
+            showsSignIn = true
+            return
+        }
+        // A half-filled form comes back as it was left, pin included.
+        let draft = NewFontDraft.load() ?? {
+            let center = controller.mapView?.centerCoordinate ?? CLLocationCoordinate2D(latitude: 41.8, longitude: 2.1)
+            let start = NewFontPlacement.start(mapCenter: center, me: location.isAuthorized ? location.location : nil)
+            return NewFontDraft(latitude: start.latitude, longitude: start.longitude)
+        }()
+        sheet = .newFont(NewFontModel(draft: draft))
+    }
+
+    private func show(toast text: String) {
+        withAnimation { toast = text }
+        Task {
+            try? await Task.sleep(for: .seconds(3))
+            withAnimation { toast = nil }
+        }
+    }
+
     /// Reads the GPX on the phone; the file itself is never sent anywhere.
     private func openGPX(_ result: Result<URL, any Error>) {
         guard case .success(let url) = result else { return }
@@ -132,7 +190,7 @@ struct MapScreen: View {
         }
         let model = RouteModel(name: url.deletingPathExtension().lastPathComponent, points: points)
         route = model
-        sheet = .route
+        sheet = .route(model)
         Task { await model.load() }
     }
 

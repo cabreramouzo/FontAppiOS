@@ -531,6 +531,32 @@ struct OutboxTests {
         #expect(box.items.map(\.kind) == [.photo])
     }
 
+    @Test func aNewFountainNearAnotherAsksAndOfflineIsQueued() async throws {
+        let defaults = UserDefaults(suiteName: "newfont-\(UUID().uuidString)")!
+        let near = #"[{"id":"00000000-0000-0000-0000-0000000000AA","name":"Font del Casal","latitude":41.81205,"longitude":2.09742}]"#
+        StubProtocol.responses = ["GET /fonts/near": (200, near), "POST /fonts": (-1, "")]
+        let box = outbox(tempDir())
+        let model = NewFontModel(draft: NewFontDraft(name: "Font de prova", status: "flowing",
+                                                     latitude: 41.81205, longitude: 2.09732),
+                                 api: StubProtocol.client(), outbox: box, defaults: defaults)
+        model.draft.name = "Font de prova "
+        #expect(NewFontDraft.load(defaults) != nil, "a half-filled form is kept")
+        await model.submit()
+        guard case .confirmDuplicate(let name, let meters) = model.state else {
+            Issue.record("expected the duplicate question, got \(model.state)"); return
+        }
+        #expect(name == "Font del Casal")
+        #expect((7...10).contains(meters))
+        await model.confirmDistinct()
+        #expect(model.state == .queued)
+        let item = try #require(box.items.first)
+        #expect(item.kind == .font)
+        #expect(item.newFont?.name == "Font de prova")
+        #expect(item.newFont?.allowNearbyDuplicate == true)
+        #expect(item.firstStatus == "flowing")
+        #expect(NewFontDraft.load(defaults) == nil, "sending removes the draft")
+    }
+
     @Test func aQueuedPhotoKeepsItsExif() async throws {
         StubProtocol.sent = []
         StubProtocol.responses = [
@@ -680,5 +706,21 @@ struct GPXTests {
         let simple = GPX.simplified(points)
         #expect(simple.first == points.first && simple.last == points.last)
         #expect(simple.count < 10)
+    }
+}
+
+struct NewFontPlacementTests {
+    let center = CLLocationCoordinate2D(latitude: 41.8105, longitude: 2.0977)
+
+    @Test func thePinStartsWhereThePersonMeans() {
+        #expect(NewFontPlacement.start(mapCenter: center, me: nil).latitude == center.latitude)
+        // Looking at their own surroundings: the pin starts at them.
+        let near = CLLocation(latitude: 41.8110, longitude: 2.0977)
+        #expect(NewFontPlacement.start(mapCenter: center, me: near).latitude == near.coordinate.latitude)
+        // Looking elsewhere: the centre of the map, not silently back home.
+        let far = CLLocation(latitude: 41.8205, longitude: 2.0977)
+        #expect(NewFontPlacement.start(mapCenter: center, me: far).latitude == center.latitude)
+        #expect(NewFontPlacement.remoteKm(pin: center, me: far).map { ($0 * 10).rounded() / 10 } == 1.1)
+        #expect(NewFontPlacement.remoteKm(pin: center, me: near) == nil)
     }
 }
