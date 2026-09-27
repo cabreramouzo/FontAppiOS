@@ -1,10 +1,12 @@
 import MapKit
 import SwiftUI
 
-/// A fountain's page: photo, status with its confidence, facts, reviews and reports.
-/// Read-only in this version.
+/// A fountain's page: status with its confidence, the quick review, directions, photo,
+/// facts, reviews and reports.
 struct FontDetailView: View {
+    @Environment(SessionStore.self) private var session
     @State private var model: FontDetailModel
+    @State private var showsSignIn = false
     /// What the caller already knows, shown while the rest loads.
     private let preview: FontSummary?
 
@@ -33,6 +35,8 @@ struct FontDetailView: View {
         .navigationTitle(L10n.fontName(loadedFont?.name ?? preview?.name))
         .navigationBarTitleDisplayMode(.inline)
         .task { await model.load() }
+        .sheet(isPresented: $showsSignIn) { SignInView() }
+        .remoteReviewAlert(model.quickReview) { await model.load() }
     }
 
     private var loadedFont: FontDetail? {
@@ -45,6 +49,10 @@ struct FontDetailView: View {
             // What decides whether to walk there comes first; at half height the sheet
             // shows the status and the way there, and the photo is one swipe away.
             statusSection(font)
+            if let quick = model.quickReview {
+                QuickReviewSection(model: quick, onChange: { await model.load() },
+                                   onSignIn: { showsSignIn = true })
+            }
             Section { directionsButton(font) }
             Section {
                 PhotoView(url: APIClient.shared.imageURL(font.image))
@@ -52,8 +60,17 @@ struct FontDetailView: View {
             }
             factsSection(font)
             if !model.reviews.isEmpty {
+                let confirmable = session.isSignedIn ? model.confirmable(by: session.user?.id) : nil
                 Section(L10n.t("detail.statusReviews")) {
-                    ForEach(model.reviews) { ReviewRow(review: $0) }
+                    ForEach(model.reviews) { review in
+                        ReviewRow(review: review)
+                        if review.id == confirmable?.id {
+                            stillTheSameButton(review)
+                        }
+                    }
+                    if let error = model.actionError {
+                        Text(error).font(.subheadline).foregroundStyle(.red)
+                    }
                 }
             }
             Section(L10n.t("detail.incidents", ["n": model.reports.count])) {
@@ -64,6 +81,20 @@ struct FontDetailView: View {
             }
         }
         .listStyle(.insetGrouped)
+    }
+
+    /// "Still the same": backs someone else's latest report instead of repeating it.
+    private func stillTheSameButton(_ review: CommentResponse) -> some View {
+        let active = review.confirmedByMe ?? false
+        return Button {
+            Task { await model.setStillTheSame(review, !active) }
+        } label: {
+            Label(L10n.t("confirm.keepSame"), systemImage: active ? "hand.thumbsup.fill" : "hand.thumbsup")
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .tint(session.isStaff ? Color.staff : .accentColor)
+        .accessibilityHint(L10n.t(active ? "confirm.titleActive" : "confirm.titleInactive"))
     }
 
     private func directionsButton(_ font: FontDetail) -> some View {

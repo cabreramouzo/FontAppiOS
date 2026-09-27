@@ -203,3 +203,135 @@ struct SessionModelTests {
         #expect(text.hasSuffix("--\(form.boundary)--\r\n"))
     }
 }
+
+struct RemoteReviewTests {
+    let fountain = CLLocationCoordinate2D(latitude: 41.8105, longitude: 2.0977)
+    let now = Date(timeIntervalSince1970: 1_800_000_000)
+
+    private func fix(km: Double, accuracy: Double, age: TimeInterval = 10) -> CLLocation {
+        // ~111 km per degree of latitude.
+        CLLocation(coordinate: .init(latitude: fountain.latitude + km / 111.2, longitude: fountain.longitude),
+                   altitude: 0, horizontalAccuracy: accuracy, verticalAccuracy: -1,
+                   timestamp: now.addingTimeInterval(-age))
+    }
+
+    @Test func farAwayIsRoundedDistance() {
+        #expect(RemoteReview.distance(from: fix(km: 1.44, accuracy: 20), to: fountain, now: now) == 1400)
+        #expect(RemoteReview.distance(from: fix(km: 12.4, accuracy: 20), to: fountain, now: now) == 12_000)
+    }
+
+    @Test func benefitOfTheDoubt() {
+        // Near, vague, stale or missing: ask nothing.
+        #expect(RemoteReview.distance(from: fix(km: 0.3, accuracy: 10), to: fountain, now: now) == nil)
+        #expect(RemoteReview.distance(from: fix(km: 1.4, accuracy: 600), to: fountain, now: now) == nil)
+        #expect(RemoteReview.distance(from: fix(km: 5, accuracy: 1500), to: fountain, now: now) == nil)
+        #expect(RemoteReview.distance(from: fix(km: 5, accuracy: 20, age: 600), to: fountain, now: now) == nil)
+        #expect(RemoteReview.distance(from: nil, to: fountain, now: now) == nil)
+    }
+
+    @Test func kmLabelInTheReadersLocale() {
+        #expect(RemoteReview.kmLabel(1400, locale: Locale(identifier: "ca_ES")) == "1,4")
+        #expect(RemoteReview.kmLabel(12_000, locale: Locale(identifier: "en_US")) == "12")
+    }
+}
+
+/// Answers requests from a table and records what was sent.
+final class StubProtocol: URLProtocol, @unchecked Sendable {
+    nonisolated(unsafe) static var responses: [String: (Int, String)] = [:]
+    nonisolated(unsafe) static var sent: [(method: String, path: String, body: Data?)] = []
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        let method = request.httpMethod ?? "GET"
+        let path = request.url?.path() ?? ""
+        var body = request.httpBody
+        if body == nil, let stream = request.httpBodyStream {
+            stream.open()
+            var data = Data()
+            var buffer = [UInt8](repeating: 0, count: 4096)
+            while stream.hasBytesAvailable {
+                let n = stream.read(&buffer, maxLength: buffer.count)
+                if n <= 0 { break }
+                data.append(buffer, count: n)
+            }
+            stream.close()
+            body = data
+        }
+        Self.sent.append((method, path, body))
+        let (status, json) = Self.responses["\(method) \(path)"] ?? (404, #"{"reason":"stub"}"#)
+        let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil)!
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Data(json.utf8))
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
+
+    static func client() -> APIClient {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [StubProtocol.self]
+        return APIClient(baseURL: URL(string: "https://stub.test")!, session: URLSession(configuration: config),
+                         credentials: Credentials())
+    }
+}
+
+@Suite(.serialized)
+struct QuickReviewTests {
+    let font = UUID()
+    let comment = UUID()
+
+    private func reviewJSON(confirmedInstead: Bool) -> String {
+        """
+        {"id":"\(comment.uuidString)","body":"","createdAt":"2026-09-27T10:00:00Z","waterStatus":"flowing",
+        "confirmedInstead":\(confirmedInstead)}
+        """
+    }
+
+    @Test func sendsTheIntentAndCanUndoAConfirmation() async throws {
+        StubProtocol.sent = []
+        StubProtocol.responses = [
+            "POST /fonts/\(font.uuidString)/comments": (200, reviewJSON(confirmedInstead: true)),
+            "DELETE /fonts/\(font.uuidString)/comments/\(comment.uuidString)/confirm": (200, reviewJSON(confirmedInstead: false)),
+        ]
+        let model = QuickReviewModel(fontID: font, coordinate: .init(latitude: 41.81, longitude: 2.10),
+                                     api: StubProtocol.client())
+        #expect(await model.tap(.flowing, fix: nil))
+        let body = try #require(StubProtocol.sent.first?.body)
+        let json = try #require(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        #expect(json["waterStatus"] as? String == "flowing")
+        #expect(json["confirmIfUnchanged"] as? Bool == true)
+        #expect(json["remoteDistanceM"] == nil)
+        #expect(model.canUndo)
+
+        // It became a "still the same": undoing takes the confirmation back, it does not
+        // delete someone else's review.
+        #expect(await model.undo())
+        #expect(StubProtocol.sent.last?.method == "DELETE")
+        #expect(StubProtocol.sent.last?.path.hasSuffix("/confirm") == true)
+        #expect(model.state == .undone)
+        #expect(!model.canUndo)
+    }
+
+    @Test func farAwayAsksOnceAndSendsTheDistance() async throws {
+        StubProtocol.sent = []
+        StubProtocol.responses = ["POST /fonts/\(font.uuidString)/comments": (201, reviewJSON(confirmedInstead: false))]
+        let model = QuickReviewModel(fontID: font, coordinate: .init(latitude: 41.81, longitude: 2.10),
+                                     api: StubProtocol.client())
+        let barcelona = CLLocation(coordinate: .init(latitude: 41.3874, longitude: 2.1686), altitude: 0,
+                                   horizontalAccuracy: 20, verticalAccuracy: -1, timestamp: .now)
+        #expect(await model.tap(.dry, fix: barcelona) == false)
+        let question = try #require(model.remoteQuestion)
+        #expect(StubProtocol.sent.isEmpty)
+        #expect(await model.confirmRemote(question))
+        let body = try #require(StubProtocol.sent.first?.body)
+        let json = try #require(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        #expect(json["remoteDistanceM"] as? Int == 47_000)
+
+        // Asked once per fountain: the next tap goes straight through, distance included.
+        #expect(await model.tap(.dry, fix: barcelona))
+        #expect(model.remoteQuestion == nil)
+        #expect(StubProtocol.sent.count == 2)
+    }
+}

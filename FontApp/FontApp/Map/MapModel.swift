@@ -21,6 +21,7 @@ final class MapModel {
     @ObservationIgnored private var pendingTask: Task<Void, Never>?
     @ObservationIgnored private var lastLoaded: (box: MapBox, width: Int, height: Int)?
     @ObservationIgnored private var lastSpan: MKCoordinateSpan?
+    @ObservationIgnored private var lastRequested: (box: MapBox, width: Int, height: Int)?
 
     init(api: APIClient = .shared) {
         self.api = api
@@ -51,6 +52,14 @@ final class MapModel {
         }
     }
 
+    /// Reloads the current view after a contribution, so the pin shows the new colour
+    /// without waiting for the map to move.
+    func refresh() {
+        guard let last = lastRequested ?? lastLoaded else { return }
+        lastLoaded = nil
+        load(box: last.box, width: last.width, height: last.height)
+    }
+
     private func schedule(at date: Date, _ action: @escaping (MapModel) -> Void) {
         pendingTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(max(0, date.timeIntervalSinceNow)))
@@ -63,6 +72,7 @@ final class MapModel {
         // Same view as the last answer (a GPS fix that did not move the map, a sheet
         // that came and went): nothing new to ask for.
         if let last = lastLoaded, last.box == box, last.width == width, last.height == height { return }
+        lastRequested = (box, width, height)
         throttle.didRequest()
         log.debug("GET /fonts/map \(box.minLat),\(box.minLong) – \(box.maxLat),\(box.maxLong)")
         // Only the latest box matters; a slow answer for an old view must not land.

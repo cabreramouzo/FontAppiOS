@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 import Observation
 
@@ -14,6 +15,10 @@ final class FontDetailModel {
     private(set) var state: State = .loading
     private(set) var reviews: [CommentResponse] = []
     private(set) var reports: [ReportResponse] = []
+    /// The chips, once the fountain (and so its position) is known.
+    private(set) var quickReview: QuickReviewModel?
+    /// A failed "still the same", already translated.
+    private(set) var actionError: String?
 
     @ObservationIgnored private let api: APIClient
 
@@ -32,10 +37,34 @@ final class FontDetailModel {
             self.reviews = loaded.1
             self.reports = Self.threaded(loaded.2)
             state = .loaded(loaded.0)
+            if quickReview == nil {
+                quickReview = QuickReviewModel(
+                    fontID: fontID,
+                    coordinate: .init(latitude: loaded.0.latitude, longitude: loaded.0.longitude))
+            }
         } catch is CancellationError {
             return
         } catch {
             state = .failed(ErrorText.describe(error))
+        }
+    }
+
+    /// The review "still the same" is offered on: the latest one with a water status, if
+    /// someone else wrote it (confirming your own report is refused for a day).
+    func confirmable(by userID: UUID?) -> CommentResponse? {
+        guard let userID, let latest = reviews.filter({ $0.waterStatus != nil })
+            .max(by: { $0.createdAt < $1.createdAt }), latest.userID != userID else { return nil }
+        return latest
+    }
+
+    func setStillTheSame(_ review: CommentResponse, _ on: Bool) async {
+        actionError = nil
+        do {
+            _ = try await api.confirm(review.id, on: fontID, on)
+            NotificationCenter.default.post(name: .fontChanged, object: fontID)
+            await load()
+        } catch {
+            actionError = ErrorText.describe(error)
         }
     }
 

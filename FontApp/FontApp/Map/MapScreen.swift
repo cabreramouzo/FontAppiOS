@@ -27,6 +27,7 @@ struct MapScreen: View {
         .overlay(alignment: .bottomLeading) { attribution }
         .onAppear(perform: locateOnce)
         .onChange(of: location.isAuthorized) { locateOnce() }
+        .onReceive(NotificationCenter.default.publisher(for: .fontChanged)) { _ in model.refresh() }
         .sheet(item: $selected) { font in
             NavigationStack {
                 FontDetailView(fontID: font.id, preview: font)

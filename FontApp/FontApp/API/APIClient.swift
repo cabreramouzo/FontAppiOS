@@ -189,7 +189,10 @@ nonisolated struct APIClient: Sendable {
                                         timeout: TimeInterval) async throws -> T {
         var components = URLComponents(url: baseURL.appending(path: path), resolvingAgainstBaseURL: false)!
         if !query.isEmpty { components.queryItems = query }
-        var request = URLRequest(url: components.url!, timeoutInterval: timeout)
+        // No HTTP cache: after a contribution the next read must show it, and the map and
+        // the lists already decide themselves when to ask again.
+        var request = URLRequest(url: components.url!, cachePolicy: .reloadIgnoringLocalCacheData,
+                                 timeoutInterval: timeout)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         let bearer = authorization == nil ? credentials.current : nil
