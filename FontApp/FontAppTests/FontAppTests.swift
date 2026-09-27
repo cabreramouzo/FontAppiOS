@@ -548,3 +548,41 @@ struct OutboxTests {
     }
 }
 }
+
+struct MapControlsTests {
+    private func font(_ status: String?, drinkable: Drinkable? = nil, source: WaterSource? = nil,
+                      confirmations: Int = 0, daysAgo: Double = 1) -> FontSummary {
+        FontSummary(id: UUID(), name: nil, latitude: 41.8, longitude: 2.1, image: nil, description: nil,
+                    source: source, drinkable: drinkable, country: nil, region: nil, createdAt: nil,
+                    lastWaterStatus: status, lastUpdate: status == nil ? nil : Date.now.addingTimeInterval(-86_400 * daysAgo),
+                    latestConfirmations: confirmations, recentStatusReporters: 1, recentStatusConflict: false)
+    }
+
+    @Test func filtersMatchTheWeb() {
+        let flowing = font("flowing", confirmations: 1)
+        let dry = font("dry", drinkable: .no)
+        let unchecked = font(nil, source: .spring)
+        let all = [flowing, dry, unchecked]
+        #expect(MapFilters().apply(all).count == 3)
+        #expect(MapFilters(onlyWithWater: true).apply(all) == [flowing])
+        #expect(MapFilters(onlyReliable: true).apply(all) == [flowing])
+        #expect(MapFilters(hideNonPotable: true).apply(all) == [flowing, unchecked])
+        #expect(MapFilters(source: .spring).apply(all) == [unchecked])
+        #expect(MapFilters(onlyWithWater: true, source: .spring).activeCount == 2)
+    }
+
+    @Test func tilesCoveringABox() throws {
+        let box = try #require(MapBox(minLat: 41.80, maxLat: 41.82, minLong: 2.09, maxLong: 2.11))
+        let tiles = TileKey.covering(box, zoom: 14)
+        #expect(!tiles.isEmpty && tiles.count <= 4)
+        #expect(tiles.allSatisfy { $0.z == 14 && (8287...8289).contains($0.x) })
+        // Each zoom level has four times as many.
+        #expect(TileKey.covering(box, zoom: 16).count > tiles.count * 2)
+    }
+
+    @Test func webTextsWithoutTheirEmoji() {
+        let es = Bundle(path: Bundle.main.path(forResource: "es", ofType: "lproj")!)!
+        #expect(L10n.plain("map.onlyWater", bundle: es) == "Solo con agua")
+        #expect(L10n.plain("map.addFont", bundle: es) == "Añadir fuente")
+    }
+}

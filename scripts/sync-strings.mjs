@@ -18,12 +18,14 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 // Web language code → Apple localization. The web's Portuguese is European.
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
-const PREFIXES = ['status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
+const PREFIXES = ['layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
   'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.']
 const KEYS = [
   'font.unnamed', 'nav.map', 'nav.profile', 'zones.title', 'review.anon',
   'report.resolved', 'report.resolvedBy',
   'source.tap', 'source.mountain', 'source.spring', 'source.well', 'source.fountain', 'source.other',
+  'map.layers', 'map.filters', 'map.onlyWater', 'map.onlyReliable', 'map.hideNonPotable',
+  'map.hideNonPotableTitle', 'map.filterType', 'map.allTypes', 'map.addFont', 'map.searchPlaceholder',
   'map.recenter', 'map.loading', 'map.rateLimited', 'map.rateLimitedBody', 'map.clusterCount',
   'detail.type', 'detail.drinkability', 'detail.unknownType', 'detail.unknownDrink',
   'detail.description', 'detail.lastUpdate', 'detail.currentStatus', 'detail.lastReportedStatus',
@@ -69,6 +71,19 @@ const IOS_ONLY = {
   'ios.uploading': {
     ca: 'Pujant la foto…', es: 'Subiendo la foto…', gl: 'Subindo a foto…', eu: 'Argazkia igotzen…',
     en: 'Uploading the photo…', fr: 'Envoi de la photo…', pt: 'A enviar a fotografia…', it: 'Caricamento della foto…',
+  },
+  'ios.layer.apple': {
+    ca: 'Mapa d’Apple', es: 'Mapa de Apple', gl: 'Mapa de Apple', eu: 'Apple mapa',
+    en: 'Apple map', fr: 'Plan Apple', pt: 'Mapa da Apple', it: 'Mappa Apple',
+  },
+  'ios.filters.clear': {
+    ca: 'Treu els filtres', es: 'Quitar filtros', gl: 'Quitar filtros', eu: 'Kendu iragazkiak',
+    en: 'Clear filters', fr: 'Effacer les filtres', pt: 'Limpar filtros', it: 'Rimuovi filtri',
+  },
+  'ios.search.prompt': {
+    ca: 'Cerca font o lloc', es: 'Buscar fuente o lugar', gl: 'Buscar fonte ou lugar', eu: 'Bilatu iturria edo lekua',
+    en: 'Search fountain or place', fr: 'Chercher une fontaine ou un lieu', pt: 'Procurar fonte ou local',
+    it: 'Cerca fontana o luogo',
   },
   // Apple draws the base map and credits it; the fountains come from these sources.
   'ios.dataAttribution': {

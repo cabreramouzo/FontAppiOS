@@ -3,14 +3,23 @@ import SwiftUI
 
 struct MapScreen: View {
     @Environment(LocationService.self) private var location
+    @Environment(SessionStore.self) private var session
     @State private var model = MapModel()
+    @State private var controller = MapController()
+    @State private var filters = MapFilters()
+    @State private var sheet: MapSheet?
+
+    private enum MapSheet: String, Identifiable {
+        case layers, filters
+        var id: String { rawValue }
+    }
     @State private var selected: FontSummary?
     @State private var followRequest = 0
     @State private var didAutoLocate = false
 
     var body: some View {
         FontMapView(
-            fonts: model.fonts,
+            fonts: filters.apply(model.fonts),
             clusters: model.clusters,
             initialRegion: { size in
                 DefaultMapView.forTimeZone(TimeZone.current.identifier).region(for: size)
@@ -20,11 +29,27 @@ struct MapScreen: View {
             onMove: { region, size, following in
                 model.mapDidMove(region: region, size: size, following: following)
             },
-            onSelect: { selected = $0 }
+            onSelect: { selected = $0 },
+            controller: controller
         )
         .ignoresSafeArea(edges: [.top, .bottom])
-        .overlay(alignment: .top) { banner }
+        .overlay(alignment: .topTrailing) {
+            MapControlColumn(controller: controller, activeFilters: filters.activeCount,
+                             onLayers: { sheet = .layers }, onFilters: { sheet = .filters },
+                             staff: session.isStaff)
+                .padding(.trailing, 12)
+                .padding(.top, 8)
+        }
+        .overlay(alignment: .top) { banner.padding(.trailing, 72) }
         .overlay(alignment: .bottomLeading) { attribution }
+        .sheet(item: $sheet) { which in
+            switch which {
+            case .layers:
+                LayersSheet(controller: controller).presentationDetents([.medium, .large])
+            case .filters:
+                FiltersSheet(filters: $filters).presentationDetents([.medium, .large])
+            }
+        }
         .onAppear(perform: locateOnce)
         .onChange(of: location.isAuthorized) { locateOnce() }
         .onReceive(NotificationCenter.default.publisher(for: .fontChanged)) { _ in model.refresh() }
@@ -70,9 +95,10 @@ struct MapScreen: View {
     }
 
     /// The fountains come from OpenStreetMap and ICGC/ACA; both licences require credit
-    /// on the map itself. Apple credits the base map on its own.
+    /// on the map itself, and so does the base map when it is not Apple's (Apple credits
+    /// its own).
     private var attribution: some View {
-        Text(L10n.t("ios.dataAttribution"))
+        Text([controller.layer.attribution, L10n.t("ios.dataAttribution")].compactMap { $0 }.joined(separator: "\n"))
             .font(.caption2)
             .foregroundStyle(.secondary)
             .padding(.horizontal, 6)

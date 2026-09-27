@@ -37,6 +37,7 @@ struct FontMapView: UIViewRepresentable {
     let followRequest: Int
     let onMove: (MKCoordinateRegion, CGSize, Bool) -> Void
     let onSelect: (FontSummary) -> Void
+    let controller: MapController
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
@@ -44,26 +45,14 @@ struct FontMapView: UIViewRepresentable {
         let map = LayoutAwareMapView()
         map.onFirstLayout = { [weak coordinator = context.coordinator] map in coordinator?.mapDidLayout(map) }
         map.delegate = context.coordinator
-        map.showsCompass = true
+        // The compass and the tracking button live in the SwiftUI control column.
+        map.showsCompass = false
         map.pointOfInterestFilter = .excludingAll
         map.register(MKMarkerAnnotationView.self, forAnnotationViewWithReuseIdentifier: Coordinator.fontID)
         map.register(ServerClusterView.self, forAnnotationViewWithReuseIdentifier: Coordinator.serverClusterID)
         map.register(LocalClusterView.self,
                      forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
-
-        let button = MKUserTrackingButton(mapView: map)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .systemBackground
-        button.layer.cornerRadius = 10
-        button.clipsToBounds = true
-        button.accessibilityLabel = L10n.t("map.recenter")
-        map.addSubview(button)
-        NSLayoutConstraint.activate([
-            button.trailingAnchor.constraint(equalTo: map.safeAreaLayoutGuide.trailingAnchor, constant: -12),
-            button.bottomAnchor.constraint(equalTo: map.safeAreaLayoutGuide.bottomAnchor, constant: -40),
-            button.widthAnchor.constraint(equalToConstant: 48),
-            button.heightAnchor.constraint(equalToConstant: 48),
-        ])
+        controller.attach(map)
         return map
     }
 
@@ -71,6 +60,7 @@ struct FontMapView: UIViewRepresentable {
         let coordinator = context.coordinator
         coordinator.parent = self
         map.showsUserLocation = showsUser
+        coordinator.apply(controller.layer, to: map)
         if coordinator.followRequest != followRequest {
             coordinator.followRequest = followRequest
             if showsUser { coordinator.startFollowing(map) }
@@ -91,9 +81,44 @@ struct FontMapView: UIViewRepresentable {
         private var clusterAnnotations: [ServerClusterAnnotation] = []
         /// What the server sent, before joining overlapping circles.
         private var serverClusters: [MapCluster] = []
+        private var shownLayer: MapLayer?
+        private var tileOverlay: LayerTileOverlay?
 
         init(_ parent: FontMapView) {
             self.parent = parent
+        }
+
+        /// Swaps the base map. Raster layers replace Apple's map entirely
+        /// (`canReplaceMapContent`), and go under the pins.
+        func apply(_ layer: MapLayer, to map: MKMapView) {
+            guard layer != shownLayer else { return }
+            shownLayer = layer
+            if let tileOverlay { map.removeOverlay(tileOverlay) }
+            tileOverlay = nil
+            switch layer {
+            case .apple:
+                let config = MKStandardMapConfiguration(elevationStyle: .realistic)
+                // Shops and schools compete with the pins; the map is about water.
+                config.pointOfInterestFilter = .excludingAll
+                map.preferredConfiguration = config
+            case .appleSatellite:
+                let config = MKHybridMapConfiguration(elevationStyle: .realistic)
+                config.pointOfInterestFilter = .excludingAll
+                map.preferredConfiguration = config
+            default:
+                let overlay = LayerTileOverlay(layer: layer)
+                tileOverlay = overlay
+                map.addOverlay(overlay, level: .aboveLabels)
+            }
+        }
+
+        func mapView(_ map: MKMapView, didChange mode: MKUserTrackingMode, animated: Bool) {
+            parent.controller.trackingMode = mode
+        }
+
+        func mapView(_ map: MKMapView, rendererFor overlay: any MKOverlay) -> MKOverlayRenderer {
+            if let tiles = overlay as? MKTileOverlay { return MKTileOverlayRenderer(tileOverlay: tiles) }
+            return MKOverlayRenderer(overlay: overlay)
         }
 
         /// Adds and removes only what changed: rebuilding thousands of annotations on
