@@ -18,7 +18,8 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 // Web language code → Apple localization. The web's Portuguese is European.
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
-const PREFIXES = ['status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.']
+const PREFIXES = ['status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
+  'login.', 'popup.', 'remote.', 'confirm.', 'toast.']
 const KEYS = [
   'font.unnamed', 'nav.map', 'nav.profile', 'zones.title', 'review.anon',
   'report.resolved', 'report.resolvedBy',
@@ -28,6 +29,7 @@ const KEYS = [
   'detail.description', 'detail.lastUpdate', 'detail.currentStatus', 'detail.lastReportedStatus',
   'detail.confirmedByOne', 'detail.confirmedByMany', 'detail.statusReviews', 'detail.beFirst',
   'detail.incidents', 'detail.noIncidents', 'detail.loading', 'detail.directions',
+  'detail.addPhoto', 'detail.firstPhotoNote', 'nav.logout', 'nav.enter', 'staff.tag', 'settings.account',
   'detail.noPhotoYet', 'detail.municipality', 'detail.region', 'detail.country', 'detail.stale',
 ]
 
@@ -45,6 +47,28 @@ const IOS_ONLY = {
     fr: 'Cette section n’est pas encore dans l’app. En attendant, elle est sur fontapp.net.',
     pt: 'Esta secção ainda não está na app. Entretanto, encontra-a em fontapp.net.',
     it: 'Questa sezione non è ancora nell’app. Nel frattempo la trovi su fontapp.net.',
+  },
+  'ios.signInPrompt': {
+    ca: 'Entra per explicar com raja una font i afegir-hi fotos.',
+    es: 'Entra para contar cómo mana una fuente y añadirle fotos.',
+    gl: 'Entra para contar como bota unha fonte e engadirlle fotos.',
+    eu: 'Sartu iturri batek nola dakarren ura kontatzeko eta argazkiak gehitzeko.',
+    en: 'Sign in to say how a fountain is flowing and add photos.',
+    fr: 'Connecte-toi pour dire comment coule une fontaine et ajouter des photos.',
+    pt: 'Entra para contar como está a correr uma fonte e juntar fotografias.',
+    it: 'Accedi per raccontare come scorre una fontana e aggiungere foto.',
+  },
+  'ios.takePhoto': {
+    ca: 'Fes una foto', es: 'Hacer una foto', gl: 'Facer unha foto', eu: 'Atera argazki bat',
+    en: 'Take a photo', fr: 'Prendre une photo', pt: 'Tirar uma fotografia', it: 'Scatta una foto',
+  },
+  'ios.choosePhoto': {
+    ca: 'Tria una foto', es: 'Elegir una foto', gl: 'Escoller unha foto', eu: 'Aukeratu argazki bat',
+    en: 'Choose a photo', fr: 'Choisir une photo', pt: 'Escolher uma fotografia', it: 'Scegli una foto',
+  },
+  'ios.uploading': {
+    ca: 'Pujant la foto…', es: 'Subiendo la foto…', gl: 'Subindo a foto…', eu: 'Argazkia igotzen…',
+    en: 'Uploading the photo…', fr: 'Envoi de la photo…', pt: 'A enviar a fotografia…', it: 'Caricamento della foto…',
   },
   // Apple draws the base map and credits it; the fountains come from these sources.
   'ios.dataAttribution': {

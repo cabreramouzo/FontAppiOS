@@ -92,6 +92,11 @@ nonisolated struct CommentResponse: Codable, Identifiable, Sendable {
     let createdAt: Date
     let confirmations: Int?
     let lastConfirmedAt: Date?
+    /// Whether the signed-in user already said "still the same" on it.
+    let confirmedByMe: Bool?
+    /// The server turned a quick review into a "still the same" on this, someone else's
+    /// recent report (`confirmIfUnchanged`). Undoing means taking the confirmation back.
+    let confirmedInstead: Bool?
 }
 
 /// A comment or an incident ("the tap is broken") about a fountain.
@@ -133,4 +138,58 @@ nonisolated struct ActivityItem: Codable, Hashable, Sendable {
     /// Pagination cursor (epoch seconds, full precision). `createdAt` is truncated to the
     /// second, so it cannot page within one second.
     let cursor: Double
+}
+
+/// Account roles, lowest to highest. Unknown roles count as `user`.
+nonisolated enum UserRole: String, Codable, Sendable, Comparable {
+    case user, moderator, admin, owner
+
+    init(from decoder: any Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = UserRole(rawValue: raw) ?? .user
+    }
+
+    private var rank: Int {
+        switch self {
+        case .user: 0
+        case .moderator: 1
+        case .admin: 2
+        case .owner: 3
+        }
+    }
+
+    static func < (a: UserRole, b: UserRole) -> Bool { a.rank < b.rank }
+
+    /// Moderator and above see the contribution controls in staff purple, so they do not
+    /// contribute as staff by mistake.
+    var isStaff: Bool { self >= .moderator }
+}
+
+/// The account, as `/auth/login` and `/auth/me` return it for its owner.
+nonisolated struct UserResponse: Codable, Equatable, Sendable {
+    let id: UUID
+    let name: String
+    let username: String
+    let role: UserRole?
+}
+
+nonisolated struct LoginResponse: Codable, Sendable {
+    let token: String
+    let user: UserResponse
+}
+
+/// A review as the app sends it: the quick chips send only a status.
+nonisolated struct NewReview: Encodable, Sendable {
+    let waterStatus: String
+    /// "If this adds nothing, count it as still the same." The server decides.
+    let confirmIfUnchanged: Bool
+    /// Only when clearly more than a kilometre away; see `RemoteReview`.
+    let remoteDistanceM: Int?
+}
+
+/// What survives of a photo's EXIF after it is re-encoded for upload.
+nonisolated struct PhotoMeta: Equatable, Sendable {
+    var takenAt: Date?
+    var latitude: Double?
+    var longitude: Double?
 }

@@ -13,7 +13,7 @@ struct ContentView: View {
                 ComingSoonView(title: L10n.t("zones.title"), systemImage: "globe.europe.africa")
             }
             Tab(L10n.t("nav.profile"), systemImage: "person.crop.circle") {
-                ComingSoonView(title: L10n.t("nav.profile"), systemImage: "person.crop.circle")
+                MeScreen()
             }
         }
     }
@@ -39,4 +39,5 @@ struct ComingSoonView: View {
 #Preview {
     ContentView()
         .environment(LocationService())
+        .environment(SessionStore())
 }

@@ -1,4 +1,5 @@
 import Foundation
+import Synchronization
 
 /// A failed request. `status` 0 means the server could not be reached (or timed out).
 nonisolated struct APIError: Error, Equatable, Sendable {
@@ -13,22 +14,66 @@ nonisolated struct APIError: Error, Equatable, Sendable {
     static let network = APIError(status: 0, reason: nil, code: nil, retryAfter: nil)
 }
 
-/// Read-only client for the FontApp API.
+/// Which backend the app talks to.
 ///
-/// Stateless and `Sendable`: screens hold a copy and call it from tasks. There is no
-/// session yet, so no `Authorization` header.
-nonisolated struct APIClient: Sendable {
+/// Debug builds use the local backend (`swift run App serve` in FontAppBE), whose data is
+/// seeded: writing reviews and photos while developing must never reach production. Pass
+/// `-FontAppAPI https://fontapp.fly.dev` as a launch argument to point a Debug build
+/// elsewhere (a phone cannot reach the Mac's 127.0.0.1). Release always uses production.
+nonisolated enum APIEnvironment {
     static let production = URL(string: "https://fontapp.fly.dev")!
-    static let shared = APIClient(baseURL: production)
+    static let local = URL(string: "http://127.0.0.1:8080")!
+
+    static var baseURL: URL {
+        #if DEBUG
+        if let override = UserDefaults.standard.string(forKey: "FontAppAPI"),
+           let url = URL(string: override) {
+            return url
+        }
+        return local
+        #else
+        return production
+        #endif
+    }
+}
+
+/// The session token, readable from any request. Only `SessionStore` writes it.
+nonisolated final class Credentials: Sendable {
+    static let shared = Credentials()
+    /// Posted when the server rejects the stored token (401 on a request that carried it):
+    /// expired, revoked from another device, or the account is gone.
+    static let rejected = Notification.Name("FontAppSessionRejected")
+
+    private let token = Mutex<String?>(nil)
+
+    var current: String? { token.withLock { $0 } }
+
+    func set(_ value: String?) { token.withLock { $0 = value } }
+}
+
+/// A response whose body does not matter (204, or a JSON the app does not use).
+nonisolated struct Ignored: Decodable, Sendable {}
+
+/// Client for the FontApp API.
+///
+/// Stateless and `Sendable`: screens hold a copy and call it from tasks. The bearer token
+/// comes from `Credentials` on every request.
+nonisolated struct APIClient: Sendable {
+    static let shared = APIClient(baseURL: APIEnvironment.baseURL)
 
     let baseURL: URL
     var session: URLSession = .shared
+    var credentials: Credentials = .shared
 
     /// Reads have a way out (the map keeps what it had, the list shows a retry), so they
     /// give up early. The web measured `/fonts/map` at 0.18–0.45 s in production.
     var readTimeout: TimeInterval = 8
+    /// A write cut short may still have landed on the server: waiting longer is cheaper
+    /// than a duplicate. Same figures as the web.
+    var writeTimeout: TimeInterval = 12
+    var uploadTimeout: TimeInterval = 45
 
-    // MARK: Endpoints
+    // MARK: Reading
 
     func map(box: MapBox, width: Int, height: Int) async throws -> MapResponse {
         try await get("/fonts/map", query: box.queryItems + [
@@ -62,6 +107,64 @@ nonisolated struct APIClient: Sendable {
         return try await get("/activity", query: query)
     }
 
+    // MARK: Session
+
+    /// Username **or email** and password, as HTTP Basic.
+    func login(user: String, password: String) async throws -> LoginResponse {
+        let basic = Data("\(user):\(password)".utf8).base64EncodedString()
+        return try await send("POST", "/auth/login", authorization: "Basic \(basic)", timeout: writeTimeout)
+    }
+
+    func me() async throws -> UserResponse {
+        try await get("/auth/me")
+    }
+
+    func logout() async throws {
+        let _: Ignored = try await send("POST", "/auth/logout", timeout: writeTimeout)
+    }
+
+    // MARK: Contributing
+
+    func postReview(on fontID: UUID, _ review: NewReview) async throws -> CommentResponse {
+        try await send("POST", "/fonts/\(fontID.uuidString)/comments",
+                       body: .json(try JSONEncoder().encode(review)), timeout: writeTimeout)
+    }
+
+    func deleteReview(_ commentID: UUID, on fontID: UUID) async throws {
+        let _: Ignored = try await send("DELETE", "/fonts/\(fontID.uuidString)/comments/\(commentID.uuidString)",
+                                        timeout: writeTimeout)
+    }
+
+    /// "Still the same" on a review, or taking it back.
+    func confirm(_ commentID: UUID, on fontID: UUID, _ on: Bool) async throws -> CommentResponse {
+        try await send(on ? "POST" : "DELETE",
+                       "/fonts/\(fontID.uuidString)/comments/\(commentID.uuidString)/confirm",
+                       timeout: writeTimeout)
+    }
+
+    /// Uploads a JPEG and returns its URL. The EXIF travels as separate fields because the
+    /// re-encoded JPEG no longer carries it.
+    func uploadImage(_ jpeg: Data, meta: PhotoMeta) async throws -> String {
+        var form = MultipartForm()
+        if let takenAt = meta.takenAt { form.add("takenAt", takenAt.formatted(.iso8601)) }
+        if let latitude = meta.latitude, let longitude = meta.longitude {
+            form.add("latitude", String(latitude))
+            form.add("longitude", String(longitude))
+        }
+        form.addFile("file", filename: "photo.jpg", contentType: "image/jpeg", data: jpeg)
+        struct Uploaded: Decodable { let url: String }
+        let uploaded: Uploaded = try await send("POST", "/images", body: .multipart(form), timeout: uploadTimeout)
+        return uploaded.url
+    }
+
+    /// Sets the photo of a fountain that has none. Replacing one is for its creator or
+    /// an admin (403 otherwise).
+    func setFontPhoto(_ fontID: UUID, image: String) async throws {
+        let body = try JSONEncoder().encode(["image": image])
+        let _: Ignored = try await send("PUT", "/fonts/\(fontID.uuidString)/photo",
+                                        body: .json(body), timeout: writeTimeout)
+    }
+
     /// Resolves an image path from the API (`/uploads/x.jpg` or an absolute URL).
     func imageURL(_ path: String?) -> URL? {
         guard let path, !path.isEmpty else { return nil }
@@ -71,11 +174,40 @@ nonisolated struct APIClient: Sendable {
 
     // MARK: Transport
 
-    @concurrent func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
+    enum Body {
+        case none
+        case json(Data)
+        case multipart(MultipartForm)
+    }
+
+    func get<T: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws -> T {
+        try await send("GET", path, query: query, timeout: readTimeout)
+    }
+
+    @concurrent func send<T: Decodable>(_ method: String, _ path: String, query: [URLQueryItem] = [],
+                                        body: Body = .none, authorization: String? = nil,
+                                        timeout: TimeInterval) async throws -> T {
         var components = URLComponents(url: baseURL.appending(path: path), resolvingAgainstBaseURL: false)!
         if !query.isEmpty { components.queryItems = query }
-        var request = URLRequest(url: components.url!, timeoutInterval: readTimeout)
+        var request = URLRequest(url: components.url!, timeoutInterval: timeout)
+        request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let bearer = authorization == nil ? credentials.current : nil
+        if let authorization {
+            request.setValue(authorization, forHTTPHeaderField: "Authorization")
+        } else if let bearer {
+            request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
+        }
+        switch body {
+        case .none:
+            break
+        case .json(let data):
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = data
+        case .multipart(let form):
+            request.setValue(form.contentType, forHTTPHeaderField: "Content-Type")
+            request.httpBody = form.body
+        }
 
         let data: Data
         let response: URLResponse
@@ -90,9 +222,13 @@ nonisolated struct APIClient: Sendable {
         }
         guard let http = response as? HTTPURLResponse else { throw APIError.network }
         guard (200..<300).contains(http.statusCode) else {
+            if http.statusCode == 401, let bearer {
+                NotificationCenter.default.post(name: Credentials.rejected, object: bearer)
+            }
             throw Self.error(status: http.statusCode, data: data,
                              retryAfter: http.value(forHTTPHeaderField: "Retry-After"))
         }
+        if T.self == Ignored.self { return Ignored() as! T }
         return try Self.decoder.decode(T.self, from: data)
     }
 
@@ -117,4 +253,25 @@ nonisolated struct APIClient: Sendable {
         }
         return decoder
     }()
+}
+
+/// A `multipart/form-data` body.
+nonisolated struct MultipartForm: Sendable {
+    let boundary = "FontApp-\(UUID().uuidString)"
+    private var data = Data()
+
+    var contentType: String { "multipart/form-data; boundary=\(boundary)" }
+
+    mutating func add(_ name: String, _ value: String) {
+        data.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(name)\"\r\n\r\n\(value)\r\n".utf8))
+    }
+
+    mutating func addFile(_ name: String, filename: String, contentType: String, data file: Data) {
+        data.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\r\nContent-Type: \(contentType)\r\n\r\n".utf8))
+        data.append(file)
+        data.append(Data("\r\n".utf8))
+    }
+
+    /// The closing boundary is added when the body is read.
+    var body: Data { data + Data("--\(boundary)--\r\n".utf8) }
 }

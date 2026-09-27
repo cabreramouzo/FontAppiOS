@@ -1,0 +1,88 @@
+import SwiftUI
+
+/// Username (or email) and password. Signing up and password recovery stay on the web
+/// for now; the links open it.
+struct SignInView: View {
+    @Environment(SessionStore.self) private var session
+    @Environment(\.dismiss) private var dismiss
+    @State private var user = ""
+    @State private var password = ""
+    @State private var isSending = false
+    @State private var error: String?
+    @FocusState private var field: Field?
+
+    private enum Field { case user, password }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField(L10n.t("login.userLabel"), text: $user)
+                        .textContentType(.username)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .focused($field, equals: .user)
+                        .submitLabel(.next)
+                        .onSubmit { field = .password }
+                    SecureField(L10n.t("login.password"), text: $password)
+                        .textContentType(.password)
+                        .focused($field, equals: .password)
+                        .submitLabel(.go)
+                        .onSubmit(submit)
+                } footer: {
+                    Text(L10n.t("login.userOrEmailHint"))
+                }
+                if let error {
+                    Section { Text(error).foregroundStyle(.red) }
+                }
+                Section {
+                    Button(action: submit) {
+                        HStack {
+                            Text(L10n.t("login.enter")).bold()
+                            if isSending { Spacer(); ProgressView() }
+                        }
+                        .frame(minHeight: 44)
+                    }
+                    .disabled(!canSubmit)
+                }
+                Section {
+                    Link(L10n.t("login.forgot"), destination: web("forgot-password"))
+                    Link(L10n.t("login.noAccount") + L10n.t("login.signup"), destination: web("register"))
+                }
+            }
+            .navigationTitle(L10n.t("login.enter"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(role: .close) { dismiss() }
+                }
+            }
+            .onAppear { field = .user }
+        }
+    }
+
+    private var canSubmit: Bool {
+        !isSending && !user.trimmingCharacters(in: .whitespaces).isEmpty && !password.isEmpty
+    }
+
+    private func submit() {
+        guard canSubmit else { return }
+        isSending = true
+        error = nil
+        Task {
+            defer { isSending = false }
+            do {
+                try await session.signIn(user: user.trimmingCharacters(in: .whitespaces), password: password)
+                dismiss()
+            } catch let e as APIError where e.status == 401 {
+                error = L10n.t("login.badCredentials")
+            } catch {
+                self.error = ErrorText.describe(error)
+            }
+        }
+    }
+
+    private func web(_ path: String) -> URL {
+        URL(string: "https://fontapp.net/\(path)")!
+    }
+}

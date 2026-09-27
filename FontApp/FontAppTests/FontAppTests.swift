@@ -83,7 +83,7 @@ struct ConfidenceTests {
         func review(_ status: String, daysAgo: Double, user: UUID = UUID()) -> CommentResponse {
             CommentResponse(id: UUID(), userID: user, username: nil, body: "", rating: nil, waterStatus: status,
                             image: nil, createdAt: now.addingTimeInterval(-86_400 * daysAgo),
-                            confirmations: 0, lastConfirmedAt: nil)
+                            confirmations: 0, lastConfirmedAt: nil, confirmedByMe: nil, confirmedInstead: nil)
         }
         let e = Confidence.evidence(from: [review("flowing", daysAgo: 1), review("dry", daysAgo: 5)], now: now)
         #expect(e.lastWaterStatus == "flowing")
@@ -180,5 +180,26 @@ struct ReportThreadTests {
         let threaded = FontDetailModel.threaded(list)
         #expect(threaded.map(\.parentID) == [nil, nil, old])
         #expect(threaded.first?.id == new)
+    }
+}
+
+struct SessionModelTests {
+    @Test func rolesAndStaff() throws {
+        let decode = { (raw: String) in try JSONDecoder().decode(UserRole.self, from: Data("\"\(raw)\"".utf8)) }
+        #expect(try decode("moderator").isStaff)
+        #expect(try decode("owner").isStaff)
+        #expect(try !decode("user").isStaff)
+        // A role this build does not know must not grant staff colours.
+        #expect(try decode("superhero") == .user)
+    }
+
+    @Test func multipartIsClosed() {
+        var form = MultipartForm()
+        form.add("takenAt", "2026-09-27T10:00:00Z")
+        form.addFile("file", filename: "photo.jpg", contentType: "image/jpeg", data: Data([0xFF, 0xD8]))
+        let text = String(decoding: form.body, as: UTF8.self)
+        #expect(text.contains("name=\"takenAt\"\r\n\r\n2026-09-27T10:00:00Z\r\n"))
+        #expect(text.contains("filename=\"photo.jpg\"\r\nContent-Type: image/jpeg"))
+        #expect(text.hasSuffix("--\(form.boundary)--\r\n"))
     }
 }
