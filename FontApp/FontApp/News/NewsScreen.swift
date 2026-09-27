@@ -87,7 +87,10 @@ struct NewsScreen: View {
 
     /// "Near me" only with a position; without one the feed is global and says so.
     private var scopePicker: some View {
-        Picker(selection: $model.scope) {
+        // Shows the scope in use: without a position that is "everywhere", whatever was
+        // chosen, and the choice itself is kept for when the position comes back.
+        Picker(selection: Binding(get: { model.effectiveScope(location: location.location) },
+                                  set: { model.scope = $0 })) {
             Text(L10n.t("activity.nearMe")).tag(NewsModel.Scope.near)
             Text(L10n.t("activity.everywhere")).tag(NewsModel.Scope.everywhere)
         } label: {
@@ -95,10 +98,6 @@ struct NewsScreen: View {
         }
         .pickerStyle(.segmented)
         .disabled(location.location == nil)
-        .onAppear { if location.location == nil { model.scope = .everywhere } }
-        .onChange(of: location.location == nil) { _, missing in
-            model.scope = missing ? .everywhere : .near
-        }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
     }

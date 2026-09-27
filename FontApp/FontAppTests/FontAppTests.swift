@@ -383,3 +383,29 @@ struct PhotoPreparerTests {
         #expect(PhotoPreparer.exifDate("2026:09:27 10:15:03", offset: "-05:00") == date("2026-09-27T15:15:03Z"))
     }
 }
+
+struct LeftoverTests {
+    @Test func overlappingClustersJoinAndKeepTheCount() {
+        let a = MapCluster(latitude: 41.0, longitude: 2.0, count: 300)
+        let b = MapCluster(latitude: 41.1, longitude: 2.0, count: 100)
+        let far = MapCluster(latitude: 45.0, longitude: 2.0, count: 7)
+        // One point per 0.01° of latitude: a and b are 10 pt apart, far is 400 pt away.
+        let merged = ClusterMerge.merge([b, far, a]) { CGPoint(x: 0, y: $0.latitude * 100) }
+        #expect(merged.count == 2)
+        #expect(merged.map(\.count).reduce(0, +) == 407)
+        let joined = merged.first { $0.count == 400 }
+        // Weighted towards the bigger one.
+        #expect(abs((joined?.latitude ?? 0) - 41.025) < 0.0001)
+    }
+
+    @Test func newsRemembersScopeAndRadius() {
+        let defaults = UserDefaults(suiteName: "news-\(UUID().uuidString)")!
+        let first = NewsModel(defaults: defaults)
+        #expect(first.scope == .near && first.km == 5)
+        first.scope = .everywhere
+        first.km = 25
+        let again = NewsModel(defaults: defaults)
+        #expect(again.scope == .everywhere)
+        #expect(again.km == 25)
+    }
+}

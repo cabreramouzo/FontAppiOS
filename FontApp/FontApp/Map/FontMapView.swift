@@ -89,6 +89,8 @@ struct FontMapView: UIViewRepresentable {
         private var wantsFollow = false
         private var fontAnnotations: [UUID: FontAnnotation] = [:]
         private var clusterAnnotations: [ServerClusterAnnotation] = []
+        /// What the server sent, before joining overlapping circles.
+        private var serverClusters: [MapCluster] = []
 
         init(_ parent: FontMapView) {
             self.parent = parent
@@ -110,9 +112,14 @@ struct FontMapView: UIViewRepresentable {
                 fontAnnotations[id] = annotation
                 toAdd.append(annotation)
             }
-            if clusterAnnotations.map(\.cluster) != clusters {
+            if serverClusters != clusters {
+                serverClusters = clusters
                 toRemove += clusterAnnotations
-                clusterAnnotations = clusters.map(ServerClusterAnnotation.init)
+                let merged = ClusterMerge.merge(clusters) { cluster in
+                    map.convert(CLLocationCoordinate2D(latitude: cluster.latitude, longitude: cluster.longitude),
+                                toPointTo: map)
+                }
+                clusterAnnotations = merged.map(ServerClusterAnnotation.init)
                 toAdd += clusterAnnotations
             }
             if !toRemove.isEmpty { map.removeAnnotations(toRemove) }
@@ -180,11 +187,30 @@ struct FontMapView: UIViewRepresentable {
             case let cluster as ServerClusterAnnotation:
                 zoom(map, into: cluster.coordinate, factor: 4)
             case let local as MKClusterAnnotation:
-                map.showAnnotations(local.memberAnnotations, animated: true)
+                show(local.memberAnnotations, in: map)
             default:
                 break
             }
         }
+
+        /// Zooms to a group of pins, but never closer than a few streets: two fountains a
+        /// few metres apart used to land the map at building level, with nothing around
+        /// to tell where it was.
+        private func show(_ annotations: [MKAnnotation], in map: MKMapView) {
+            var rect = annotations.reduce(MKMapRect.null) { rect, annotation in
+                rect.union(MKMapRect(origin: MKMapPoint(annotation.coordinate), size: MKMapSize(width: 0, height: 0)))
+            }
+            guard !rect.isNull else { return }
+            let minSide = MKMapPointsPerMeterAtLatitude(rect.origin.coordinate.latitude) * Self.minZoomMeters
+            if rect.size.width < minSide && rect.size.height < minSide {
+                rect = rect.insetBy(dx: (rect.size.width - minSide) / 2, dy: (rect.size.height - minSide) / 2)
+            }
+            map.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 60, left: 40, bottom: 60, right: 40),
+                                  animated: true)
+        }
+
+        /// The closest a tap on a group zooms: about this many metres across.
+        static let minZoomMeters: Double = 500
 
         private func zoom(_ map: MKMapView, into center: CLLocationCoordinate2D, factor: Double) {
             let span = MKCoordinateSpan(latitudeDelta: map.region.span.latitudeDelta / factor,

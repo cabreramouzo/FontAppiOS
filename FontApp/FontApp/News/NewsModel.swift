@@ -22,20 +22,34 @@ final class NewsModel {
     static let radii: [Double] = [5, 10, 25, 50]
     static let pageSize = 24
 
-    var scope: Scope = .near
-    var km: Double = 5
+    /// Remembered between launches, as the web does: someone who chose "everywhere"
+    /// should not find "near me" again every time.
+    var scope: Scope {
+        didSet { defaults.set(scope == .near, forKey: Self.nearKey) }
+    }
+    var km: Double {
+        didSet { defaults.set(km, forKey: Self.kmKey) }
+    }
     private(set) var items: [ActivityItem] = []
     private(set) var state: State = .idle
     private(set) var canLoadMore = false
     private(set) var isLoadingMore = false
 
     @ObservationIgnored private let api: APIClient
+    @ObservationIgnored private let defaults: UserDefaults
+    private static let nearKey = "news.near"
+    private static let kmKey = "news.km"
     /// Where the current list was asked for. A new GPS fix does not reload the feed
     /// (the limit is 120/h), only a change of scope or radius, or pull to refresh.
     @ObservationIgnored private var origin: CLLocationCoordinate2D?
 
-    init(api: APIClient = .shared) {
+    init(api: APIClient = .shared, defaults: UserDefaults = .standard) {
         self.api = api
+        self.defaults = defaults
+        // Near me by default; a saved radius only if it is still one of the choices.
+        scope = (defaults.object(forKey: Self.nearKey) as? Bool ?? true) ? .near : .everywhere
+        let saved = defaults.double(forKey: Self.kmKey)
+        km = Self.radii.contains(saved) ? saved : 5
     }
 
     /// The scope actually used: "near" needs a position.
