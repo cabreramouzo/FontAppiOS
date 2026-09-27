@@ -62,6 +62,12 @@ final class SessionStore {
         UserDefaults.standard.set(try? JSONEncoder().encode(user), forKey: accountKey)
     }
 
+    /// Creates the account and signs in with it, as the web does.
+    func signUp(_ account: NewAccount) async throws {
+        _ = try await api.register(account)
+        try await signIn(user: account.username, password: account.password)
+    }
+
     /// Revokes the token on the server when possible, and forgets it here in any case:
     /// signing out must work without signal.
     func signOut() async {

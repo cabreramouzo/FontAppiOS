@@ -17385,6 +17385,165 @@
         }
       }
     },
+    "profile.nameEmpty": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nom no pot quedar buit."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre no puede quedar vacío."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome non pode quedar baleiro."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Izena ezin da hutsik geratu."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The name cannot be empty."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le nom ne peut pas être vide."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome não pode ficar vazio."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il nome non può restare vuoto."
+          }
+        }
+      }
+    },
+    "profile.usernameNotEmail": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nom d’usuari és públic i signa cada ressenya: no hi posis el teu correu. No admet @."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El nombre de usuario es público y firma cada reseña: no pongas aquí tu correo. No admite @."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome de usuario é público e asina cada reseña: non poñas aquí o teu correo. Non admite @."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erabiltzaile-izena publikoa da eta iritzi bakoitza sinatzen du: ez jarri hemen zure helbide elektronikoa. Ez du @ onartzen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your username is public and signs every review: do not put your email here. No @ allowed."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le nom d'utilisateur est public et signe chaque avis : n'y mettez pas votre e-mail. Le @ n'est pas accepté."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O nome de utilizador é público e assina cada avaliação: não ponhas aqui o teu email. Não admite @."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il nome utente è pubblico e firma ogni recensione: non mettere qui la tua email. Non ammette @."
+          }
+        }
+      }
+    },
+    "profile.usernameRules": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lletres sense accents, xifres, punt, guió i guió baix. De 3 a 30 caràcters."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letras sin acentos, números, punto, guion y guion bajo. De 3 a 30 caracteres."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letras sen acentos, números, punto, guión e guión baixo. De 3 a 30 caracteres."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Azenturik gabeko letrak, zenbakiak, puntua, marratxoa eta azpimarra. 3 eta 30 karaktere artean."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unaccented letters, digits, dot, hyphen and underscore. 3 to 30 characters."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lettres, chiffres, points, traits d'union et traits de soulignement non accentués. 3 à 30 caractères."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letras sem acentos, números, ponto, hífen e sublinhado. De 3 a 30 caracteres."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lettere senza accenti, numeri, punto, trattino e trattino basso. Da 3 a 30 caratteri."
+          }
+        }
+      }
+    },
     "remote.body": {
       "extractionState": "manual",
       "localizations": {
@@ -21409,6 +21568,112 @@
           "stringUnit": {
             "state": "translated",
             "value": "È un’altra fontana"
+          }
+        }
+      }
+    },
+    "ios.signUp.emailInvalid": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aquest correu no sembla vàlid."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ese correo no parece válido."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ese correo non parece válido."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posta helbide hori ez dirudi baliozkoa."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That email doesn’t look valid."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet e-mail ne semble pas valide."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esse e-mail não parece válido."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa email non sembra valida."
+          }
+        }
+      }
+    },
+    "ios.signUp.passwordShort": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La contrasenya ha de tenir almenys 8 caràcters."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La contraseña debe tener al menos 8 caracteres."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O contrasinal debe ter polo menos 8 caracteres."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasahitzak gutxienez 8 karaktere izan behar ditu."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The password needs at least 8 characters."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le mot de passe doit contenir au moins 8 caractères."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A palavra-passe tem de ter pelo menos 8 caracteres."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La password deve avere almeno 8 caratteri."
           }
         }
       }

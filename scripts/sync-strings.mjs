@@ -27,6 +27,7 @@ const KEYS = [
   'map.layers', 'map.filters', 'map.onlyWater', 'map.onlyReliable', 'map.hideNonPotable',
   'map.hideNonPotableTitle', 'map.filterType', 'map.allTypes', 'map.addFont', 'map.searchPlaceholder',
   'map.nearbyTitle', 'map.nearbyEmpty', 'zones.neverChecked',
+  'profile.usernameRules', 'profile.usernameNotEmail', 'profile.nameEmpty',
   'map.recenter', 'map.loading', 'map.rateLimited', 'map.rateLimitedBody', 'map.clusterCount',
   'detail.type', 'detail.drinkability', 'detail.unknownType', 'detail.unknownDrink',
   'detail.description', 'detail.lastUpdate', 'detail.currentStatus', 'detail.lastReportedStatus',
@@ -154,6 +155,17 @@ const IOS_ONLY = {
   'ios.newFont.itIsDifferent': {
     ca: 'És una altra font', es: 'Es otra fuente', gl: 'É outra fonte', eu: 'Beste iturri bat da',
     en: 'It’s a different fountain', fr: 'C’est une autre fontaine', pt: 'É outra fonte', it: 'È un’altra fontana',
+  },
+  'ios.signUp.emailInvalid': {
+    ca: 'Aquest correu no sembla vàlid.', es: 'Ese correo no parece válido.', gl: 'Ese correo non parece válido.',
+    eu: 'Posta helbide hori ez dirudi baliozkoa.', en: 'That email doesn’t look valid.',
+    fr: 'Cet e-mail ne semble pas valide.', pt: 'Esse e-mail não parece válido.', it: 'Questa email non sembra valida.',
+  },
+  'ios.signUp.passwordShort': {
+    ca: 'La contrasenya ha de tenir almenys 8 caràcters.', es: 'La contraseña debe tener al menos 8 caracteres.',
+    gl: 'O contrasinal debe ter polo menos 8 caracteres.', eu: 'Pasahitzak gutxienez 8 karaktere izan behar ditu.',
+    en: 'The password needs at least 8 characters.', fr: 'Le mot de passe doit contenir au moins 8 caractères.',
+    pt: 'A palavra-passe tem de ter pelo menos 8 caracteres.', it: 'La password deve avere almeno 8 caratteri.',
   },
   // Apple draws the base map and credits it; the fountains come from these sources.
   'ios.dataAttribution': {

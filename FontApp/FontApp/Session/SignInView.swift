@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Username (or email) and password. Signing up and password recovery stay on the web
-/// for now; the links open it.
+/// Username (or email) and password, and the way to create an account. Password
+/// recovery stays on the web: it works through a link sent by email.
 struct SignInView: View {
     @Environment(SessionStore.self) private var session
     @Environment(\.dismiss) private var dismiss
@@ -46,8 +46,11 @@ struct SignInView: View {
                     .disabled(!canSubmit)
                 }
                 Section {
+                    NavigationLink(L10n.t("login.noAccount") + L10n.t("login.signup")) {
+                        SignUpView { dismiss() }
+                    }
+                    // Resetting needs the link the server emails, which opens the web.
                     Link(L10n.t("login.forgot"), destination: web("forgot-password"))
-                    Link(L10n.t("login.noAccount") + L10n.t("login.signup"), destination: web("register"))
                 }
             }
             .navigationTitle(L10n.t("login.enter"))

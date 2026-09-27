@@ -251,3 +251,13 @@ nonisolated struct Missions: Codable, Sendable {
     /// Not checked for over half a year.
     let stale: [MissionTarget]
 }
+
+/// A new account as `POST /users` takes it.
+nonisolated struct NewAccount: Encodable, Equatable, Sendable {
+    let name: String
+    let username: String
+    let email: String
+    let password: String
+    /// Language of the welcome email (the web's codes: ca, es, gl, eu, en, fr, pt, it).
+    let lang: String?
+}

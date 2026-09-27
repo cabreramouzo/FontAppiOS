@@ -152,6 +152,12 @@ nonisolated struct APIClient: Sendable {
         return try await send("POST", "/auth/login", authorization: "Basic \(basic)", timeout: writeTimeout)
     }
 
+    /// Creates an account (`POST /users`). `lang` localises the welcome email. The server
+    /// allows 5 sign-ups an hour per IP (429 with Retry-After).
+    func register(_ account: NewAccount) async throws -> UserResponse {
+        try await send("POST", "/users", body: .json(try JSONEncoder().encode(account)), timeout: writeTimeout)
+    }
+
     func me() async throws -> UserResponse {
         try await get("/auth/me")
     }
