@@ -7,6 +7,8 @@ struct FontDetailView: View {
     @Environment(SessionStore.self) private var session
     @State private var model: FontDetailModel
     @State private var showsSignIn = false
+    @State private var showsCamera = false
+    @Environment(LocationService.self) private var location
     /// What the caller already knows, shown while the rest loads.
     private let preview: FontSummary?
 
@@ -36,6 +38,15 @@ struct FontDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task { await model.load() }
         .sheet(isPresented: $showsSignIn) { SignInView() }
+        .fullScreenCover(isPresented: $showsCamera) {
+            CameraPicker { jpeg in
+                showsCamera = false
+                guard let jpeg, let upload = model.photoUpload else { return }
+                let fix = location.isAuthorized ? location.location : nil
+                Task { if await upload.upload(cameraJPEG: jpeg, fix: fix) { await model.load() } }
+            }
+            .ignoresSafeArea()
+        }
         .remoteReviewAlert(model.quickReview) { await model.load() }
     }
 
@@ -54,9 +65,14 @@ struct FontDetailView: View {
                                    onSignIn: { showsSignIn = true })
             }
             Section { directionsButton(font) }
-            Section {
-                PhotoView(url: APIClient.shared.imageURL(font.image))
-                    .listRowInsets(EdgeInsets())
+            if font.image == nil, let upload = model.photoUpload {
+                PhotoSection(model: upload, onUploaded: { await model.load() },
+                             onCamera: { showsCamera = true })
+            } else {
+                Section {
+                    PhotoView(url: APIClient.shared.imageURL(font.image))
+                        .listRowInsets(EdgeInsets())
+                }
             }
             factsSection(font)
             if !model.reviews.isEmpty {

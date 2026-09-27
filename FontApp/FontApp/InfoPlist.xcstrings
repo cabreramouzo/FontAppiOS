@@ -53,6 +53,59 @@
           }
         }
       }
+    },
+    "NSCameraUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp fa servir la càmera per fer la foto d'una font."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp usa la cámara para hacer la foto de una fuente."
+          }
+        },
+        "gl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp usa a cámara para facer a foto dunha fonte."
+          }
+        },
+        "eu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp-ek kamera erabiltzen du iturri baten argazkia ateratzeko."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp uses the camera to take the photo of a fountain."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp utilise l’appareil photo pour prendre la photo d’une fontaine."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A FontApp usa a câmara para tirar a fotografia de uma fonte."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FontApp usa la fotocamera per scattare la foto di una fontana."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

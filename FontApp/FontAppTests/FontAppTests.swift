@@ -1,5 +1,7 @@
 import Foundation
+import ImageIO
 import MapKit
+import UniformTypeIdentifiers
 import Testing
 @testable import FontApp
 
@@ -333,5 +335,51 @@ struct QuickReviewTests {
         #expect(await model.tap(.dry, fix: barcelona))
         #expect(model.remoteQuestion == nil)
         #expect(StubProtocol.sent.count == 2)
+    }
+}
+
+struct PhotoPreparerTests {
+    /// A 4000x3000 JPEG with a capture date and a position, like a phone photo.
+    private func phonePhoto() throws -> Data {
+        let context = try #require(CGContext(data: nil, width: 4000, height: 3000, bitsPerComponent: 8,
+                                             bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
+                                             bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue))
+        context.setFillColor(red: 0.2, green: 0.5, blue: 0.8, alpha: 1)
+        context.fill(CGRect(x: 0, y: 0, width: 4000, height: 3000))
+        let image = try #require(context.makeImage())
+        let data = NSMutableData()
+        let destination = try #require(CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil))
+        let properties: [CFString: Any] = [
+            kCGImagePropertyExifDictionary: [
+                kCGImagePropertyExifDateTimeOriginal: "2026:09:27 10:15:03",
+                kCGImagePropertyExifOffsetTimeOriginal: "+02:00",
+            ],
+            kCGImagePropertyGPSDictionary: [
+                kCGImagePropertyGPSLatitude: 41.8105, kCGImagePropertyGPSLatitudeRef: "N",
+                kCGImagePropertyGPSLongitude: 2.0977, kCGImagePropertyGPSLongitudeRef: "E",
+            ],
+        ]
+        CGImageDestinationAddImage(destination, image, properties as CFDictionary)
+        #expect(CGImageDestinationFinalize(destination))
+        return data as Data
+    }
+
+    @Test func keepsTheExifAsFieldsAndShrinksThePhoto() throws {
+        let prepared = try PhotoPreparer.prepare(try phonePhoto())
+        #expect(prepared.meta.takenAt == date("2026-09-27T08:15:03Z"))
+        #expect(abs((prepared.meta.latitude ?? 0) - 41.8105) < 0.0001)
+        #expect(abs((prepared.meta.longitude ?? 0) - 2.0977) < 0.0001)
+
+        let source = try #require(CGImageSourceCreateWithData(prepared.jpeg as CFData, nil))
+        let props = try #require(CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any])
+        #expect(props[kCGImagePropertyPixelWidth] as? Int == PhotoPreparer.maxPixelSize)
+        // The uploaded file itself no longer says where it was taken.
+        #expect(props[kCGImagePropertyGPSDictionary] == nil)
+    }
+
+    @Test func exifDateWithoutOffsetUsesTheDeviceZone() {
+        let madrid = TimeZone(identifier: "Europe/Madrid")!
+        #expect(PhotoPreparer.exifDate("2026:09:27 10:15:03", offset: nil, timeZone: madrid) == date("2026-09-27T08:15:03Z"))
+        #expect(PhotoPreparer.exifDate("2026:09:27 10:15:03", offset: "-05:00") == date("2026-09-27T15:15:03Z"))
     }
 }

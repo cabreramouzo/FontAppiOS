@@ -17,6 +17,8 @@ final class FontDetailModel {
     private(set) var reports: [ReportResponse] = []
     /// The chips, once the fountain (and so its position) is known.
     private(set) var quickReview: QuickReviewModel?
+    /// The first photo, for a fountain that has none.
+    private(set) var photoUpload: PhotoUploadModel?
     /// A failed "still the same", already translated.
     private(set) var actionError: String?
 
@@ -37,6 +39,9 @@ final class FontDetailModel {
             self.reviews = loaded.1
             self.reports = Self.threaded(loaded.2)
             state = .loaded(loaded.0)
+            if photoUpload == nil {
+                photoUpload = PhotoUploadModel(fontID: fontID)
+            }
             if quickReview == nil {
                 quickReview = QuickReviewModel(
                     fontID: fontID,

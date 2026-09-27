@@ -29,7 +29,7 @@ const KEYS = [
   'detail.description', 'detail.lastUpdate', 'detail.currentStatus', 'detail.lastReportedStatus',
   'detail.confirmedByOne', 'detail.confirmedByMany', 'detail.statusReviews', 'detail.beFirst',
   'detail.incidents', 'detail.noIncidents', 'detail.loading', 'detail.directions',
-  'detail.addPhoto', 'detail.firstPhotoNote', 'nav.logout', 'nav.enter', 'staff.tag', 'settings.account',
+  'detail.addPhoto', 'detail.firstPhotoNote', 'nav.logout', 'nav.enter', 'staff.tag', 'settings.account', 'photo.failed',
   'detail.noPhotoYet', 'detail.municipality', 'detail.region', 'detail.country', 'detail.stale',
 ]
 
