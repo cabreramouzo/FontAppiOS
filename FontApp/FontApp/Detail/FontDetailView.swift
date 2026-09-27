@@ -13,7 +13,7 @@ struct FontDetailView: View {
     private let preview: FontSummary?
 
     init(fontID: UUID, preview: FontSummary? = nil) {
-        _model = State(initialValue: FontDetailModel(fontID: fontID))
+        _model = State(initialValue: FontDetailModel(fontID: fontID, summary: preview))
         self.preview = preview
     }
 
@@ -31,7 +31,9 @@ struct FontDetailView: View {
                         .buttonStyle(.bordered)
                 }
             case .loaded(let font):
-                content(font)
+                content(font, offlineNote: nil)
+            case .offline(let font, let message):
+                content(font, offlineNote: message)
             }
         }
         .navigationTitle(L10n.fontName(loadedFont?.name ?? preview?.name))
@@ -50,13 +52,19 @@ struct FontDetailView: View {
         .remoteReviewAlert(model.quickReview) { await model.load() }
     }
 
-    private var loadedFont: FontDetail? {
-        if case .loaded(let font) = model.state { return font }
-        return nil
-    }
+    private var loadedFont: FontDetail? { model.font }
 
-    private func content(_ font: FontDetail) -> some View {
+    private func content(_ font: FontDetail, offlineNote: String?) -> some View {
         List {
+            if let offlineNote {
+                // Only what the map knew: reviews and reports need signal. Reviewing and
+                // adding a photo still work — they go to the outbox.
+                Section {
+                    Label(offlineNote, systemImage: "wifi.slash")
+                    Button(L10n.t("activity.retry")) { Task { await model.load() } }
+                        .frame(minHeight: 44)
+                }
+            }
             // What decides whether to walk there comes first; at half height the sheet
             // shows the status and the way there, and the photo is one swipe away.
             statusSection(font)

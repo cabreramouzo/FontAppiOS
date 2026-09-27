@@ -3,6 +3,7 @@ import SwiftUI
 /// The "Me" tab: the account and signing out. The rest of the web's profile comes later.
 struct MeScreen: View {
     @Environment(SessionStore.self) private var session
+    @Environment(Outbox.self) private var outbox
     @State private var showsSignIn = false
     @State private var isSigningOut = false
 
@@ -11,6 +12,17 @@ struct MeScreen: View {
             Group {
                 if session.isSignedIn {
                     account
+                } else if !outbox.items.isEmpty {
+                    // Signed out with contributions still on the phone: show them, they
+                    // are why signing in matters right now.
+                    List {
+                        Section {
+                            Button(L10n.t("nav.enter")) { showsSignIn = true }.frame(minHeight: 44)
+                        } footer: {
+                            Text(L10n.t("ios.signInPrompt"))
+                        }
+                        PendingSection()
+                    }
                 } else {
                     ContentUnavailableView {
                         Label(L10n.t("nav.profile"), systemImage: "person.crop.circle")
@@ -51,6 +63,7 @@ struct MeScreen: View {
                     ProgressView()
                 }
             }
+            PendingSection()
             Section {
                 Button(role: .destructive) {
                     isSigningOut = true

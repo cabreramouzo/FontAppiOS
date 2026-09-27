@@ -8,6 +8,8 @@ final class FontDetailModel {
     enum State {
         case loading
         case loaded(FontDetail)
+        /// Only the map's summary could be shown: no signal. The message says why.
+        case offline(FontDetail, String)
         case failed(String)
     }
 
@@ -23,10 +25,21 @@ final class FontDetailModel {
     private(set) var actionError: String?
 
     @ObservationIgnored private let api: APIClient
+    @ObservationIgnored private let fallback: FontDetail?
 
-    init(fontID: UUID, api: APIClient = .shared) {
+    /// `summary` is what the map pin knew; it stands in when the page cannot load.
+    init(fontID: UUID, summary: FontSummary? = nil, api: APIClient = .shared) {
         self.fontID = fontID
         self.api = api
+        fallback = summary.map(FontDetail.init(summary:))
+    }
+
+    /// The fountain on screen, fully loaded or from the summary.
+    var font: FontDetail? {
+        switch state {
+        case .loaded(let font), .offline(let font, _): font
+        default: nil
+        }
     }
 
     func load() async {
@@ -39,18 +52,29 @@ final class FontDetailModel {
             self.reviews = loaded.1
             self.reports = Self.threaded(loaded.2)
             state = .loaded(loaded.0)
-            if photoUpload == nil {
-                photoUpload = PhotoUploadModel(fontID: fontID)
-            }
-            if quickReview == nil {
-                quickReview = QuickReviewModel(
-                    fontID: fontID,
-                    coordinate: .init(latitude: loaded.0.latitude, longitude: loaded.0.longitude))
-            }
+            prepareContributions(for: loaded.0)
         } catch is CancellationError {
             return
         } catch {
-            state = .failed(ErrorText.describe(error))
+            // A reload that fails (no signal after a contribution was queued) keeps the
+            // page on screen: replacing it with an error would hide what is still true.
+            if case .loaded = state { return }
+            if let fallback, let e = error as? APIError, e.status == 0 {
+                state = .offline(fallback, ErrorText.describe(error))
+                prepareContributions(for: fallback)
+            } else {
+                state = .failed(ErrorText.describe(error))
+            }
+        }
+    }
+
+    private func prepareContributions(for font: FontDetail) {
+        if photoUpload == nil {
+            photoUpload = PhotoUploadModel(fontID: fontID, fontName: font.name)
+        }
+        if quickReview == nil {
+            quickReview = QuickReviewModel(fontID: fontID, fontName: font.name,
+                                           coordinate: .init(latitude: font.latitude, longitude: font.longitude))
         }
     }
 

@@ -9,6 +9,9 @@ final class SessionStore {
 
     var isSignedIn: Bool { user != nil || hasToken }
     var isStaff: Bool { user?.role?.isStaff ?? false }
+    /// Known as soon as the app starts, before `/auth/me` answers (or without signal):
+    /// the outbox needs it to send each contribution only under the account that made it.
+    private(set) var userID: UUID?
 
     @ObservationIgnored private let api: APIClient
     @ObservationIgnored private let keychain: TokenKeychain
@@ -21,6 +24,7 @@ final class SessionStore {
         if let token = keychain.read() {
             api.credentials.set(token)
             hasToken = true
+            userID = UserDefaults.standard.string(forKey: userKey).flatMap(UUID.init(uuidString:))
         }
         observer = NotificationCenter.default.addObserver(
             forName: Credentials.rejected, object: nil, queue: .main
@@ -34,7 +38,7 @@ final class SessionStore {
     /// network keeps the session, since the token is still good.
     func refresh() async {
         guard hasToken else { return }
-        if let me = try? await api.me() { user = me }
+        if let me = try? await api.me() { setUser(me) }
     }
 
     func signIn(user name: String, password: String) async throws {
@@ -42,7 +46,15 @@ final class SessionStore {
         keychain.save(response.token)
         api.credentials.set(response.token)
         hasToken = true
-        user = response.user
+        setUser(response.user)
+    }
+
+    private var userKey: String { "session.userID.\(keychain.account)" }
+
+    private func setUser(_ user: UserResponse) {
+        self.user = user
+        userID = user.id
+        UserDefaults.standard.set(user.id.uuidString, forKey: userKey)
     }
 
     /// Revokes the token on the server when possible, and forgets it here in any case:
@@ -63,5 +75,7 @@ final class SessionStore {
         api.credentials.set(nil)
         hasToken = false
         user = nil
+        userID = nil
+        UserDefaults.standard.removeObject(forKey: userKey)
     }
 }

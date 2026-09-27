@@ -237,6 +237,10 @@ struct RemoteReviewTests {
     }
 }
 
+/// Every suite that uses `StubProtocol` lives inside this one, which runs them one at a
+/// time: the stub's table is static and shared.
+@Suite(.serialized) struct StubbedNetwork {}
+
 /// Answers requests from a table and records what was sent.
 final class StubProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var responses: [String: (Int, String)] = [:]
@@ -263,6 +267,11 @@ final class StubProtocol: URLProtocol, @unchecked Sendable {
         }
         Self.sent.append((method, path, body))
         let (status, json) = Self.responses["\(method) \(path)"] ?? (404, #"{"reason":"stub"}"#)
+        // -1: no signal.
+        if status == -1 {
+            client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
+            return
+        }
         let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data(json.utf8))
@@ -279,7 +288,9 @@ final class StubProtocol: URLProtocol, @unchecked Sendable {
     }
 }
 
-@Suite(.serialized)
+/// Shares `StubProtocol`'s static table with the other stubbed suites, so they must
+/// not run at the same time.
+extension StubbedNetwork {
 struct QuickReviewTests {
     let font = UUID()
     let comment = UUID()
@@ -337,8 +348,11 @@ struct QuickReviewTests {
         #expect(StubProtocol.sent.count == 2)
     }
 }
+}
 
 struct PhotoPreparerTests {
+    func phoneJPEG() throws -> Data { try phonePhoto() }
+
     /// A 4000x3000 JPEG with a capture date and a position, like a phone photo.
     private func phonePhoto() throws -> Data {
         let context = try #require(CGContext(data: nil, width: 4000, height: 3000, bitsPerComponent: 8,
@@ -408,4 +422,129 @@ struct LeftoverTests {
         #expect(again.scope == .everywhere)
         #expect(again.km == 25)
     }
+}
+
+/// Shares `StubProtocol`'s static table with the other stubbed suites, so they must
+/// not run at the same time.
+extension StubbedNetwork {
+struct OutboxTests {
+    let font = UUID()
+    let me = UUID()
+    let review = NewReview(waterStatus: "flowing", confirmIfUnchanged: true, remoteDistanceM: nil)
+
+    private func outbox(_ dir: URL) -> Outbox {
+        let box = Outbox(directory: dir, api: StubProtocol.client())
+        box.currentUserID = me
+        return box
+    }
+
+    private func tempDir() -> URL {
+        FileManager.default.temporaryDirectory.appending(path: "outbox-\(UUID().uuidString)")
+    }
+
+    private var commentPath: String { "POST /fonts/\(font.uuidString)/comments" }
+    private let okReview = #"{"id":"00000000-0000-0000-0000-000000000001","body":"","createdAt":"2026-09-27T10:00:00Z"}"#
+
+    @Test func survivesARestartAndSendsMarkedAsOffline() async {
+        StubProtocol.sent = []
+        StubProtocol.responses = [commentPath: (201, okReview)]
+        let dir = tempDir()
+        outbox(dir).enqueueReview(review, fontID: font, fontName: "Font del Faig")
+        // A new instance on the same folder: the app was killed and opened again.
+        let reopened = outbox(dir)
+        #expect(reopened.items.count == 1)
+        #expect(await reopened.flush() == 1)
+        #expect(reopened.items.isEmpty)
+        #expect(outbox(dir).items.isEmpty)
+    }
+
+    @Test func transientFailuresKeepItForEver() async {
+        StubProtocol.responses = [commentPath: (503, #"{"reason":"down"}"#)]
+        let box = outbox(tempDir())
+        box.enqueueReview(review, fontID: font, fontName: nil)
+        for _ in 0..<5 { await box.flush() }
+        #expect(box.items.count == 1)
+        #expect(box.items.first?.attempts == 0)
+    }
+
+    @Test func aDefinitiveRejectionIsDroppedAfterThreeTries() async {
+        StubProtocol.responses = [commentPath: (404, #"{"reason":"gone","code":"font.notFound"}"#)]
+        let box = outbox(tempDir())
+        box.enqueueReview(review, fontID: font, fontName: nil)
+        await box.flush()
+        await box.flush()
+        #expect(box.items.first?.attempts == 2)
+        await box.flush()
+        #expect(box.items.isEmpty)
+    }
+
+    @Test func anExpiredSessionWaitsForASignIn() async {
+        StubProtocol.responses = [commentPath: (401, #"{"reason":"no"}"#)]
+        let box = outbox(tempDir())
+        box.enqueueReview(review, fontID: font, fontName: nil)
+        await box.flush()
+        #expect(box.needsAuth)
+        StubProtocol.responses = [commentPath: (201, okReview)]
+        await box.flush()
+        #expect(box.items.count == 1, "not retried until a new sign-in")
+        box.sessionChanged(to: me)
+        #expect(await box.flush() == 1)
+    }
+
+    @Test func onlyTheAccountThatQueuedItSendsIt() async {
+        StubProtocol.sent = []
+        StubProtocol.responses = [commentPath: (201, okReview)]
+        let box = outbox(tempDir())
+        box.enqueueReview(review, fontID: font, fontName: nil)
+        box.sessionChanged(to: UUID())
+        #expect(await box.flush() == 0)
+        #expect(StubProtocol.sent.isEmpty)
+        #expect(box.othersCount == 1)
+        box.sessionChanged(to: nil)
+        #expect(box.othersCount == 0, "signed out, nothing is someone else's")
+        #expect(await box.flush() == 0)
+        box.sessionChanged(to: me)
+        #expect(await box.flush() == 1)
+    }
+
+    @Test func withoutSignalAReviewAndAPhotoGoToTheOutbox() async throws {
+        StubProtocol.responses = [
+            commentPath: (-1, ""),
+            "POST /images": (-1, ""),
+        ]
+        let box = outbox(tempDir())
+        let quick = QuickReviewModel(fontID: font, fontName: "Font del Faig",
+                                     coordinate: .init(latitude: 41.81, longitude: 2.10),
+                                     api: StubProtocol.client(), outbox: box)
+        #expect(await quick.tap(.dry, fix: nil) == false)
+        guard case .queued = quick.state else { Issue.record("not queued: \(quick.state)"); return }
+        #expect(quick.canUndo)
+
+        let photo = PhotoUploadModel(fontID: font, fontName: "Font del Faig", api: StubProtocol.client(), outbox: box)
+        #expect(await photo.upload(cameraJPEG: try PhotoPreparerTests().phoneJPEG(), fix: nil) == false)
+        #expect(photo.state == .queued)
+        #expect(box.items.map(\.kind) == [.review, .photo])
+
+        // Undo while it is still on the phone: it is simply not sent.
+        _ = await quick.undo()
+        #expect(quick.state == .undone)
+        #expect(box.items.map(\.kind) == [.photo])
+    }
+
+    @Test func aQueuedPhotoKeepsItsExif() async throws {
+        StubProtocol.sent = []
+        StubProtocol.responses = [
+            "POST /images": (200, #"{"url":"/uploads/x.jpg"}"#),
+            "PUT /fonts/\(font.uuidString)/photo": (200, #"{}"#),
+        ]
+        let box = outbox(tempDir())
+        let meta = PhotoMeta(takenAt: Date(timeIntervalSince1970: 1_790_000_000), latitude: 41.81, longitude: 2.09)
+        try box.enqueuePhoto(jpeg: Data([0xFF, 0xD8, 0xFF]), meta: meta, fontID: font, fontName: nil)
+        #expect(await box.flush() == 1)
+        let upload = try #require(StubProtocol.sent.first { $0.path == "/images" }?.body)
+        let text = String(decoding: upload, as: UTF8.self)
+        #expect(text.contains("name=\"latitude\"\r\n\r\n41.81"))
+        #expect(text.contains("name=\"takenAt\""))
+    }
+}
 }

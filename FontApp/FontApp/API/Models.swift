@@ -80,6 +80,19 @@ nonisolated struct FontDetail: Codable, Identifiable, Sendable {
     let statusConflict: Bool?
 }
 
+extension FontDetail {
+    /// What the map pin already knew, for when the full page cannot be loaded (no
+    /// signal). Enough to show the status and to review or add a photo, which are the
+    /// things one does standing in front of a fountain.
+    nonisolated init(summary s: FontSummary) {
+        self.init(id: s.id, name: s.name, latitude: s.latitude, longitude: s.longitude, image: s.image,
+                  description: s.description, source: s.source, drinkable: s.drinkable, country: s.country,
+                  region: s.region, municipality: nil, createdAt: s.createdAt, retiredAt: nil,
+                  lastWaterStatus: s.lastWaterStatus, lastUpdate: s.lastUpdate,
+                  statusConflict: s.recentStatusConflict)
+    }
+}
+
 /// A review: a status update with optional text, rating and photo.
 nonisolated struct CommentResponse: Codable, Identifiable, Sendable {
     let id: UUID
@@ -179,7 +192,7 @@ nonisolated struct LoginResponse: Codable, Sendable {
 }
 
 /// A review as the app sends it: the quick chips send only a status.
-nonisolated struct NewReview: Encodable, Sendable {
+nonisolated struct NewReview: Codable, Equatable, Sendable {
     let waterStatus: String
     /// "If this adds nothing, count it as still the same." The server decides.
     let confirmIfUnchanged: Bool
@@ -188,7 +201,7 @@ nonisolated struct NewReview: Encodable, Sendable {
 }
 
 /// What survives of a photo's EXIF after it is re-encoded for upload.
-nonisolated struct PhotoMeta: Equatable, Sendable {
+nonisolated struct PhotoMeta: Codable, Equatable, Sendable {
     var takenAt: Date?
     var latitude: Double?
     var longitude: Double?

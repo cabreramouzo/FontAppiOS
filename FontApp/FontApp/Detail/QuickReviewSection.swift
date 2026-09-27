@@ -71,6 +71,17 @@ struct QuickReviewSection: View {
                     .frame(minHeight: 44)
                 }
             }
+        case .queued:
+            HStack {
+                Label(L10n.t("offline.savedUpdate"), systemImage: "tray.and.arrow.up")
+                    .font(.subheadline)
+                Spacer()
+                if model.canUndo {
+                    Button(L10n.t("popup.undo")) { Task { _ = await model.undo() } }
+                        .buttonStyle(.borderless)
+                        .frame(minHeight: 44)
+                }
+            }
         case .undone:
             Text(L10n.t("popup.undone")).font(.subheadline).foregroundStyle(.secondary)
         case .failed(let message):

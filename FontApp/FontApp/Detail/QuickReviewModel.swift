@@ -20,6 +20,8 @@ final class QuickReviewModel {
         case sending(WaterStatus)
         /// Published (or counted as "still the same"); can be undone until `undoUntil`.
         case sent(CommentResponse.ID, confirmedInstead: Bool, undoUntil: Date)
+        /// No signal: saved in the outbox (item id), sent when there is signal.
+        case queued(OutboxItem.ID)
         case undone
         case failed(String)
     }
@@ -32,6 +34,7 @@ final class QuickReviewModel {
     }
 
     let fontID: UUID
+    let fontName: String?
     let coordinate: CLLocationCoordinate2D
     private(set) var state: State = .idle
     var remoteQuestion: RemoteQuestion?
@@ -40,12 +43,16 @@ final class QuickReviewModel {
     private static var remoteConfirmed = Set<UUID>()
 
     @ObservationIgnored private let api: APIClient
+    @ObservationIgnored private let outbox: Outbox
     @ObservationIgnored private var expiry: Task<Void, Never>?
 
-    init(fontID: UUID, coordinate: CLLocationCoordinate2D, api: APIClient = .shared) {
+    init(fontID: UUID, fontName: String? = nil, coordinate: CLLocationCoordinate2D,
+         api: APIClient = .shared, outbox: Outbox = .shared) {
         self.fontID = fontID
+        self.fontName = fontName
         self.coordinate = coordinate
         self.api = api
+        self.outbox = outbox
     }
 
     /// True during the undo window after a review lands. Stored, not derived from the
@@ -72,9 +79,9 @@ final class QuickReviewModel {
 
     private func send(_ status: WaterStatus, remoteDistanceM: Int?) async -> Bool {
         state = .sending(status)
+        let review = NewReview(waterStatus: status.rawValue, confirmIfUnchanged: true,
+                               remoteDistanceM: remoteDistanceM)
         do {
-            let review = NewReview(waterStatus: status.rawValue, confirmIfUnchanged: true,
-                                   remoteDistanceM: remoteDistanceM)
             let response = try await api.postReview(on: fontID, review)
             let until = Date.now.addingTimeInterval(Self.undoWindow)
             state = .sent(response.id, confirmedInstead: response.confirmedInstead ?? false, undoUntil: until)
@@ -82,6 +89,15 @@ final class QuickReviewModel {
             scheduleExpiry(at: until)
             NotificationCenter.default.post(name: .fontChanged, object: fontID)
             return true
+        } catch let error as APIError where error.status == 0 {
+            // No signal, which in front of a fountain on a mountain is the usual case:
+            // keep it on the phone with the same intent, and let the server decide when
+            // it arrives (confirmIfUnchanged travels with it).
+            let item = outbox.enqueueReview(review, fontID: fontID, fontName: fontName)
+            state = .queued(item.id)
+            canUndo = true
+            scheduleExpiry(at: .now.addingTimeInterval(Self.undoWindow))
+            return false
         } catch {
             state = .failed(ErrorText.describe(error))
             return false
@@ -90,7 +106,16 @@ final class QuickReviewModel {
 
     /// Deletes the review, or takes the "still the same" back if that is what it became.
     func undo() async -> Bool {
-        guard canUndo, case .sent(let id, let confirmedInstead, let until) = state, until > .now else { return false }
+        guard canUndo else { return false }
+        if case .queued(let itemID) = state {
+            // Still on the phone: undoing is just not sending it.
+            expiry?.cancel()
+            canUndo = false
+            outbox.remove(itemID)
+            state = .undone
+            return false
+        }
+        guard case .sent(let id, let confirmedInstead, let until) = state, until > .now else { return false }
         expiry?.cancel()
         canUndo = false
         do {

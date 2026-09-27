@@ -1,112 +1,124 @@
 {
-  "sourceLanguage": "ca",
-  "strings": {
-    "NSLocationWhenInUseUsageDescription": {
-      "extractionState": "manual",
-      "localizations": {
-        "ca": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp fa servir la teva ubicació per mostrar-te les fonts i les novetats que tens a prop."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp usa tu ubicación para mostrarte las fuentes y las novedades que tienes cerca."
-          }
-        },
-        "gl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp usa a túa localización para amosarche as fontes e as novidades que tes preto."
-          }
-        },
-        "eu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp-ek zure kokapena erabiltzen du inguruko iturriak eta berriak erakusteko."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp uses your location to show you the fountains and news near you."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp utilise ta position pour te montrer les fontaines et les nouveautés près de toi."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A FontApp usa a tua localização para te mostrar as fontes e as novidades perto de ti."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp usa la tua posizione per mostrarti le fontane e le novità vicino a te."
+  "sourceLanguage" : "ca",
+  "strings" : {
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "FontApp"
           }
         }
       }
     },
-    "NSCameraUsageDescription": {
-      "extractionState": "manual",
-      "localizations": {
-        "ca": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp fa servir la càmera per fer la foto d'una font."
+    "NSCameraUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp fa servir la càmera per fer la foto d'una font."
           }
         },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp usa la cámara para hacer la foto de una fuente."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp uses the camera to take the photo of a fountain."
           }
         },
-        "gl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp usa a cámara para facer a foto dunha fonte."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp usa la cámara para hacer la foto de una fuente."
           }
         },
-        "eu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp-ek kamera erabiltzen du iturri baten argazkia ateratzeko."
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp-ek kamera erabiltzen du iturri baten argazkia ateratzeko."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp uses the camera to take the photo of a fountain."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp utilise l’appareil photo pour prendre la photo d’une fontaine."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp utilise l’appareil photo pour prendre la photo d’une fontaine."
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp usa a cámara para facer a foto dunha fonte."
           }
         },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A FontApp usa a câmara para tirar a fotografia de uma fonte."
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp usa la fotocamera per scattare la foto di una fontana."
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FontApp usa la fotocamera per scattare la foto di una fontana."
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A FontApp usa a câmara para tirar a fotografia de uma fonte."
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp fa servir la teva ubicació per mostrar-te les fonts i les novetats que tens a prop."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp uses your location to show you the fountains and news near you."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp usa tu ubicación para mostrarte las fuentes y las novedades que tienes cerca."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp-ek zure kokapena erabiltzen du inguruko iturriak eta berriak erakusteko."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp utilise ta position pour te montrer les fontaines et les nouveautés près de toi."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp usa a túa localización para amosarche as fontes e as novidades que tes preto."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp usa la tua posizione per mostrarti le fontane e le novità vicino a te."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A FontApp usa a tua localização para te mostrar as fontes e as novidades perto de ti."
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

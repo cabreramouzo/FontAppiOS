@@ -36,6 +36,8 @@ struct PhotoSection: View {
             .frame(minHeight: 44)
         case .done:
             Text(L10n.t("toast.photoAdded"))
+        case .queued:
+            Label(L10n.t("offline.savedPhoto"), systemImage: "tray.and.arrow.up")
         case .idle, .failed:
             if case .failed(let message) = model.state {
                 Text(message).foregroundStyle(.red)

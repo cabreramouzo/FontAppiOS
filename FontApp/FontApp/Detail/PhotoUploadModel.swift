@@ -10,17 +10,23 @@ final class PhotoUploadModel {
         case idle
         case uploading
         case done
+        /// No signal: saved in the outbox, uploaded when there is signal.
+        case queued
         case failed(String)
     }
 
     let fontID: UUID
+    let fontName: String?
     private(set) var state: State = .idle
 
     @ObservationIgnored private let api: APIClient
+    @ObservationIgnored private let outbox: Outbox
 
-    init(fontID: UUID, api: APIClient = .shared) {
+    init(fontID: UUID, fontName: String? = nil, api: APIClient = .shared, outbox: Outbox = .shared) {
         self.fontID = fontID
+        self.fontName = fontName
         self.api = api
+        self.outbox = outbox
     }
 
     /// A photo from the library: its own EXIF says when and where it was taken.
@@ -67,6 +73,16 @@ final class PhotoUploadModel {
             state = .done
             NotificationCenter.default.post(name: .fontChanged, object: fontID)
             return true
+        } catch let error as APIError where error.status == 0 {
+            // In front of a fountain without a photo is exactly where signal is worst.
+            // The JPEG is already compressed and its EXIF read, so the queue keeps both.
+            do {
+                try outbox.enqueuePhoto(jpeg: jpeg, meta: meta, fontID: fontID, fontName: fontName)
+                state = .queued
+            } catch {
+                state = .failed(ErrorText.describe(error))
+            }
+            return false
         } catch {
             // A 429 on uploads (30 an hour) carries Retry-After; ErrorText says how long.
             state = .failed(ErrorText.describe(error))

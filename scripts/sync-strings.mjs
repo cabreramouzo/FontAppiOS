@@ -19,7 +19,7 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
 const PREFIXES = ['status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
-  'login.', 'popup.', 'remote.', 'confirm.', 'toast.']
+  'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.']
 const KEYS = [
   'font.unnamed', 'nav.map', 'nav.profile', 'zones.title', 'review.anon',
   'report.resolved', 'report.resolvedBy',

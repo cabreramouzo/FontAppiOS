@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(Outbox.self) private var outbox
+
     var body: some View {
         TabView {
             Tab(L10n.t("nav.map"), systemImage: "map") {
@@ -12,9 +14,11 @@ struct ContentView: View {
             Tab(L10n.t("zones.title"), systemImage: "globe.europe.africa") {
                 ComingSoonView(title: L10n.t("zones.title"), systemImage: "globe.europe.africa")
             }
+            // The count of contributions still on the phone, where they can be seen and sent.
             Tab(L10n.t("nav.profile"), systemImage: "person.crop.circle") {
                 MeScreen()
             }
+            .badge(outbox.items.count)
         }
     }
 }
@@ -40,4 +44,5 @@ struct ComingSoonView: View {
     ContentView()
         .environment(LocationService())
         .environment(SessionStore())
+        .environment(Outbox.shared)
 }

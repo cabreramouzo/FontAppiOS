@@ -125,9 +125,12 @@ nonisolated struct APIClient: Sendable {
 
     // MARK: Contributing
 
-    func postReview(on fontID: UUID, _ review: NewReview) async throws -> CommentResponse {
+    /// `queuedOffline`: it was written without signal and sent later from the outbox.
+    /// The server keeps the mark for moderation; nothing else hangs from it.
+    func postReview(on fontID: UUID, _ review: NewReview, queuedOffline: Bool = false) async throws -> CommentResponse {
         try await send("POST", "/fonts/\(fontID.uuidString)/comments",
-                       body: .json(try JSONEncoder().encode(review)), timeout: writeTimeout)
+                       body: .json(try JSONEncoder().encode(review)), queuedOffline: queuedOffline,
+                       timeout: writeTimeout)
     }
 
     func deleteReview(_ commentID: UUID, on fontID: UUID) async throws {
@@ -159,10 +162,10 @@ nonisolated struct APIClient: Sendable {
 
     /// Sets the photo of a fountain that has none. Replacing one is for its creator or
     /// an admin (403 otherwise).
-    func setFontPhoto(_ fontID: UUID, image: String) async throws {
+    func setFontPhoto(_ fontID: UUID, image: String, queuedOffline: Bool = false) async throws {
         let body = try JSONEncoder().encode(["image": image])
         let _: Ignored = try await send("PUT", "/fonts/\(fontID.uuidString)/photo",
-                                        body: .json(body), timeout: writeTimeout)
+                                        body: .json(body), queuedOffline: queuedOffline, timeout: writeTimeout)
     }
 
     /// Resolves an image path from the API (`/uploads/x.jpg` or an absolute URL).
@@ -186,6 +189,7 @@ nonisolated struct APIClient: Sendable {
 
     @concurrent func send<T: Decodable>(_ method: String, _ path: String, query: [URLQueryItem] = [],
                                         body: Body = .none, authorization: String? = nil,
+                                        queuedOffline: Bool = false,
                                         timeout: TimeInterval) async throws -> T {
         var components = URLComponents(url: baseURL.appending(path: path), resolvingAgainstBaseURL: false)!
         if !query.isEmpty { components.queryItems = query }
@@ -195,6 +199,7 @@ nonisolated struct APIClient: Sendable {
                                  timeoutInterval: timeout)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if queuedOffline { request.setValue("1", forHTTPHeaderField: "X-FontApp-Queued-Offline") }
         let bearer = authorization == nil ? credentials.current : nil
         if let authorization {
             request.setValue(authorization, forHTTPHeaderField: "Authorization")
