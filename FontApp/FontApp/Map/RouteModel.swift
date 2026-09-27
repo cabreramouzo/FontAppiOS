@@ -19,6 +19,10 @@ final class RouteModel {
         didSet { recompute() }
     }
     private(set) var onRoute: [GPX.OnRoute] = []
+    /// The ones left out of the GPS file. The EXCLUDED and not the chosen: widening the
+    /// corridor brings new fountains, and they must come in chosen. "All" is the empty set.
+    private(set) var excluded = Set<UUID>()
+    let profile: [GPX.ProfilePoint]
 
     @ObservationIgnored private var candidates: [FontSummary] = []
     @ObservationIgnored private let api: APIClient
@@ -27,6 +31,7 @@ final class RouteModel {
         self.name = name
         self.points = GPX.simplified(points)
         lengthKm = GPX.lengthKm(self.points)
+        profile = GPX.profile(self.points)
         self.api = api
     }
 
@@ -58,6 +63,33 @@ final class RouteModel {
         onRoute = GPX.fountains(candidates, along: points, corridor: corridor)
     }
 
+    // MARK: Choosing what goes to the GPS unit
+
+    /// Choosing hides nothing: the list, the profile and the dry stretches stay the whole
+    /// route; this only decides the file.
+    var chosen: [GPX.OnRoute] { onRoute.filter { !excluded.contains($0.id) } }
+
+    func isChosen(_ stop: GPX.OnRoute) -> Bool { !excluded.contains(stop.id) }
+
+    func toggle(_ stop: GPX.OnRoute) {
+        if excluded.remove(stop.id) == nil { excluded.insert(stop.id) }
+    }
+
+    /// "Only from here": you leave home with a full bottle. By position in the list, not
+    /// by kilometre: two fountains can share a kilometre to the decimal.
+    func onlyFrom(_ stop: GPX.OnRoute) {
+        guard let index = onRoute.firstIndex(where: { $0.id == stop.id }) else { return }
+        excluded = Set(onRoute[..<index].map(\.id))
+    }
+
+    func chooseAll() { excluded = [] }
+    func chooseNone() { excluded = Set(onRoute.map(\.id)) }
+
+    /// The dry stretch with the most climbing.
+    var driestClimb: (stretch: GPX.DryStretch, meters: Int)? {
+        GPX.longestDryClimb(fountainKms: onRoute.map(\.km), lengthKm: lengthKm, profile: profile)
+    }
+
     /// The longest stretch without any fountain, and — the figure that decides one bottle
     /// or two — counting only those where water is on record.
     var driest: GPX.DryStretch { GPX.driest(fountainKms: onRoute.map(\.km), lengthKm: lengthKm) }
@@ -67,9 +99,9 @@ final class RouteModel {
                    lengthKm: lengthKm)
     }
 
-    /// Only the route's fountains, with their kilometre and detour in the description.
+    /// Only the chosen fountains, with their kilometre and detour in the description.
     func gpx() -> String {
-        GPX.build(onRoute.map { stop in
+        GPX.build(chosen.map { stop in
             GPX.Waypoint(latitude: stop.font.latitude, longitude: stop.font.longitude,
                          name: L10n.fontName(stop.font.name),
                          description: GPX.description(of: stop.font, extra: L10n.t("gpxIn.wptDesc", [

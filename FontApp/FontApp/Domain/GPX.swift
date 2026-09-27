@@ -182,12 +182,76 @@ nonisolated enum GPX {
     /// The longest stretch without a fountain. Both ends count: start to first fountain and
     /// last fountain to the end are dry stretches too, and the last one is ridden tired.
     static func driest(fountainKms: [Double], lengthKm: Double) -> DryStretch {
-        let stops = [0] + fountainKms.filter { $0 >= 0 && $0 <= lengthKm }.sorted() + [lengthKm]
         var best = DryStretch(fromKm: 0, toKm: 0)
-        for (a, b) in zip(stops, stops.dropFirst()) where b - a > best.lengthKm {
-            best = DryStretch(fromKm: a, toKm: b)
+        for stretch in dryStretches(fountainKms: fountainKms, lengthKm: lengthKm) where stretch.lengthKm > best.lengthKm {
+            best = stretch
         }
         return best
+    }
+
+    /// All dry stretches, both ends included.
+    static func dryStretches(fountainKms: [Double], lengthKm: Double) -> [DryStretch] {
+        let stops = [0] + fountainKms.filter { $0 >= 0 && $0 <= lengthKm }.sorted() + [lengthKm]
+        return zip(stops, stops.dropFirst()).map { DryStretch(fromKm: $0, toKm: $1) }
+    }
+
+    // MARK: Elevation
+
+    struct ProfilePoint: Equatable, Sendable {
+        let km: Double
+        let elevation: Double
+    }
+
+    /// Kilometre and elevation along the route. Empty without any `<ele>`: flat and
+    /// unknown are not the same, and a flat line over a mountain pass would say "no climb".
+    /// A single missing elevation takes the last known one instead of breaking the line.
+    static func profile(_ route: [Point]) -> [ProfilePoint] {
+        guard route.count >= 2, var last = route.first(where: { $0.elevation != nil })?.elevation else { return [] }
+        var out: [ProfilePoint] = []
+        var total = 0.0
+        for (i, point) in route.enumerated() {
+            if i > 0 { total += meters(route[i - 1], point) }
+            if let e = point.elevation { last = e }
+            out.append(ProfilePoint(km: total / 1000, elevation: last))
+        }
+        return out
+    }
+
+    /// Positive climb between two kilometres: every ascent counts, a stretch that climbs,
+    /// drops and climbs again is ridden whole. The ends are interpolated, because a stretch
+    /// starts at a fountain and that rarely falls on a vertex. Port of `subidaEntre`.
+    static func climb(_ profile: [ProfilePoint], fromKm: Double, toKm: Double) -> Double {
+        guard profile.count >= 2, toKm > fromKm else { return 0 }
+        func elevation(at km: Double) -> Double {
+            if km <= profile[0].km { return profile[0].elevation }
+            guard let hi = profile.firstIndex(where: { $0.km >= km }) else { return profile[profile.count - 1].elevation }
+            let lo = max(0, hi - 1)
+            let span = profile[hi].km - profile[lo].km
+            let t = span > 0 ? (km - profile[lo].km) / span : 0
+            return profile[lo].elevation + (profile[hi].elevation - profile[lo].elevation) * t
+        }
+        var total = 0.0
+        var previous = elevation(at: fromKm)
+        for p in profile where p.km > fromKm && p.km < toKm {
+            if p.elevation > previous { total += p.elevation - previous }
+            previous = p.elevation
+        }
+        let end = elevation(at: toKm)
+        if end > previous { total += end - previous }
+        return total
+    }
+
+    /// The dry stretch with the most climbing, by metres gained and not by length: five
+    /// kilometres flat and five uphill are not the same. `nil` without elevations or under
+    /// 100 m, which is a rise and not a climb.
+    static func longestDryClimb(fountainKms: [Double], lengthKm: Double,
+                                profile: [ProfilePoint]) -> (stretch: DryStretch, meters: Int)? {
+        guard profile.count >= 2 else { return nil }
+        let best = dryStretches(fountainKms: fountainKms, lengthKm: lengthKm)
+            .map { ($0, climb(profile, fromKm: $0.fromKm, toKm: $0.toKm)) }
+            .max { $0.1 < $1.1 }
+        guard let best, best.1 >= 100 else { return nil }
+        return (best.0, Int(best.1.rounded()))
     }
 
     // MARK: Writing

@@ -724,3 +724,61 @@ struct NewFontPlacementTests {
         #expect(NewFontPlacement.remoteKm(pin: center, me: near) == nil)
     }
 }
+
+extension StubbedNetwork {
+struct RouteExtrasTests {
+    private func point(_ km: Double, _ ele: Double?) -> GPX.Point {
+        // Along a meridian, ~111.2 km per degree.
+        GPX.Point(latitude: 41.8 + km / 111.195, longitude: 2.1, elevation: ele)
+    }
+
+    @Test func profileNeedsElevations() {
+        #expect(GPX.profile([point(0, nil), point(1, nil)]).isEmpty)
+        let p = GPX.profile([point(0, 700), point(1, nil), point(2, 760)])
+        #expect(p.map(\.elevation) == [700, 700, 760])
+        #expect(abs((p.last?.km ?? 0) - 2) < 0.01)
+    }
+
+    @Test func climbCountsEveryAscentAndInterpolatesTheEnds() {
+        let p = [GPX.ProfilePoint(km: 0, elevation: 700), GPX.ProfilePoint(km: 1, elevation: 800),
+                 GPX.ProfilePoint(km: 2, elevation: 750), GPX.ProfilePoint(km: 3, elevation: 850)]
+        // Up 100, down 50, up 100: 200 climbed, not the 150 of the ends.
+        #expect(GPX.climb(p, fromKm: 0, toKm: 3) == 200)
+        // From the middle of the first ramp: 750 → 800, then 750 → 850.
+        #expect(GPX.climb(p, fromKm: 0.5, toKm: 3) == 150)
+    }
+
+    @Test func longestDryClimbIsByMetresAndCallsARiseARise() {
+        let p = [GPX.ProfilePoint(km: 0, elevation: 700), GPX.ProfilePoint(km: 2, elevation: 720),
+                 GPX.ProfilePoint(km: 3, elevation: 850), GPX.ProfilePoint(km: 6, elevation: 860)]
+        // Stretches 0–2 (+20), 2–3 (+130) and 3–6 (+10): the short steep one wins.
+        let best = GPX.longestDryClimb(fountainKms: [2, 3], lengthKm: 6, profile: p)
+        #expect(best?.stretch == GPX.DryStretch(fromKm: 2, toKm: 3))
+        #expect(best?.meters == 130)
+        let flat = p.map { GPX.ProfilePoint(km: $0.km, elevation: 700 + $0.elevation / 100) }
+        #expect(GPX.longestDryClimb(fountainKms: [2, 3], lengthKm: 6, profile: flat) == nil)
+    }
+
+    @Test func choosingKeepsExcludedOnesExcludedWhenTheCorridorGrows() async {
+        let near = FontSummary(id: UUID(), name: "a", latitude: 41.8 + 1 / 111.195, longitude: 2.1 + 100 / 83_000,
+                               image: nil, description: nil, source: nil, drinkable: nil, country: nil, region: nil,
+                               createdAt: nil, lastWaterStatus: nil, lastUpdate: nil, latestConfirmations: nil,
+                               recentStatusReporters: nil, recentStatusConflict: nil)
+        let wide = FontSummary(id: UUID(), name: "b", latitude: 41.8 + 2 / 111.195, longitude: 2.1 + 700 / 83_000,
+                               image: nil, description: nil, source: nil, drinkable: nil, country: nil, region: nil,
+                               createdAt: nil, lastWaterStatus: nil, lastUpdate: nil, latestConfirmations: nil,
+                               recentStatusReporters: nil, recentStatusConflict: nil)
+        let route = RouteModel(name: "r", points: [point(0, 700), point(3, 800)],
+                               api: StubProtocol.client())
+        StubProtocol.responses["GET /fonts/in-bounds"] = (200, String(decoding: try! JSONEncoder().encode([near, wide]), as: UTF8.self))
+        await route.load()
+        #expect(route.onRoute.map(\.font.name) == ["a"])
+        route.chooseNone()
+        route.corridor = 1000
+        // The new one comes in chosen; the one left out stays out.
+        #expect(route.chosen.map(\.font.name) == ["b"])
+        route.onlyFrom(route.onRoute[0])
+        #expect(route.chosen.count == 2)
+    }
+}
+}
