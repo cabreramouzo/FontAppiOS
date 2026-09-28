@@ -58,7 +58,12 @@ struct MapScreen: View {
                 model.mapDidMove(region: region, size: size, following: following)
                 controller.checkCoverage()
             },
-            onSelect: { selected = $0 },
+            onSelect: { font in
+                selected = font
+                // The pin into the part of the map the short card leaves in view.
+                controller.reveal(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                  covered: PresentationDetent.shortCardHeight)
+            },
             controller: controller,
             route: route?.coordinates ?? [],
             selected: selected
@@ -337,7 +342,8 @@ private extension View {
 
 extension PresentationDetent {
     /// A fountain's short card: title, status line, chips and directions.
-    static let shortCard = PresentationDetent.height(420)
+    static let shortCardHeight: CGFloat = 420
+    static let shortCard = PresentationDetent.height(shortCardHeight)
 }
 
 extension UTType {

@@ -65,6 +65,21 @@ final class MapController {
         show(MLNCoordinateBounds(MKCoordinateRegion(rect)), aboveSheet: aboveSheet)
     }
 
+    /// Keeps the zoom and slides the map so the point sits in the middle of what stays
+    /// visible above a sheet `covered` points tall, as Apple Maps does with a place. It
+    /// moves always, not only when hidden: the sheet is the same, so the pin lands in the
+    /// same place every time.
+    func reveal(_ coordinate: CLLocationCoordinate2D, covered: CGFloat) {
+        guard let map = mapView else { return }
+        map.setUserTrackingMode(.none, animated: false, completionHandler: nil)
+        let top = map.safeAreaInsets.top
+        let visibleMiddle = CGPoint(x: map.bounds.midX, y: (top + map.bounds.height - covered) / 2)
+        let pin = map.convert(coordinate, toPointTo: map)
+        let centre = CGPoint(x: map.bounds.midX + pin.x - visibleMiddle.x,
+                             y: map.bounds.midY + pin.y - visibleMiddle.y)
+        map.setCenter(map.convert(centre, toCoordinateFrom: map), animated: true)
+    }
+
     func show(_ bounds: MLNCoordinateBounds, aboveSheet: Bool = false) {
         guard let map = mapView else { return }
         map.setUserTrackingMode(.none, animated: false, completionHandler: nil)
