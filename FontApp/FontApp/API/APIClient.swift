@@ -185,6 +185,14 @@ nonisolated struct APIClient: Sendable {
         let _: Ignored = try await send("DELETE", "/users/\(userID.uuidString)", timeout: writeTimeout)
     }
 
+    // MARK: Profile
+
+    /// Fountains you put on the map, newest first.
+    func myFonts() async throws -> [FontSummary] { try await get("/auth/me/fonts") }
+    /// Starred ones, newest first. Reporting an incident also stars the fountain.
+    func myFavorites() async throws -> [FontSummary] { try await get("/auth/me/favorites") }
+    func myComments() async throws -> [MyComment] { try await get("/auth/me/comments") }
+
     // MARK: Bell
 
     /// The in-app notifications. Reading them does **not** mark them read: that happens

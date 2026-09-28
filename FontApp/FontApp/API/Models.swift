@@ -7,6 +7,18 @@ import Foundation
 /// Kind of water point (`fonts.source`).
 nonisolated enum WaterSource: String, Codable, Sendable {
     case tap, mountain, spring, well, fountain, other
+
+    /// Fixed per kind, as `SOURCE_EMOJI` in `web/src/lib/waterType.ts`.
+    var emoji: String {
+        switch self {
+        case .tap: "🚰"
+        case .mountain: "⛰️"
+        case .spring: "💦"
+        case .well: "🪣"
+        case .fountain: "⛲"
+        case .other: "💧"
+        }
+    }
 }
 
 /// Declared drinkability (`fonts.drinkable`).
@@ -33,6 +45,8 @@ nonisolated struct FontSummary: Codable, Identifiable, Hashable, Sendable {
     let latestConfirmations: Int?
     let recentStatusReporters: Int?
     let recentStatusConflict: Bool?
+    /// Spain only; elsewhere `nil`, and a list falls back to `region` — never invents one.
+    var municipality: String? = nil
 
     var evidence: ConfidenceEvidence {
         ConfidenceEvidence(
@@ -198,6 +212,8 @@ nonisolated struct UserResponse: Codable, Equatable, Sendable {
     let username: String
     let role: UserRole?
     var isAdmin: Bool? = nil
+    /// Only in your own responses (login, `/auth/me`, editing).
+    var email: String? = nil
 
     var canManageFonts: Bool { role.map { $0 >= .admin } ?? (isAdmin == true) }
 }
@@ -284,4 +300,14 @@ nonisolated struct NotificationItem: Codable, Identifiable, Equatable, Sendable 
 nonisolated struct NotificationInbox: Codable, Sendable {
     let unread: Int
     let items: [NotificationItem]
+}
+
+/// A review of yours (`GET /auth/me/comments`): where, what you said and when.
+nonisolated struct MyComment: Codable, Identifiable, Sendable {
+    let id: UUID
+    let fontID: UUID
+    let fontName: String?
+    let body: String
+    let waterStatus: String?
+    let createdAt: Date?
 }

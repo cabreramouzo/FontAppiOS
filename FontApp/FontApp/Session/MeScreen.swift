@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The "Me" tab: the account, the bell, signing out and deleting the account. The rest of
-/// the web's profile comes later.
+/// The "Me" tab: what is yours — who you are, your fountains, favourites and reviews —
+/// with the bell, signing out and deleting the account.
 struct MeScreen: View {
     @Environment(SessionStore.self) private var session
     @Environment(Outbox.self) private var outbox
@@ -10,6 +10,7 @@ struct MeScreen: View {
     @State private var confirmsDeletion = false
     @State private var isDeleting = false
     @State private var deletionError: String?
+    @State private var profile = ProfileModel()
 
     var body: some View {
         NavigationStack {
@@ -40,6 +41,7 @@ struct MeScreen: View {
                 }
             }
             .navigationTitle(L10n.t("nav.profile"))
+            .navigationDestination(for: UUID.self) { FontDetailView(fontID: $0) }
             .toolbar {
                 if session.isSignedIn { ToolbarItem(placement: .topBarTrailing) { BellButton() } }
             }
@@ -49,28 +51,26 @@ struct MeScreen: View {
 
     private var account: some View {
         List {
-            Section(L10n.t("settings.account")) {
+            Section {
                 if let user = session.user {
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack {
-                            Text(user.name).font(.headline)
-                            if session.isStaff {
-                                Text(L10n.t("staff.tag"))
-                                    .font(.caption.bold())
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 2)
-                                    .foregroundStyle(.white)
-                                    .background(Color.staff, in: Capsule())
-                            }
-                        }
-                        Text("@\(user.username)").foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 4)
+                    ProfileHeader(user: user, staff: session.isStaff)
                 } else {
                     ProgressView()
                 }
             }
             PendingSection()
+            if let failed = profile.failed {
+                Section { Text(failed).foregroundStyle(.secondary) }
+            }
+            CappedSection(title: L10n.t("profile.myFavorites"), systemImage: "star",
+                          hint: L10n.t("profile.myFavoritesHint"), empty: L10n.t("profile.noFavorites"),
+                          items: profile.favorites) { ProfileFontRow(font: $0) }
+            CappedSection(title: L10n.t("profile.myFonts"), systemImage: "mappin.and.ellipse",
+                          hint: L10n.t("profile.myFontsHint"), empty: L10n.t("profile.noFonts"),
+                          items: profile.fonts) { ProfileFontRow(font: $0) }
+            CappedSection(title: L10n.t("profile.myReviews"), systemImage: "bubble.left",
+                          empty: L10n.t("profile.noReviews"),
+                          items: profile.comments) { ProfileReviewRow(comment: $0) }
             Section {
                 Button(role: .destructive) {
                     isSigningOut = true
@@ -89,7 +89,17 @@ struct MeScreen: View {
             }
             deletion
         }
-        .task { await session.refresh() }
+        .refreshable { await reload() }
+        .task(id: session.userID) {
+            profile.clear()
+            await reload()
+        }
+    }
+
+    private func reload() async {
+        async let account: Void = session.refresh()
+        async let lists: Void = profile.load()
+        _ = await (account, lists)
     }
 
     /// Apple requires deleting the account from inside the app (App Store rule 5.1.1(v)).
