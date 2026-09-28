@@ -84,6 +84,7 @@ struct SettingsScreen: View {
             setting(L10n.t("notif.mentions"), hint: L10n.t("notif.mentionsHint"),
                     value: user.mentionEmails ?? true) { $0.mentionEmails = $1 }
         }
+        pushSection(user)
         Section {
             let shared = !(user.gamificationOptOut ?? false)
             setting(L10n.t("game.share"), hint: nil, value: shared) { $0.gamificationOptOut = !$1 }
@@ -95,6 +96,44 @@ struct SettingsScreen: View {
             Text(shared ? [L10n.t("game.shareKeeps"), L10n.t("game.shareOffHides"), L10n.t("game.shareOffCaps")].joined(separator: " ")
                         : L10n.t("game.shareKeeps"))
         }
+    }
+
+    /// Notices on this iPhone: the system's permission first, then which groups, as the
+    /// web groups them (a fountain you follow, someone talking to you, administration)
+    /// instead of one switch per event nobody reads. The groups only once it is on:
+    /// asking which before saying yes is two decisions for nothing.
+    @ViewBuilder private func pushSection(_ user: UserResponse) -> some View {
+        let push = PushNotifications.shared
+        Section {
+            switch push.status {
+            case .authorized, .provisional, .ephemeral:
+                Label(L10n.t("ios.push.on"), systemImage: "bell.badge").frame(minHeight: 44)
+                setting(L10n.t("notif.pushFonts"), hint: nil, value: user.pushFontUpdates ?? true) { $0.pushFontUpdates = $1 }
+                setting(L10n.t("notif.pushMentions"), hint: nil, value: user.pushMentions ?? true) { $0.pushMentions = $1 }
+                // Only to whoever really gets them.
+                if user.isAdmin == true || user.canManageFonts {
+                    setting(L10n.t("notif.pushAdmin"), hint: nil, value: user.pushAdmin ?? true) { $0.pushAdmin = $1 }
+                }
+                Button(L10n.t("notif.pushTest")) {
+                    Task {
+                        do { try await APIClient.shared.sendTestPush() } catch { self.error = ErrorText.describe(error) }
+                    }
+                }
+                .frame(minHeight: 44)
+            case .denied:
+                Text(L10n.t("ios.push.denied")).font(.subheadline).foregroundStyle(.secondary)
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    Link(L10n.t("ios.push.openSettings"), destination: url).frame(minHeight: 44)
+                }
+            default:
+                Button(L10n.t("ios.push.enable")) { Task { await push.enable() } }.frame(minHeight: 44)
+            }
+        } header: {
+            Text(L10n.t("notif.push"))
+        } footer: {
+            Text(L10n.t("ios.push.hint"))
+        }
+        .task { await push.refresh() }
     }
 
     /// A switch that saves on change. The account's value is the truth: while saving, and

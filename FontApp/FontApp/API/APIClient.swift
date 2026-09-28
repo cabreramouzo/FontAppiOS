@@ -201,6 +201,12 @@ nonisolated struct APIClient: Sendable {
                                         timeout: writeTimeout)
     }
 
+    /// A test notice to this account's devices: the only way to tell "push does not
+    /// work" from "nobody reviewed anything".
+    func sendTestPush() async throws {
+        let _: Ignored = try await send("POST", "/push/test", timeout: writeTimeout)
+    }
+
     /// Before signing out: this phone stops receiving that account's notices.
     func removePushToken(_ token: String) async throws {
         struct Body: Encodable { let token: String }

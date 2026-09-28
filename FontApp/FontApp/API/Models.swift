@@ -309,6 +309,10 @@ nonisolated struct UserResponse: Codable, Equatable, Sendable {
     var weeklyDigest: Bool? = nil
     var mentionEmails: Bool? = nil
     var gamificationOptOut: Bool? = nil
+    /// System notices by group, as the web's settings.
+    var pushFontUpdates: Bool? = nil
+    var pushMentions: Bool? = nil
+    var pushAdmin: Bool? = nil
 
     var canManageFonts: Bool { role.map { $0 >= .admin } ?? (isAdmin == true) }
 }
@@ -518,6 +522,9 @@ nonisolated struct ProfileUpdate: Encodable, Sendable {
     var weeklyDigest: Bool?
     var mentionEmails: Bool?
     var gamificationOptOut: Bool?
+    var pushFontUpdates: Bool?
+    var pushMentions: Bool?
+    var pushAdmin: Bool?
 
     init(_ user: UserResponse) {
         name = user.name

@@ -234,6 +234,21 @@ const IOS_ONLY = {
   'ios.fill.dontKnow': {
     ca: 'No ho sé', es: 'No lo sé', gl: 'Non o sei', eu: 'Ez dakit', en: 'I don’t know', fr: 'Je ne sais pas', pt: 'Não sei', it: 'Non lo so',
   },
+  'ios.push.on': {
+    ca: 'Avisos activats en aquest iPhone', es: 'Avisos activados en este iPhone', gl: 'Avisos activados neste iPhone', eu: 'Abisuak aktibatuta iPhone honetan', en: 'Notifications on for this iPhone', fr: 'Notifications activées sur cet iPhone', pt: 'Avisos ativados neste iPhone', it: 'Avvisi attivi su questo iPhone',
+  },
+  'ios.push.enable': {
+    ca: 'Activa els avisos en aquest iPhone', es: 'Activar los avisos en este iPhone', gl: 'Activar os avisos neste iPhone', eu: 'Aktibatu abisuak iPhone honetan', en: 'Turn on notifications for this iPhone', fr: 'Activer les notifications sur cet iPhone', pt: 'Ativar os avisos neste iPhone', it: 'Attiva gli avvisi su questo iPhone',
+  },
+  'ios.push.denied': {
+    ca: 'Les notificacions de FontApp estan desactivades. Es poden tornar a activar als Ajustos de l’iPhone.', es: 'Las notificaciones de FontApp están desactivadas. Se pueden volver a activar en los Ajustes del iPhone.', gl: 'As notificacións de FontApp están desactivadas. Pódense volver activar nos Axustes do iPhone.', eu: 'FontApp-en jakinarazpenak desaktibatuta daude. iPhonearen Ezarpenetan aktiba daitezke berriro.', en: 'FontApp notifications are off. They can be turned back on in the iPhone’s Settings.', fr: 'Les notifications de FontApp sont désactivées. Vous pouvez les réactiver dans les Réglages de l’iPhone.', pt: 'As notificações da FontApp estão desativadas. Pode voltar a ativá-las nas Definições do iPhone.', it: 'Le notifiche di FontApp sono disattivate. Puoi riattivarle nelle Impostazioni dell’iPhone.',
+  },
+  'ios.push.openSettings': {
+    ca: 'Obre els Ajustos', es: 'Abrir Ajustes', gl: 'Abrir Axustes', eu: 'Ireki Ezarpenak', en: 'Open Settings', fr: 'Ouvrir Réglages', pt: 'Abrir Definições', it: 'Apri Impostazioni',
+  },
+  'ios.push.hint': {
+    ca: 'Només el que pot canviar el que estàs a punt de fer: una font que segueixes s’ha assecat o té una incidència, o algú et parla. La resta, a la campaneta.', es: 'Solo lo que puede cambiar lo que vas a hacer: una fuente que sigues se ha secado o tiene una incidencia, o alguien te habla. Lo demás, en la campana.', gl: 'Só o que pode cambiar o que vas facer: unha fonte que segues secou ou ten unha incidencia, ou alguén che fala. O demais, na campá.', eu: 'Egitera zoazena alda dezakeena bakarrik: jarraitzen duzun iturri bat lehortu da edo gorabehera bat du, edo norbaitek hitz egiten dizu. Gainerakoa, kanpaian.', en: 'Only what can change what you are about to do: a fountain you follow went dry or has an incident, or someone is talking to you. Everything else goes to the bell.', fr: 'Seulement ce qui peut changer ce que vous allez faire : une fontaine que vous suivez est à sec ou a un incident, ou quelqu’un vous parle. Le reste, dans la cloche.', pt: 'Só o que pode mudar o que vai fazer: uma fonte que segue secou ou tem um incidente, ou alguém fala consigo. O resto, no sino.', it: 'Solo ciò che può cambiare quello che stai per fare: una fontana che segui è asciutta o ha un problema, o qualcuno ti scrive. Il resto, nella campanella.',
+  },
   'ios.showAll': {
     ca: 'Mostra-les totes ({n})', es: 'Mostrar todas ({n})', gl: 'Amosalas todas ({n})', eu: 'Erakutsi guztiak ({n})', en: 'Show all ({n})', fr: 'Tout afficher ({n})', pt: 'Mostrar todas ({n})', it: 'Mostra tutte ({n})',
   },

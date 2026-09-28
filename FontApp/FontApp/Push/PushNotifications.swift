@@ -46,6 +46,12 @@ final class PushNotifications: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
+    /// From Settings: the person asked for it, so it is asked now.
+    func enable() async {
+        _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])
+        await refresh()
+    }
+
     /// After following a fountain or writing to someone. Asks only the first time.
     func askIfUseful() {
         guard status == .notDetermined else { return }
