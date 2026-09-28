@@ -41,6 +41,7 @@ struct FontDetailView: View {
         var id: UUID { replyTo?.id ?? UUID(uuidString: "00000000-0000-0000-0000-000000000000")! }
     }
     @Environment(LocationService.self) private var location
+    @State private var approach = ApproachTracker()
     /// What the caller already knows, shown while the rest loads.
     private let preview: FontSummary?
 
@@ -79,6 +80,8 @@ struct FontDetailView: View {
         .toolbar { ToolbarItem(placement: .principal) { Color.clear.frame(width: 1, height: 1) } }
         .toolbarVisibility(onClose == nil ? .automatic : .hidden, for: .navigationBar)
         .task { await model.load() }
+        .onAppear { approach.start() }
+        .onDisappear { approach.stop() }
         // Dry, broken or gone: where the nearest water is, as the web says it. Only then:
         // a fountain that flows needs no alternative.
         .task(id: loadedFont.map { model.evidence(for: $0).lastWaterStatus }) {
@@ -619,6 +622,10 @@ struct FontDetailView: View {
             // one line, the three chips where the thumb is, and the way there. The rest is
             // one swipe up.
             header(font)
+            // First, when it shows at all: then you are there, and nothing on the page
+            // matters more. The rest of the time it takes no room.
+            FinalApproachSection(coordinate: CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                 hasPhoto: font.image != nil, tracker: approach)
             HiddenNotice(font: font)
             if let quick = model.quickReview {
                 QuickReviewSection(model: quick, onChange: { await model.load() },
