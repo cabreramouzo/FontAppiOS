@@ -60,6 +60,7 @@ struct SignInView: View {
                     }
                     // Resetting needs the link the server emails, which opens the web.
                     Link(L10n.t("login.forgot"), destination: web("forgot-password"))
+                    LegalLink()
                 }
             }
             .navigationTitle(L10n.t("login.enter"))

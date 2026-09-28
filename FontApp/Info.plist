@@ -48,6 +48,10 @@
 			</dict>
 		</dict>
 	</array>
+	<!-- Only HTTPS, which is exempt: without this, every build waits in TestFlight for the
+	     export compliance question. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
 	<key>UIBackgroundModes</key>

@@ -209,3 +209,15 @@ struct ProfileNavigation: ViewModifier {
 extension View {
     func profileNavigation() -> some View { modifier(ProfileNavigation()) }
 }
+
+/// "Legal and privacy": the web's page, in the app's language. Apple asks for the
+/// privacy policy to be reachable from inside the app, signed in or not.
+struct LegalLink: View {
+    var body: some View {
+        let lang = Bundle.main.preferredLocalizations.first.map { String($0.prefix(2)) } ?? "ca"
+        Link(destination: URL(string: "https://fontapp.net/legal?lang=\(lang)")!) {
+            Label(L10n.t("footer.legal"), systemImage: "hand.raised")
+                .frame(minHeight: 44)
+        }
+    }
+}

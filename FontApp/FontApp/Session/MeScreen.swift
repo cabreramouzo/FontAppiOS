@@ -30,6 +30,7 @@ struct MeScreen: View {
                             Text(L10n.t("ios.signInPrompt"))
                         }
                         PendingSection()
+                        Section { LegalLink() }
                     }
                 } else {
                     ContentUnavailableView {
@@ -40,6 +41,7 @@ struct MeScreen: View {
                         Button(L10n.t("nav.enter")) { showsSignIn = true }
                             .buttonStyle(.borderedProminent)
                             .controlSize(.large)
+                        LegalLink()
                     }
                 }
             }
@@ -96,6 +98,7 @@ struct MeScreen: View {
                 }
                 .disabled(isSigningOut || isDeleting)
             }
+            Section { LegalLink() }
             deletion
         }
         .refreshable { await reload() }
