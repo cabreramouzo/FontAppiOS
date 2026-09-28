@@ -10,7 +10,8 @@ struct MapScreen: View {
     @State private var controller = MapController()
     @State private var filters = MapFilters()
     @State private var sheet: MapSheet?
-    @State private var searching = false
+    /// What the Search tab asked to show; cleared once shown.
+    @Binding var focus: MapFocus?
     @State private var route: RouteModel?
     @State private var importsGPX = false
     @State private var exported: SharedFile?
@@ -72,13 +73,7 @@ struct MapScreen: View {
                 .padding(.trailing, 12)
                 .padding(.top, 8)
         }
-        .overlay(alignment: .topLeading) {
-            MapSearchCapsule { withAnimation(.snappy) { searching = true } }
-                .padding(.leading, 12)
-                .padding(.trailing, 76)
-                .padding(.top, 8)
-        }
-        .overlay(alignment: .top) { banner.padding(.trailing, 72).padding(.top, 56) }
+        .overlay(alignment: .top) { banner.padding(.trailing, 72) }
         .overlay(alignment: .bottomLeading) { attribution }
         .overlay(alignment: .bottomTrailing) {
             AddFountainButton(staff: session.isStaff, action: startNewFont)
@@ -96,20 +91,9 @@ struct MapScreen: View {
                     .transition(.opacity)
             }
         }
-        // Search in place: over everything on the map, under the status bar, where the
-        // capsule was. The selected fountain's sheet opens after it closes.
-        .overlay {
-            if searching {
-                MapSearch(isActive: $searching,
-                          onFountain: { font in
-                              controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
-                                              meters: 400, aboveSheet: true)
-                              selected = font
-                          },
-                          onPlace: { controller.show($0) })
-                    .transition(.opacity)
-            }
-        }
+        // A result chosen in the Search tab.
+        .onChange(of: focus) { showFocus() }
+        .onAppear(perform: showFocus)
         .sheet(isPresented: $showsSignIn, onDismiss: {
             if addAfterSignIn, session.isSignedIn {
                 addAfterSignIn = false
@@ -182,6 +166,19 @@ struct MapScreen: View {
             }
             .presentationDetents([.medium, .large])
             .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+        }
+    }
+
+    private func showFocus() {
+        guard let target = focus?.target else { return }
+        focus = nil
+        switch target {
+        case .fountain(let font):
+            controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                            meters: 400, aboveSheet: true)
+            selected = font
+        case .place(let rect):
+            controller.show(rect)
         }
     }
 

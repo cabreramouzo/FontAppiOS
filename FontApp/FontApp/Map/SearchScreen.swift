@@ -2,94 +2,72 @@ import CoreLocation
 import MapKit
 import SwiftUI
 
-/// Search in place, as Komoot and AllTrails do over their maps: the capsule on the map
-/// becomes the field where it is, the keyboard comes up and the results take the screen
-/// below it. "Cancel" goes back to the map. No sheet on top, no second search bar.
+/// What the Search tab asks the map to show. Each request is new, even for the same
+/// fountain twice, so the map reacts every time.
+struct MapFocus: Equatable {
+    enum Target {
+        case fountain(FontSummary)
+        case place(MKMapRect)
+    }
+
+    let id = UUID()
+    let target: Target
+
+    static func == (a: MapFocus, b: MapFocus) -> Bool { a.id == b.id }
+}
+
+/// The Search tab, as iOS 26 asks: the field lives at the bottom, in the tab bar, where
+/// the thumb is, and the system draws, clears and cancels it. On a wide screen the tab bar
+/// becomes a sidebar and the field moves to its top, with nothing to do here.
 /// Fountains by name from the API, places from MapKit; before typing, what is near.
-struct MapSearch: View {
-    @Binding var isActive: Bool
-    let onFountain: (FontSummary) -> Void
-    let onPlace: (MKMapRect) -> Void
+/// Choosing one goes to the map and shows it there: a fountain is a place to walk to.
+struct SearchScreen: View {
+    let onShow: (MapFocus.Target) -> Void
 
     @Environment(LocationService.self) private var location
     @State private var model = SearchModel()
-    @FocusState private var focused: Bool
+    @State private var isActive = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 10) {
-                field
-                Button(L10n.t("ios.search.cancel"), action: close)
-                    .frame(minHeight: 44)
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, 8)
-            .padding(.bottom, 8)
-            results
-        }
-        .background(Color(.systemGroupedBackground))
-        .onAppear { focused = true }
-        .onChange(of: model.query) { model.queryChanged(near: location.location) }
-        .task { await model.loadNearby(from: location.location) }
-    }
-
-    private var field: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-            TextField(L10n.t("ios.search.prompt"), text: $model.query)
-                .focused($focused)
-                .submitLabel(.search)
-                .autocorrectionDisabled()
-                .accessibilityIdentifier("map.search.field")
-            if !model.query.isEmpty {
-                Button {
-                    model.query = ""
-                    focused = true
-                } label: {
-                    Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+        NavigationStack {
+            List {
+                // Before typing, what is near, as Apple Maps does.
+                if model.query.trimmingCharacters(in: .whitespaces).count < 2 {
+                    nearbySection
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(L10n.t("ios.search.clear"))
+                // A place that is exactly what was typed (a town) goes first; otherwise
+                // fountains, which is what the app is for.
+                if model.placesFirst {
+                    placesSection
+                    fountainsSection
+                } else {
+                    fountainsSection
+                    placesSection
+                }
+                if let error = model.error {
+                    Text(error).foregroundStyle(.secondary)
+                }
             }
+            .scrollDismissesKeyboard(.immediately)
+            .overlay {
+                if model.isEmptyResult {
+                    ContentUnavailableView.search(text: model.query)
+                }
+            }
+            .navigationTitle(L10n.t("ios.search.title"))
+            .searchable(text: $model.query, isPresented: $isActive, prompt: L10n.t("ios.search.prompt"))
+            .autocorrectionDisabled()
         }
-        .padding(.horizontal, 16)
-        .frame(height: 48)
-        .glassEffect(.regular, in: Capsule())
+        .onChange(of: model.query) { model.queryChanged(near: location.location) }
+        // Again once the position arrives: the first fix often comes after the tab opens.
+        .task(id: location.location == nil) { await model.loadNearby(from: location.location) }
     }
 
-    private var results: some View {
-        List {
-            // Before typing, what is near, as Apple Maps does.
-            if model.query.trimmingCharacters(in: .whitespaces).count < 2 {
-                nearbySection
-            }
-            // A place that is exactly what was typed (a town) goes first; otherwise
-            // fountains, which is what the app is for.
-            if model.placesFirst {
-                placesSection
-                fountainsSection
-            } else {
-                fountainsSection
-                placesSection
-            }
-            if let error = model.error {
-                Text(error).foregroundStyle(.secondary)
-            }
-        }
-        .scrollDismissesKeyboard(.immediately)
-        .overlay {
-            if model.isEmptyResult {
-                ContentUnavailableView.search(text: model.query)
-            }
-        }
+    /// The keyboard goes, the query stays: coming back to the tab finds the same results.
+    private func show(_ target: MapFocus.Target) {
+        isActive = false
+        onShow(target)
     }
-
-    private func close() {
-        focused = false
-        withAnimation(.snappy) { isActive = false }
-    }
-
-    private func dismiss() { close() }
 
     @ViewBuilder private var nearbySection: some View {
         if location.location == nil {
@@ -101,8 +79,7 @@ struct MapSearch: View {
                 }
                 ForEach(nearby) { font in
                     Button {
-                        dismiss()
-                        onFountain(font)
+                        show(.fountain(font))
                     } label: {
                         NearbyRow(font: font, from: location.location)
                     }
@@ -119,8 +96,7 @@ struct MapSearch: View {
             Section(L10n.t("ios.search.fountains")) {
                 ForEach(model.fountains) { font in
                     Button {
-                        dismiss()
-                        onFountain(font)
+                        show(.fountain(font))
                     } label: {
                         FountainResultRow(font: font, from: location.location)
                     }
@@ -137,8 +113,7 @@ struct MapSearch: View {
                     Button {
                         Task {
                             if let rect = await model.rect(for: place) {
-                                dismiss()
-                                onPlace(rect)
+                                show(.place(rect))
                             }
                         }
                     } label: {

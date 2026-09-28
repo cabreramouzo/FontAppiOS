@@ -4,12 +4,14 @@ struct ContentView: View {
     @Environment(Outbox.self) private var outbox
     @State private var tab = AppTab.map
 
-    enum AppTab: Hashable { case map, news, favorites, me }
+    @State private var focus: MapFocus?
+
+    enum AppTab: Hashable { case map, news, favorites, me, search }
 
     var body: some View {
         TabView(selection: $tab) {
             Tab(L10n.t("nav.map"), systemImage: "map", value: AppTab.map) {
-                MapScreen()
+                MapScreen(focus: $focus)
             }
             Tab(L10n.t("news.title"), systemImage: "newspaper", value: AppTab.news) {
                 NewsScreen()
@@ -23,7 +25,23 @@ struct ContentView: View {
                 MeScreen()
             }
             .badge(outbox.items.count)
+            // iOS 26: search is its own tab, drawn apart at the trailing end of the tab bar,
+            // and its field opens at the bottom, where the thumb is.
+            Tab(L10n.t("ios.search.title"), systemImage: "magnifyingglass", value: AppTab.search, role: .search) {
+                SearchScreen { target in
+                    // The field closes first: switching tabs mid-animation left it open over
+                    // the map and the fountain's sheet never came up.
+                    Task {
+                        try? await Task.sleep(for: .milliseconds(350))
+                        tab = .map
+                        try? await Task.sleep(for: .milliseconds(350))
+                        focus = MapFocus(target: target)
+                    }
+                }
+            }
         }
+        // A tab bar on a phone, a sidebar where the screen is wide enough.
+        .tabViewStyle(.sidebarAdaptable)
         // A GPX opened from another app is a route to show on the map.
         .onOpenURL { url in if url.isFileURL { tab = .map } }
     }

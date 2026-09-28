@@ -1,9 +1,9 @@
 import MapLibre
 import SwiftUI
 
-/// The buttons over the map, laid out like Apple Maps: a search capsule at the top, a
-/// grouped glass column at the top right, and the one primary action (add a fountain) at
-/// the bottom right, where the thumb is.
+/// The buttons over the map, laid out like Apple Maps: a grouped glass column at the top
+/// right and the one primary action (add a fountain) at the bottom right, where the thumb
+/// is. Search is its own tab.
 ///
 /// The web had nine floating buttons; here they are fewer and grouped, because on a phone
 /// every button covers the map, which is the thing being looked at. The colour legend
@@ -120,29 +120,6 @@ private struct SystemMapButtons: View {
         case .followWithHeading: "location.north.line.fill"
         default: "location"
         }
-    }
-}
-
-/// "Search a fountain or a place": tapping it turns it into the search field, in place.
-struct MapSearchCapsule: View {
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                Text(L10n.t("ios.search.prompt"))
-                    .lineLimit(1)
-                Spacer(minLength: 0)
-            }
-            .font(.body)
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 16)
-            .frame(height: 48)
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .glassEffect(.regular.interactive(), in: Capsule())
     }
 }
 
