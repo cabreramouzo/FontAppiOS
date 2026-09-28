@@ -41,9 +41,8 @@ struct ReportSheet: View {
                     }
                 }
                 Section {
-                    TextField(L10n.t(replyTo == nil ? "comment.placeholder" : "report.replyPlaceholder"),
-                              text: $draft.message, axis: .vertical)
-                        .lineLimit(3...10)
+                    MentionField(placeholder: L10n.t(replyTo == nil ? "comment.placeholder" : "report.replyPlaceholder"),
+                                 text: $draft.message)
                 }
                 if replyTo == nil, editing == nil {
                     Section {

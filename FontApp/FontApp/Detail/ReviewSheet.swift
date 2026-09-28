@@ -48,8 +48,7 @@ struct ReviewSheet: View {
                     StarPicker(rating: $draft.rating)
                 }
                 Section {
-                    TextField(L10n.t("update.howNowOpt"), text: $draft.body, axis: .vertical)
-                        .lineLimit(3...8)
+                    MentionField(placeholder: L10n.t("update.howNowOpt"), text: $draft.body)
                 }
                 Section {
                     PhotosPicker(selection: $pickerItem, matching: .images) {

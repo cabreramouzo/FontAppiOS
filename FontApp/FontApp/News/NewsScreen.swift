@@ -16,6 +16,7 @@ struct NewsScreen: View {
             .navigationTitle(L10n.t("news.title"))
             .navigationSubtitle(filterSummary)
             .navigationDestination(for: UUID.self) { FontDetailView(fontID: $0) }
+            .profileNavigation()
             .toolbar {
                 if session.isSignedIn { ToolbarItem(placement: .topBarLeading) { BellButton() } }
                 ToolbarItem(placement: .topBarTrailing) { filterMenu }
@@ -204,12 +205,16 @@ private struct ActivityCard: View {
                     .font(prominent ? .title2.bold() : .headline)
                     .fixedSize(horizontal: false, vertical: true)
                 if let text = item.text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty {
-                    Text(text)
+                    MentionText(text)
                         .font(.subheadline)
                         .lineLimit(prominent ? 4 : 3)
                 }
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(item.author ?? L10n.t("activity.anon"))
+                    if let author = item.author {
+                        UserLink(username: author, color: .white).fontWeight(.semibold)
+                    } else {
+                        Text(L10n.t("activity.anon"))
+                    }
                     Text([RelativeTime.string(since: item.createdAt), item.region]
                         .compactMap { $0 }.joined(separator: " · "))
                 }

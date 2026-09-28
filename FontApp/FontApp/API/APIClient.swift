@@ -316,6 +316,13 @@ nonisolated struct APIClient: Sendable {
         return user.username
     }
 
+    /// Usernames starting with what is typed after an @, for the suggestions.
+    func searchMentions(_ prefix: String) async throws -> [String] {
+        struct Row: Decodable { let username: String }
+        let rows: [Row] = try await get("/mentions", query: [URLQueryItem(name: "q", value: prefix)])
+        return rows.map(\.username)
+    }
+
     /// Someone's public profile, by id or username (the server resolves both).
     func publicUser(_ handle: String) async throws -> PublicUser { try await get("/users/\(Self.segment(handle))") }
     func userFonts(_ handle: String) async throws -> [FontSummary] { try await get("/users/\(Self.segment(handle))/fonts") }

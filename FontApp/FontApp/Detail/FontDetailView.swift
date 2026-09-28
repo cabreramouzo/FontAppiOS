@@ -24,8 +24,6 @@ struct FontDetailView: View {
     @State private var creatorName: String?
     @State private var creatorTier: String?
     @State private var photoAuthor: String?
-    /// Someone whose @name was tapped: their profile goes on this page's stack.
-    @State private var profile: String?
     @State private var capabilities: Set<String> = []
     @State private var editingReview: CommentResponse?
     @State private var editingReport: ReportResponse?
@@ -84,8 +82,7 @@ struct FontDetailView: View {
         .toolbar { ToolbarItem(placement: .principal) { Color.clear.frame(width: 1, height: 1) } }
         .toolbarVisibility(onClose == nil ? .automatic : .hidden, for: .navigationBar)
         .task { await model.load() }
-        .navigationDestination(item: $profile) { UserProfileScreen(handle: $0) }
-        .environment(\.openProfile) { profile = $0 }
+        .profileNavigation()
         .onAppear { approach.start() }
         .onDisappear { approach.stop() }
         // Dry, broken or gone: where the nearest water is, as the web says it. Only then:
@@ -956,7 +953,7 @@ private struct ReviewRow: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
-            if !review.body.isEmpty { Text(review.body) }
+            if !review.body.isEmpty { MentionText(review.body) }
             if let url = APIClient.shared.imageURL(review.image) {
                 AsyncImage(url: url) { image in
                     image.resizable().scaledToFill()
@@ -1000,7 +997,7 @@ private struct ReportRow: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
-            Text(report.message)
+            MentionText(report.message)
             HStack(spacing: 4) {
                 if let user = report.username { UserLink(username: user) } else { Text(L10n.t("review.anon")) }
                 if report.editedAt != nil { Text("· " + L10n.t("report.edited")) }

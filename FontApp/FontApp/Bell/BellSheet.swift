@@ -28,6 +28,7 @@ struct BellSheet: View {
                 .navigationTitle(L10n.t("notif.bell"))
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationDestination(for: UUID.self) { FontDetailView(fontID: $0) }
+                .profileNavigation()
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) { Button(role: .close) { dismiss() } }
                 }
@@ -75,6 +76,7 @@ struct BellSheet: View {
 
 private struct NotificationRow: View {
     let item: NotificationItem
+    @Environment(\.openProfile) private var openProfile
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -103,5 +105,13 @@ private struct NotificationRow: View {
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)
+        // The row leads to the fountain; who did it is one long press away.
+        .contextMenu {
+            if let openProfile, !item.actorName.isEmpty {
+                Button { openProfile(item.actorName) } label: {
+                    Label { Text(verbatim: "@\(item.actorName)") } icon: { Image(systemName: "person.crop.circle") }
+                }
+            }
+        }
     }
 }

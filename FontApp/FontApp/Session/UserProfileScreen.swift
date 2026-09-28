@@ -176,12 +176,13 @@ struct UserProfileScreen: View {
 /// "@someone", tappable: opens their profile from wherever a page shows the way to.
 struct UserLink: View {
     let username: String
+    var color: Color = .accentColor
     @Environment(\.openProfile) private var openProfile
 
     var body: some View {
         if let openProfile {
             // The accent explicitly: inside a secondary caption it would read as plain text.
-            Button { openProfile(username) } label: { Text(verbatim: "@\(username)").foregroundStyle(Color.accentColor) }
+            Button { openProfile(username) } label: { Text(verbatim: "@\(username)").foregroundStyle(color) }
                 .buttonStyle(.borderless)
         } else {
             Text(verbatim: "@\(username)")
@@ -192,4 +193,19 @@ struct UserLink: View {
 extension EnvironmentValues {
     /// Set by a page that can push a profile onto its navigation stack.
     @Entry var openProfile: ((String) -> Void)? = nil
+}
+
+/// Lets any @name inside this stack push the person's profile onto it.
+struct ProfileNavigation: ViewModifier {
+    @State private var profile: String?
+
+    func body(content: Content) -> some View {
+        content
+            .navigationDestination(item: $profile) { UserProfileScreen(handle: $0) }
+            .environment(\.openProfile) { profile = $0 }
+    }
+}
+
+extension View {
+    func profileNavigation() -> some View { modifier(ProfileNavigation()) }
 }
