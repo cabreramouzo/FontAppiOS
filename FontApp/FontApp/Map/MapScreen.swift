@@ -60,7 +60,8 @@ struct MapScreen: View {
             },
             onSelect: { selected = $0 },
             controller: controller,
-            route: route?.coordinates ?? []
+            route: route?.coordinates ?? [],
+            selected: selected
         )
         .ignoresSafeArea(edges: [.top, .bottom])
         .overlay(alignment: .topTrailing) {

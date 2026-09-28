@@ -21,6 +21,9 @@ struct FontMapView: UIViewRepresentable {
     let controller: MapController
     /// An imported GPX route, drawn over the map.
     var route: [CLLocationCoordinate2D] = []
+    /// The fountain whose sheet is open: drawn as a larger pin that springs in, so it is
+    /// clear which one the sheet is about.
+    var selected: FontSummary?
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
@@ -59,6 +62,7 @@ struct FontMapView: UIViewRepresentable {
             if showsUser { coordinator.startFollowing(map) }
         }
         coordinator.update(map, fonts: fonts, clusters: clusters, route: route)
+        coordinator.select(selected, on: map)
     }
 
     final class Coordinator: NSObject, MLNMapViewDelegate {
@@ -77,6 +81,8 @@ struct FontMapView: UIViewRepresentable {
         private var fontsSource: MLNShapeSource?
         private var clustersSource: MLNShapeSource?
         private var routeSource: MLNShapeSource?
+        /// The raised pin standing in for the selected fountain's dot.
+        private var selection: SelectedFountain?
 
         init(_ parent: FontMapView) {
             self.parent = parent
@@ -195,6 +201,8 @@ struct FontMapView: UIViewRepresentable {
                 style.addLayer(glyph)
             }
 
+            hideSelectedDot(in: style)
+
             addCircles(to: style, identifier: "fa-local", source: fontsSource,
                        predicate: NSPredicate(format: "cluster == YES"), countKey: "point_count_abbreviated",
                        sizeKey: "point_count", font: font)
@@ -239,6 +247,46 @@ struct FontMapView: UIViewRepresentable {
             }.flatMap { $0 }
             if names.isEmpty { return RasterStyle.countFont }
             return names.first { $0.localizedCaseInsensitiveContains("bold") } ?? names.first
+        }
+
+        // MARK: Selection
+
+        func select(_ font: FontSummary?, on map: MLNMapView) {
+            guard font?.id != selection?.font.id else { return }
+            if let old = selection {
+                selection = nil
+                if let view = map.view(for: old) as? SelectedPinView {
+                    view.lower { map.removeAnnotation(old) }
+                } else {
+                    map.removeAnnotation(old)
+                }
+            }
+            if let font {
+                let annotation = SelectedFountain(font: font)
+                selection = annotation
+                map.addAnnotation(annotation)
+            }
+            hideSelectedDot(in: map.style)
+        }
+
+        /// The dot under the raised pin would peek out around its tip.
+        private func hideSelectedDot(in style: MLNStyle?) {
+            let hidden = selection?.font.id.uuidString ?? ""
+            for id in ["fa-pins", "fa-pin-drop"] {
+                (style?.layer(withIdentifier: id) as? MLNVectorStyleLayer)?.predicate =
+                    NSPredicate(format: "cluster != YES AND id != %@", hidden)
+            }
+        }
+
+        func mapView(_ map: MLNMapView, viewFor annotation: MLNAnnotation) -> MLNAnnotationView? {
+            guard let selected = annotation as? SelectedFountain else { return nil }
+            let view = SelectedPinView(annotation: selected, reuseIdentifier: nil)
+            view.configure(color: UIColor(WaterStatus.color(for: selected.font.lastWaterStatus)))
+            return view
+        }
+
+        func mapView(_ map: MLNMapView, didAdd annotationViews: [MLNAnnotationView]) {
+            for view in annotationViews { (view as? SelectedPinView)?.raise() }
         }
 
         // MARK: Taps
@@ -326,5 +374,106 @@ extension UIColor {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         getRed(&r, green: &g, blue: &b, alpha: &a)
         return String(format: "#%02X%02X%02X", Int(r * 255), Int(g * 255), Int(b * 255))
+    }
+}
+
+/// The selected fountain, as an annotation: the only one on the map.
+final class SelectedFountain: MLNPointAnnotation {
+    let font: FontSummary
+
+    init(font: FontSummary) {
+        self.font = font
+        super.init()
+        coordinate = CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude)
+    }
+
+    required init?(coder: NSCoder) { fatalError("not coded") }
+}
+
+/// A balloon marker in the fountain's status colour with the drop inside, its tip on the
+/// spot. It rises as Apple Maps raises a selected place: grows from the tip past its size,
+/// settles with a little sway, and a light tap in the hand. Reduce Motion: it just fades in.
+final class SelectedPinView: MLNAnnotationView {
+    private let head = UIView()
+    private let tail = CAShapeLayer()
+    private let glyph = UIImageView()
+    private static let headSize: CGFloat = 46
+    private static let tailHeight: CGFloat = 10
+
+    override init(annotation: MLNAnnotation?, reuseIdentifier: String?) {
+        super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
+        let size = Self.headSize
+        frame = CGRect(x: 0, y: 0, width: size, height: size + Self.tailHeight)
+        // The tip, not the middle, sits on the coordinate; and it grows from there.
+        centerOffset = CGVector(dx: 0, dy: -(size + Self.tailHeight) / 2)
+        layer.anchorPoint = CGPoint(x: 0.5, y: 1)
+        scalesWithViewingDistance = false
+        isUserInteractionEnabled = false
+
+        tail.path = {
+            let path = UIBezierPath()
+            path.move(to: CGPoint(x: size / 2 - 9, y: size - 6))
+            path.addLine(to: CGPoint(x: size / 2, y: size + Self.tailHeight))
+            path.addLine(to: CGPoint(x: size / 2 + 9, y: size - 6))
+            path.close()
+            return path.cgPath
+        }()
+        layer.addSublayer(tail)
+
+        head.frame = CGRect(x: 0, y: 0, width: size, height: size)
+        head.layer.cornerRadius = size / 2
+        head.layer.borderColor = UIColor.white.cgColor
+        head.layer.borderWidth = 3
+        addSubview(head)
+
+        glyph.image = UIImage(systemName: "drop.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 20, weight: .bold))
+        glyph.tintColor = .white
+        glyph.contentMode = .center
+        glyph.frame = head.bounds
+        head.addSubview(glyph)
+
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.3
+        layer.shadowRadius = 5
+        layer.shadowOffset = CGSize(width: 0, height: 3)
+        isAccessibilityElement = false
+    }
+
+    required init?(coder: NSCoder) { fatalError("not coded") }
+
+    func configure(color: UIColor) {
+        head.backgroundColor = color
+        tail.fillColor = color.cgColor
+    }
+
+    func raise() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        guard !UIAccessibility.isReduceMotionEnabled else {
+            alpha = 0
+            UIView.animate(withDuration: 0.2) { self.alpha = 1 }
+            return
+        }
+        transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
+        alpha = 0
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.8) {
+            self.transform = .identity
+            self.alpha = 1
+        }
+        // The little dance: a sway either side that dies out, about the tip.
+        let sway = CAKeyframeAnimation(keyPath: "transform.rotation.z")
+        sway.values = [0, -0.14, 0.1, -0.05, 0.02, 0]
+        sway.keyTimes = [0, 0.25, 0.5, 0.7, 0.85, 1]
+        sway.duration = 0.7
+        sway.beginTime = CACurrentMediaTime() + 0.15
+        sway.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        head.layer.superlayer?.add(sway, forKey: "sway")
+    }
+
+    func lower(_ done: @escaping () -> Void) {
+        guard !UIAccessibility.isReduceMotionEnabled else { done(); return }
+        UIView.animate(withDuration: 0.18, animations: {
+            self.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
+            self.alpha = 0
+        }, completion: { _ in done() })
     }
 }
