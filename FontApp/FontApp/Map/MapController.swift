@@ -10,7 +10,21 @@ final class MapController {
 
     /// The layer on screen. Remembered between launches.
     var layer: MapLayer = MapLayer.saved {
-        didSet { UserDefaults.standard.set(layer.rawValue, forKey: MapLayer.storageKey) }
+        didSet {
+            UserDefaults.standard.set(layer.rawValue, forKey: MapLayer.storageKey)
+            checkCoverage()
+        }
+    }
+
+    /// The view is entirely outside the layer's data: without a word the map just looks
+    /// broken (blank, and no fountains if there are none there either).
+    private(set) var outsideCoverage = false
+
+    /// After every move and every change of layer.
+    func checkCoverage() {
+        guard let box = visibleBox else { return }
+        let outside = !layer.covers(box)
+        if outside != outsideCoverage { outsideCoverage = outside }
     }
 
     /// Mirrors the map's tracking mode, for the location button's icon.

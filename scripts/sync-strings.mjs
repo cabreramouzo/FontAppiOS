@@ -107,6 +107,15 @@ const IOS_ONLY = {
     ca: 'Mapa (OpenStreetMap)', es: 'Mapa (OpenStreetMap)', gl: 'Mapa (OpenStreetMap)', eu: 'Mapa (OpenStreetMap)',
     en: 'Map (OpenStreetMap)', fr: 'Carte (OpenStreetMap)', pt: 'Mapa (OpenStreetMap)', it: 'Mappa (OpenStreetMap)',
   },
+  'ios.layer.outside': {
+    ca: '{layer} no cobreix aquesta zona.', es: '{layer} no cubre esta zona.', gl: '{layer} non cobre esta zona.',
+    eu: '{layer} geruzak ez du eremu hau hartzen.', en: '{layer} doesn’t cover this area.',
+    fr: '{layer} ne couvre pas cette zone.', pt: '{layer} não cobre esta zona.', it: '{layer} non copre questa zona.',
+  },
+  'ios.layer.useWorld': {
+    ca: 'Mapa mundial', es: 'Mapa mundial', gl: 'Mapa mundial', eu: 'Munduko mapa', en: 'World map',
+    fr: 'Carte du monde', pt: 'Mapa-múndi', it: 'Mappa del mondo',
+  },
   'ios.layer.ignBase': {
     ca: 'Mapa base IGN (ES)', es: 'Mapa base IGN (ES)', gl: 'Mapa base IGN (ES)', eu: 'IGN oinarrizko mapa (ES)',
     en: 'IGN base map (ES)', fr: 'Carte de base IGN (ES)', pt: 'Mapa base IGN (ES)', it: 'Mappa di base IGN (ES)',

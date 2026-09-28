@@ -54,6 +54,7 @@ struct MapScreen: View {
             followRequest: followRequest,
             onMove: { region, size, following in
                 model.mapDidMove(region: region, size: size, following: following)
+                controller.checkCoverage()
             },
             onSelect: { selected = $0 },
             controller: controller,
@@ -277,6 +278,16 @@ struct MapScreen: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(L10n.t("map.rateLimited")).font(.subheadline.bold())
                 Text(L10n.t("map.rateLimitedBody")).font(.footnote)
+            }
+            .bannerStyle()
+        } else if controller.outsideCoverage {
+            HStack(spacing: 12) {
+                Text(L10n.t("ios.layer.outside", ["layer": L10n.t(controller.layer.labelKey)]))
+                    .font(.footnote)
+                Button(L10n.t("ios.layer.useWorld")) { controller.layer = .world }
+                    .font(.footnote.bold())
+                    .buttonStyle(.borderedProminent)
+                    .frame(minHeight: 44)
             }
             .bannerStyle()
         } else if let message = model.errorMessage {

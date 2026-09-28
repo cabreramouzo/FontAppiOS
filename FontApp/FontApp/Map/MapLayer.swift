@@ -59,6 +59,26 @@ nonisolated enum MapLayer: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// Where a regional layer has data. Outside it the map is blank, not an error: the
+    /// ICGC vector style is Catalonia only and the IGN layers are Spain only (the web's
+    /// ICGC raster fills the rest of the world with OpenStreetMap; the vector one does
+    /// not). Coarse boxes: they only have to tell "somewhere else entirely".
+    var coverage: MapBox? {
+        switch self {
+        case .icgc: MapBox(minLat: 40.45, maxLat: 42.95, minLong: 0.1, maxLong: 3.4)
+        // Peninsula, Balearic and Canary Islands, Ceuta and Melilla.
+        case .ignBase, .mtn, .pnoa: MapBox(minLat: 27.4, maxLat: 44.0, minLong: -18.4, maxLong: 4.6)
+        case .world, .openTopo: nil
+        }
+    }
+
+    /// Whether anything of this layer can be seen in `box`.
+    func covers(_ box: MapBox) -> Bool {
+        guard let area = coverage else { return true }
+        return box.minLat < area.maxLat && box.maxLat > area.minLat
+            && box.minLong < area.maxLong && box.maxLong > area.minLong
+    }
+
     /// Whether a zone's map may be downloaded. ICGC and IGN publish under CC BY 4.0 and
     /// OpenFreeMap allows it; OpenTopoMap asks not to be bulk-downloaded.
     var canSaveOffline: Bool { self != .openTopo }
