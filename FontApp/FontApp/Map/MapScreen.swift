@@ -160,8 +160,13 @@ struct MapScreen: View {
         .sheet(item: $selected) { font in
             NavigationStack {
                 FontDetailView(fontID: font.id, preview: font, onClose: { selected = nil })
-                    // Already over the map.
-                    .environment(\.showOnMap, nil)
+                    // Over the map it brings the fountain into view, close, and lowers the
+                    // sheet to the short card so the map shows around it.
+                    .environment(\.showOnMap) { font in
+                        detent = .shortCard
+                        controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                        meters: 250, aboveSheet: true)
+                    }
             }
             // Opens as the short card: status, the three chips and the way there, with the
             // map still in view. Up for the whole page.

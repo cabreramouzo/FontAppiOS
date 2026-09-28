@@ -86,7 +86,9 @@ struct FavoritesScreen: View {
         } else {
             let arranged = favorites.arranged(sort, from: location.location)
             let pins = filtered(arranged.pinned), rest = filtered(arranged.rest)
-            List(selection: $selection) {
+            // Selecting only while editing: a selectable list swallows the tap that should
+            // open the fountain.
+            List(selection: editMode.isEditing ? $selection : nil) {
                 if case .failed(let message) = favorites.state {
                     // Without signal the saved list stays; say it may be behind.
                     Text(message).font(.footnote).foregroundStyle(.secondary)

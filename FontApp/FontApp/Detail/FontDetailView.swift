@@ -237,8 +237,7 @@ struct FontDetailView: View {
                 }
                 .buttonStyle(.plain)
                 .glassEffect(.regular.tint(tint).interactive(), in: Capsule())
-                // Only away from the map (Favourites, the profile, the bell): over it, the
-                // fountain is already in view.
+                // Away from the map it goes there; over the map it zooms onto the fountain.
                 if let showOnMap {
                     Button { showOnMap(FontSummary(font)) } label: { CircleIcon(systemImage: "map") }
                         .buttonStyle(.plain)
