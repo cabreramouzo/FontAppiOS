@@ -18,8 +18,10 @@ struct NewsScreen: View {
             .navigationDestination(for: UUID.self) { FontDetailView(fontID: $0) }
             .profileNavigation()
             .toolbar {
-                if session.isSignedIn { ToolbarItem(placement: .topBarLeading) { BellButton() } }
+                // The screen's own action first; the bell is always the last, top right, on
+                // every tab, as App Store keeps the account in one place.
                 ToolbarItem(placement: .topBarTrailing) { filterMenu }
+                if session.isSignedIn { ToolbarItem(placement: .topBarTrailing) { BellButton() } }
             }
             .refreshable { await model.reload(location: location.location) }
         }
