@@ -187,6 +187,11 @@ nonisolated struct APIClient: Sendable {
 
     // MARK: Profile
 
+    func updateProfile(_ userID: UUID, _ update: ProfileUpdate) async throws -> UserResponse {
+        try await send("PUT", "/users/\(userID.uuidString)", body: .json(try JSONEncoder().encode(update)),
+                       timeout: writeTimeout)
+    }
+
     /// Fountains you put on the map, newest first.
     func myFonts() async throws -> [FontSummary] { try await get("/auth/me/fonts") }
     /// Starred ones, newest first. Reporting an incident also stars the fountain.

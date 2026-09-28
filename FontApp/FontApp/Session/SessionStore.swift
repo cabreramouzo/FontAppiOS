@@ -75,6 +75,14 @@ final class SessionStore {
         clear()
     }
 
+    /// Saves a change to the account and keeps the server's answer as the account.
+    func update(_ change: (inout ProfileUpdate) -> Void) async throws {
+        guard let user else { return }
+        var update = ProfileUpdate(user)
+        change(&update)
+        setUser(try await api.updateProfile(user.id, update))
+    }
+
     /// Deletes (anonymises) the account on the server, then forgets it here. Unlike
     /// signing out it needs signal: nothing is forgotten until the server has agreed.
     func deleteAccount() async throws {

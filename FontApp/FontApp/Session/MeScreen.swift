@@ -57,6 +57,12 @@ struct MeScreen: View {
             Section {
                 if let user = session.user {
                     ProfileHeader(user: user, staff: session.isStaff)
+                    NavigationLink {
+                        SettingsScreen()
+                    } label: {
+                        Label(L10n.t("settings.title"), systemImage: "gearshape")
+                            .frame(minHeight: 44)
+                    }
                 } else {
                     ProgressView()
                 }
@@ -93,8 +99,9 @@ struct MeScreen: View {
             deletion
         }
         .refreshable { await reload() }
-        .task(id: session.userID) {
-            profile.clear()
+        // Switching the game off or on in Settings changes what the profile shows.
+        .task(id: ProfileKey(user: session.userID, gameOff: session.user?.gamificationOptOut)) {
+            if profile.owner != session.userID { profile.clear(for: session.userID) }
             await reload()
         }
     }
@@ -161,6 +168,11 @@ struct MeScreen: View {
             }
         }
     }
+}
+
+private struct ProfileKey: Equatable {
+    let user: UUID?
+    let gameOff: Bool?
 }
 
 extension Color {

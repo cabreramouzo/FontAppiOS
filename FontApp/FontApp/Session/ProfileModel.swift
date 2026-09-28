@@ -15,6 +15,8 @@ final class ProfileModel {
     private(set) var collection: VisitedCollection?
     private(set) var guarded: [GuardedFont]?
 
+    /// Whose lists these are.
+    @ObservationIgnored private(set) var owner: UUID?
     @ObservationIgnored private let api: APIClient
 
     init(api: APIClient = .shared) {
@@ -25,12 +27,13 @@ final class ProfileModel {
     func load(near: (latitude: Double, longitude: Double)? = nil) async {
         // The game's parts are extras: one failing does not hide the lists, and a
         // failure keeps what was shown.
-        async let game = try? api.gamification()
-        async let collection = try? api.visitedCollection(near: near)
-        async let guarded = try? api.guardedFonts()
+        async let game = attempt { try await self.api.gamification() }
+        async let collection = attempt { try await self.api.visitedCollection(near: near) }
+        async let guarded = attempt { try await self.api.guardedFonts() }
         async let fonts = api.myFonts()
         async let comments = api.myComments()
         let extras = await (game, collection, guarded)
+        // `.some(nil)` is the game switched off (204) and clears; `nil` is a failure and keeps.
         if let game = extras.0 { self.game = game }
         if let collection = extras.1 { self.collection = collection }
         if let guarded = extras.2 { self.guarded = guarded }
@@ -45,12 +48,19 @@ final class ProfileModel {
     }
 
     /// Another account signed in: the last one's lists must not show under it.
-    func clear() {
+    func clear(for account: UUID? = nil) {
+        owner = account
         fonts = nil
         comments = nil
         failed = nil
         game = nil
         collection = nil
         guarded = nil
+    }
+
+    /// `nil` when it failed; a generic wrapper so a `nil` answer (204) is not flattened
+    /// into the failure, as `try?` on an optional would.
+    private func attempt<T>(_ call: () async throws -> T) async -> T? {
+        try? await call()
     }
 }

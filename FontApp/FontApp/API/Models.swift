@@ -212,8 +212,13 @@ nonisolated struct UserResponse: Codable, Equatable, Sendable {
     let username: String
     let role: UserRole?
     var isAdmin: Bool? = nil
-    /// Only in your own responses (login, `/auth/me`, editing).
+    /// Only in your own responses (login, `/auth/me`, editing), like the settings below.
     var email: String? = nil
+    var namePublic: Bool? = nil
+    var emailPublic: Bool? = nil
+    var weeklyDigest: Bool? = nil
+    var mentionEmails: Bool? = nil
+    var gamificationOptOut: Bool? = nil
 
     var canManageFonts: Bool { role.map { $0 >= .admin } ?? (isAdmin == true) }
 }
@@ -367,4 +372,23 @@ nonisolated struct VisitedCollection: Decodable, Sendable {
     let visited: Int
     let types: [Kind]
     let local: Local?
+}
+
+/// `PUT /users/:id`. Name, username and email always travel; each setting only when it
+/// changes, since the server leaves an absent one as it was.
+nonisolated struct ProfileUpdate: Encodable, Sendable {
+    var name: String
+    var username: String
+    var email: String
+    var namePublic: Bool?
+    var emailPublic: Bool?
+    var weeklyDigest: Bool?
+    var mentionEmails: Bool?
+    var gamificationOptOut: Bool?
+
+    init(_ user: UserResponse) {
+        name = user.name
+        username = user.username
+        email = user.email ?? ""
+    }
 }

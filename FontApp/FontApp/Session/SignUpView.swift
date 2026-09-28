@@ -74,7 +74,7 @@ struct SignUpView: View {
     private func submit() {
         guard !isSending else { return }
         if let problem = SignUpRules.problem(name: name, username: username, email: email, password: password) {
-            error = message(for: problem)
+            error = problem.message
             return
         }
         error = nil
@@ -92,16 +92,6 @@ struct SignUpView: View {
                 // Taken username or email come with their code and are translated.
                 self.error = ErrorText.describe(error)
             }
-        }
-    }
-
-    private func message(for problem: SignUpRules.Problem) -> String {
-        switch problem {
-        case .nameEmpty: L10n.t("profile.nameEmpty")
-        case .usernameIsEmail: L10n.t("profile.usernameNotEmail")
-        case .usernameInvalid: L10n.t("profile.usernameRules")
-        case .emailInvalid: L10n.t("ios.signUp.emailInvalid")
-        case .passwordShort: L10n.t("ios.signUp.passwordShort")
         }
     }
 }

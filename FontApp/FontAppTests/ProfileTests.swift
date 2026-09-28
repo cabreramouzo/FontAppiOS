@@ -59,5 +59,36 @@ extension StubbedNetwork {
         model.clear()
         #expect(model.comments == nil && model.guarded == nil)
     }
+
+    @Test func switchingTheGameOffClearsItButAFailureKeepsIt() async {
+        StubProtocol.responses = ["GET /gamification/me": (200, game), "GET /auth/me/comments": (200, "[]"),
+                                  "GET /auth/me/fonts": (200, "[]")]
+        let model = ProfileModel(api: StubProtocol.client())
+        await model.load()
+        StubProtocol.responses["GET /gamification/me"] = (-1, "")
+        await model.load()
+        #expect(model.game?.gotes == 5437)
+        StubProtocol.responses["GET /gamification/me"] = (204, "")
+        await model.load()
+        #expect(model.game == nil)
+    }
+
+    @Test func aSettingSendsOnlyWhatChanged() async throws {
+        let me = "44444444-4444-4444-4444-444444444444"
+        let account = #"{"id":"\#(me)","name":"Prova","username":"prova_ios","email":"p@example.com","role":"user","weeklyDigest":true}"#
+        StubProtocol.sent = []
+        StubProtocol.responses = [
+            "POST /auth/login": (200, #"{"token":"t","user":\#(account)}"#),
+            "PUT /users/\(me)": (200, account.replacingOccurrences(of: #""weeklyDigest":true"#, with: #""weeklyDigest":false"#)),
+        ]
+        let session = SessionStore(api: StubProtocol.client())
+        try await session.signIn(user: "prova_ios", password: "x")
+        try await session.update { $0.weeklyDigest = false }
+        #expect(session.user?.weeklyDigest == false)
+        let body = try #require(StubProtocol.sent.last { $0.method == "PUT" }?.body)
+        let sent = try #require(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        #expect(sent["weeklyDigest"] as? Bool == false && sent["email"] as? String == "p@example.com")
+        #expect(sent["namePublic"] == nil && sent["gamificationOptOut"] == nil)
+    }
 }
 }

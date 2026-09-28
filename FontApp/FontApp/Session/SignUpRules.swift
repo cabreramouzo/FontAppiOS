@@ -15,18 +15,34 @@ nonisolated enum SignUpRules {
         case usernameInvalid
         case emailInvalid
         case passwordShort
+
+        var message: String {
+            switch self {
+            case .nameEmpty: L10n.t("profile.nameEmpty")
+            case .usernameIsEmail: L10n.t("profile.usernameNotEmail")
+            case .usernameInvalid: L10n.t("profile.usernameRules")
+            case .emailInvalid: L10n.t("ios.signUp.emailInvalid")
+            case .passwordShort: L10n.t("ios.signUp.passwordShort")
+            }
+        }
     }
 
     static let minPassword = 8
 
     static func problem(name: String, username: String, email: String, password: String) -> Problem? {
+        if let problem = accountProblem(name: name, username: username, email: email) { return problem }
+        if password.count < minPassword { return .passwordShort }
+        return nil
+    }
+
+    /// The same rules without a password, for editing the account in Settings.
+    static func accountProblem(name: String, username: String, email: String) -> Problem? {
         if name.trimmingCharacters(in: .whitespaces).isEmpty { return .nameEmpty }
         let user = username.trimmingCharacters(in: .whitespaces)
         if user.contains("@") { return .usernameIsEmail }
         if user.range(of: "^[a-zA-Z0-9_.-]{3,30}$", options: .regularExpression) == nil { return .usernameInvalid }
         let mail = email.trimmingCharacters(in: .whitespaces)
         if mail.range(of: "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", options: .regularExpression) == nil { return .emailInvalid }
-        if password.count < minPassword { return .passwordShort }
         return nil
     }
 
