@@ -4,956 +4,3182 @@
     "" : {
 
     },
-    "detail.nearWaterGo" : {
+    "comment.isIncident" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Veure-la"
+            "value" : "Això és una incidència"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "View it"
+            "value" : "This is an issue"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verla"
+            "value" : "Esto es una incidencia"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ikusi"
+            "value" : "Hau gorabehera bat da"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La voir"
+            "value" : "Ceci est un incident"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vela"
+            "value" : "Isto é unha incidencia"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vederla"
+            "value" : "Questa è una segnalazione"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ver"
+            "value" : "Isto é uma incidência"
           }
         }
       }
     },
-    "detail.nearWaterTitle" : {
+    "comment.mark" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hi ha una font amb aigua més a prop: {dist}"
+            "value" : "Marca com a incidència"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "There's a nearer fountain with water: {dist}"
+            "value" : "Mark as an issue"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hay una fuente con agua más cercana: {dist}"
+            "value" : "Marcar como incidencia"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ura duen iturri hurbilago bat dago: {dist}"
+            "value" : "Markatu gorabehera gisa"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il y a une fontaine avec de l'eau plus proche : {dist}"
+            "value" : "Marquer comme incident"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hai unha fonte con auga máis preto: {dist}"
+            "value" : "Marcar como incidencia"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "C'è una fontana con acqua più vicina: {dist}"
+            "value" : "Segna come segnalazione"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Há uma fonte com água mais próxima: {dist}"
+            "value" : "Marcar como incidência"
           }
         }
       }
     },
-    "detail.share" : {
+    "comment.placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comparteix"
+            "value" : "Explica què has vist en aquesta font"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Share"
+            "value" : "Tell us what you saw at this fountain"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartir"
+            "value" : "Cuenta qué has visto en esta fuente"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Partekatu"
+            "value" : "Kontatu zer ikusi duzun iturri honetan"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Partager"
+            "value" : "Racontez ce que vous avez vu à cette fontaine"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartir"
+            "value" : "Conta que viches nesta fonte"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Condividi"
+            "value" : "Racconta cosa hai visto in questa fontana"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Partilhar"
+            "value" : "Conta o que viste nesta fonte"
           }
         }
       }
     },
-    "detail.shareText" : {
+    "comment.submit" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "«{name}» a FontApp: com està l'aigua i com arribar-hi."
+            "value" : "Publicar"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "“{name}” on FontApp: how the water is and how to get there."
+            "value" : "Post"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "«{name}» en FontApp: cómo está el agua y cómo llegar."
+            "value" : "Publicar"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "«{name}» FontApp-en: nola dagoen ura eta nola iritsi."
+            "value" : "Argitaratu"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "« {name} » sur FontApp : l'état de l'eau et comment y aller."
+            "value" : "Publier"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "«{name}» en FontApp: como está a auga e como chegar."
+            "value" : "Publicar"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "«{name}» su FontApp: com’è l’acqua e come arrivarci."
+            "value" : "Pubblica"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\"{name}\" em FontApp: como está a água e como chegar."
+            "value" : "Publicar"
           }
         }
       }
     },
-    "detail.viewOnMap" : {
+    "comment.unmark" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Veure al mapa"
+            "value" : "Desmarca com a incidència"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "View on map"
+            "value" : "Unmark as an issue"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ver en el mapa"
+            "value" : "Desmarcar como incidencia"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ikusi mapan"
+            "value" : "Kendu gorabehera marka"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voir sur la carte"
+            "value" : "Ne plus marquer comme incident"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ver no mapa"
+            "value" : "Desmarcar como incidencia"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vedi sulla mappa"
+            "value" : "Togli da segnalazione"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ver no mapa"
+            "value" : "Desmarcar como incidência"
           }
         }
       }
     },
-    "flag.confirm" : {
+    "detail.confirmDeleteFont" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reportar aquest contingut com a inapropiat?"
+            "value" : "Esborrar aquesta font?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Report this content as inappropriate?"
+            "value" : "Delete this fountain?"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Reportar este contenido como inapropiado?"
+            "value" : "¿Borrar esta fuente?"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eduki hau desegoki gisa salatu?"
+            "value" : "Iturri hau ezabatu?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signaler ce contenu comme inapproprié ?"
+            "value" : "Supprimer cette fontaine ?"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reportar este contido como inapropiado?"
+            "value" : "Borrar esta fonte?"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Segnalare questo contenuto come inappropriato?"
+            "value" : "Eliminare questa fontana?"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reportar este conteúdo como inapropriado?"
+            "value" : "Apagar esta fonte?"
           }
         }
       }
     },
-    "flag.done" : {
+    "detail.createdBy" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contingut reportat. Gràcies."
+            "value" : "Creada per"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Content reported. Thanks."
+            "value" : "Created by"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contenido reportado. Gracias."
+            "value" : "Creada por"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edukia salatua. Eskerrik asko."
+            "value" : "Sortzailea:"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contenu signalé. Merci."
+            "value" : "Créé par"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contido reportado. Grazas."
+            "value" : "Creada por"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contenuto segnalato. Grazie."
+            "value" : "Aggiunta da"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conteúdo reportado. Obrigado."
+            "value" : "Criada por"
           }
         }
       }
     },
-    "flag.font" : {
+    "detail.delete" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denuncia aquesta font"
+            "value" : "Esborra"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Report this fountain"
+            "value" : "Delete"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denunciar esta fuente"
+            "value" : "Borrar"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Iturri hau salatu"
+            "value" : "Ezabatu"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Signaler cette fontaine"
+            "value" : "Supprimer"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denunciar esta fonte"
+            "value" : "Borrar"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Segnala questa fontana"
+            "value" : "Elimina"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denunciar esta fonte"
+            "value" : "Apagar"
           }
         }
       }
     },
-    "flag.fontHelp" : {
+    "detail.mayorBy" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La denúncia és privada. Tres denúncies diferents la posen en quarantena fins que una persona moderadora la revisi."
+            "value" : "Guardià"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your report is private. Three independent reports quarantine it until a moderator reviews it."
+            "value" : "Guardian"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La denuncia es privada. Tres denuncias distintas la ponen en cuarentena hasta que una persona moderadora la revise."
+            "value" : "Guardián"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salaketa pribatua da. Hiru salaketa desberdinek berrogeialdian jarriko dute moderatzaile batek berrikusi arte."
+            "value" : "Zaindaria"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le signalement est privé. Trois signalements distincts la mettent en quarantaine jusqu'à sa vérification."
+            "value" : "Gardien"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A denuncia é privada. Tres denuncias distintas póñena en corentena ata que moderación a revise."
+            "value" : "Gardián"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La segnalazione è privata. Tre segnalazioni distinte la mettono in quarantena finché una persona moderatrice non la esamina."
+            "value" : "Guardiano"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A denúncia é privada. Três denúncias diferentes colocam-na em quarentena até que uma pessoa moderadora a reveja."
+            "value" : "Guardião"
           }
         }
       }
     },
-    "flag.fontTitle" : {
+    "detail.mayorHelp" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Què passa amb aquesta font?"
+            "value" : "Qui més ha comprovat aquesta font els últims 60 dies"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What is wrong with this fountain?"
+            "value" : "Who has checked this fountain the most in the last 60 days"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Qué ocurre con esta fuente?"
+            "value" : "Quien más ha comprobado esta fuente en los últimos 60 días"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zer gertatzen da iturri honekin?"
+            "value" : "Azken 60 egunetan iturri hau gehien egiaztatu duena"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quel est le problème avec cette fontaine ?"
+            "value" : "Celui qui a le plus vérifié cette fontaine ces 60 derniers jours"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Que ocorre con esta fonte?"
+            "value" : "Quen máis comprobou esta fonte nos últimos 60 días"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cosa succede con questa fontana?"
+            "value" : "Chi ha verificato di più questa fontana negli ultimi 60 giorni"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O que se passa com esta fonte?"
+            "value" : "Quem mais verificou esta fonte nos últimos 60 dias"
           }
         }
       }
     },
-    "flag.reason.abuse" : {
+    "detail.mayorReviews" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contingut ofensiu"
+            "value" : "{n} comprovacions en 60 dies"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Offensive content"
+            "value" : "{n} check-ins in 60 days"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contenido ofensivo"
+            "value" : "{n} comprobaciones en 60 días"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eduki iraingarria"
+            "value" : "{n} egiaztapen 60 egunetan"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contenu offensant"
+            "value" : "{n} vérifications en 60 jours"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contido ofensivo"
+            "value" : "{n} comprobacións en 60 días"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contenuto offensivo"
+            "value" : "{n} verifiche in 60 giorni"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conteúdo ofensivo"
+            "value" : "{n} verificações em 60 dias"
           }
         }
       }
     },
-    "flag.reason.duplicate" : {
+    "detail.newUpdate" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Està duplicada"
+            "value" : "Nova actualització"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "It is a duplicate"
+            "value" : "New update"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Está duplicada"
+            "value" : "Nueva actualización"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bikoiztuta dago"
+            "value" : "Eguneratze berria"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "C'est un doublon"
+            "value" : "Nouvelle mise à jour"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Está duplicada"
+            "value" : "Nova actualización"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "È duplicata"
+            "value" : "Nuovo aggiornamento"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Está duplicada"
+            "value" : "Nova atualização"
           }
         }
       }
     },
-    "flag.reason.fake" : {
+    "detail.pioneerBy" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "És inventada o falsa"
+            "value" : "Primer a ressenyar-la"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "It is made up or fake"
+            "value" : "First to review it"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es inventada o falsa"
+            "value" : "Primero en reseñarla"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Asmatua edo faltsua da"
+            "value" : "Lehen balorazioa:"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elle est inventée ou fausse"
+            "value" : "D'abord pour l'examiner"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "É inventada ou falsa"
+            "value" : "Primeiro en reseñala"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "È inventata o falsa"
+            "value" : "Prima a recensirla"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "É inventada ou falsa"
+            "value" : "Primeiro a avaliá-la"
           }
         }
       }
     },
-    "flag.reason.nonexistent" : {
+    "dup.help" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No existeix"
+            "value" : "Tria la font que creus que és la mateixa. Això no amaga res del mapa: ho revisarà algú."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "It does not exist"
+            "value" : "Pick the fountain you think is the same. This hides nothing from the map: someone will review it."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No existe"
+            "value" : "Elige la fuente que crees que es la misma. Esto no esconde nada del mapa: lo revisará alguien."
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ez da existitzen"
+            "value" : "Aukeratu berdina dela uste duzun iturria. Honek ez du ezer ezkutatzen mapatik: norbaitek berrikusiko du."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elle n'existe pas"
+            "value" : "Choisissez la fontaine qui vous semble être la même. Cela ne masque rien sur la carte : quelqu'un le vérifiera."
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Non existe"
+            "value" : "Escolle a fonte que cres que é a mesma. Isto non agocha nada do mapa: revisarao alguén."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Non esiste"
+            "value" : "Scegli la fontana che pensi sia la stessa. Questo non nasconde nulla dalla mappa: lo rivedrà qualcuno."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não existe"
+            "value" : "Escolhe a fonte que achas que é a mesma. Isto não esconde nada do mapa: alguém vai rever."
           }
         }
       }
     },
-    "flag.reason.spam" : {
+    "dup.message" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "És publicitat o spam"
+            "value" : "Sembla la mateixa font."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "It is advertising or spam"
+            "value" : "Looks like the same fountain."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es publicidad o spam"
+            "value" : "Parece la misma fuente."
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Publizitatea edo spama da"
+            "value" : "Iturri bera dirudi."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "C'est de la publicité ou du spam"
+            "value" : "On dirait la même fontaine."
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "É publicidade ou spam"
+            "value" : "Semella a mesma fonte."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "È pubblicità o spam"
+            "value" : "Sembra la stessa fontana."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "É publicidade ou spam"
+            "value" : "Parece a mesma fonte."
           }
         }
       }
     },
-    "flag.report" : {
+    "dup.sent" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reporta"
+            "value" : "Gràcies. Ho revisarem."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Report"
+            "value" : "Thanks. We will look into it."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reportar"
+            "value" : "Gracias. Lo revisaremos."
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salatu"
+            "value" : "Eskerrik asko. Berrikusiko dugu."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rapport"
+            "value" : "Merci. Nous allons le vérifier."
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reportar"
+            "value" : "Grazas. Revisarémolo."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Segnala"
+            "value" : "Grazie. Lo rivedremo."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reportar"
+            "value" : "Obrigado. Vamos rever."
           }
         }
       }
     },
-    "form.cancel" : {
+    "dup.suggest" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel·la"
+            "value" : "És la mateixa que una altra"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel"
+            "value" : "This is the same as another one"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelar"
+            "value" : "Es la misma que otra"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utzi"
+            "value" : "Beste baten berdina da"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Annuler"
+            "value" : "C'est la même qu'une autre"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelar"
+            "value" : "É a mesma ca outra"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Annulla"
+            "value" : "È la stessa di un’altra"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancelar"
+            "value" : "É a mesma que outra"
           }
         }
       }
     },
-    "ios.search.title" : {
+    "gallery.add" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cerca"
+            "value" : "Afegir-ne"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Search"
+            "value" : "Add one"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Buscar"
+            "value" : "Añadir"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bilatu"
+            "value" : "Gehitu"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rechercher"
+            "value" : "Ajoutez-en un"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Buscar"
+            "value" : "Engadir"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cerca"
+            "value" : "Aggiungi"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pesquisar"
+            "value" : "Adicionar"
+          }
+        }
+      }
+    },
+    "gallery.addHelp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tria el tipus i, si vols, una descripció; després tria la imatge."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pick the type and, if you like, a description; then choose the image."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el tipo y, si quieres, una descripción; luego elige la imagen."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aukeratu mota eta, nahi baduzu, deskribapena; gero aukeratu irudia."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez le type et, si vous voulez, une description ; puis choisissez l'image."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolle o tipo e, se queres, unha descrición; despois escolle a imaxe."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli il tipo e, se vuoi, una descrizione; poi scegli l'immagine."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolhe o tipo e, se quiseres, uma descrição; depois escolhe a imagem."
+          }
+        }
+      }
+    },
+    "gallery.caption" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descripció (opcional)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descripción (opcional)"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deskribapena (aukerakoa)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description (facultatif)"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descrición (opcional)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descrizione (facoltativa)"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descrição (opcional)"
+          }
+        }
+      }
+    },
+    "gallery.captionHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P. ex.: Anàlisi de l’ACA, març del 2026"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E.g.: ACA water analysis, March 2026"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P. ej.: Análisis de la ACA, marzo de 2026"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adib.: ACAren analisia, 2026ko martxoa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ex. : Analyse de l’eau ACA, mars 2026"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "P. ex.: Análise da ACA, marzo de 2026"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es.: Analisi dell’ACA, marzo 2026"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ex.: Análise da ACA, março de 2026"
+          }
+        }
+      }
+    },
+    "gallery.choose" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triar imatge"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose image"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir imagen"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aukeratu irudia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir une image"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escoller imaxe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli l’immagine"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolher imagem"
+          }
+        }
+      }
+    },
+    "gallery.documents" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documentos"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumentuak"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documentos"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documenti"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documentos"
+          }
+        }
+      }
+    },
+    "gallery.documentsFree" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Els documents no en demanen cap."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documents need none."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los documentos no piden ninguno."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumentuek ez dute mailarik eskatzen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les documents n’en ont pas besoin."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os documentos non piden ningún."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I documenti non ne richiedono nessuno."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os documentos não exigem nenhum."
+          }
+        }
+      }
+    },
+    "gallery.documentsNote" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Els aporten les persones usuàries; FontApp no els certifica. Mira’n sempre la data."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contributed by users; FontApp does not certify them. Always check the date."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los aportan las personas usuarias; FontApp no los certifica. Mira siempre su fecha."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erabiltzaileek ekarritakoak dira; FontAppek ez ditu ziurtatzen. Begiratu beti data."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contribué par les utilisateurs ; FontApp ne les certifie pas. Vérifiez toujours la date."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achéganos as persoas usuarias; FontApp non os certifica. Mira sempre a súa data."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Li caricano le persone che usano l’app; FontApp non li certifica. Guarda sempre la loro data."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "São fornecidos pelos utilizadores; FontApp não os certifica. Verifica sempre a sua data."
+          }
+        }
+      }
+    },
+    "gallery.empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encara no hi ha res més. Pots afegir-hi una altra vista o un document."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing else yet. You can add another view or a document."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todavía no hay nada más. Puedes añadir otra vista o un documento."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oraindik ez dago besterik. Beste ikuspegi bat edo dokumentu bat gehi dezakezu."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien d'autre pour l'instant. Vous pouvez ajouter une autre vue ou un document."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aínda non hai nada máis. Podes engadir outra vista ou un documento."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non c’è ancora nient’altro. Puoi aggiungere un’altra vista o un documento."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ainda não há mais nada. Podes adicionar outra vista ou um documento."
+          }
+        }
+      }
+    },
+    "gallery.kind" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Què és"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What it is"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qué es"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zer den"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qu'est-ce que c'est"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que é"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Che cos’è"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que é"
+          }
+        }
+      }
+    },
+    "gallery.kind.context" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’accés o els voltants"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The access or surroundings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El acceso o los alrededores"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sarbidea edo ingurua"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'accès ou les environs"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O acceso ou os arredores"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’accesso o i dintorni"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O acesso ou os arredores"
+          }
+        }
+      }
+    },
+    "gallery.kind.document" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document (informe, cartell, avís)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document (report, sign, notice)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documento (informe, cartel, aviso)"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokumentua (txostena, kartela, oharra)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document (rapport, signature, avis)"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documento (informe, cartel, aviso)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documento (analisi, cartello, avviso)"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Documento (relatório, cartaz, aviso)"
+          }
+        }
+      }
+    },
+    "gallery.kind.fountain" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una altra vista de la font"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another view of the fountain"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otra vista de la fuente"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iturriaren beste ikuspegi bat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une autre vue de la fontaine"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outra vista da fonte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un’altra vista della fontana"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outra vista da fonte"
+          }
+        }
+      }
+    },
+    "gallery.open" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altres fotos"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More photos"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otras fotos"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beste argazki batzuk"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus de photos"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outras fotos"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altre foto"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outras fotos"
+          }
+        }
+      }
+    },
+    "gallery.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos i documents"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos and documents"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos y documentos"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Argazkiak eta dokumentuak"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos et documents"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos e documentos"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto e documenti"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotos e documentos"
+          }
+        }
+      }
+    },
+    "gallery.uploading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pujant…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uploading…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subiendo…"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Igotzen…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Téléchargement…"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subindo…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caricamento…"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A carregar…"
+          }
+        }
+      }
+    },
+    "report.add" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informa d'una incidència"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report an issue"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reportar una incidencia"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jakinarazi gorabehera bat"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signaler un problème"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informar dunha incidencia"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segnala un problema"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reportar um incidente"
+          }
+        }
+      }
+    },
+    "report.edited" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "editat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "edited"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "editado"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "editatua"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "modifié"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "editado"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "modificato"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "editado"
+          }
+        }
+      }
+    },
+    "report.like" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "M’agrada"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Like"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me gusta"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atsegin dut"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "J’aime"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gústame"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi piace"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gosto"
+          }
+        }
+      }
+    },
+    "report.loginToReport" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "per deixar un avís."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "to leave a note."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "para dejar un aviso."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ohar bat uzteko."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pour laisser un mot."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "para deixar un aviso."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "per lasciare un avviso."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "para deixar um aviso."
+          }
+        }
+      }
+    },
+    "report.placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un avís útil per a qui hi vagi: avaria, accés, animals, obres…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A useful heads-up for the next person: broken, access, animals, works…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un aviso útil para quien venga: avería, acceso, animales, obras…"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohar erabilgarri bat datorrenarentzat: matxura, sarbidea, animaliak, obrak…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un avertissement utile pour la prochaine personne : casse, accès, animaux, travaux…"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un aviso útil para quen veña: avaría, acceso, animais, obras…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un avviso utile per chi arriva: guasto, accesso, animali, lavori…"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um aviso útil para quem vier: avaria, acesso, animais, obras…"
+          }
+        }
+      }
+    },
+    "report.reopen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tornar a obrir"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reopen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a abrir"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berriro ireki"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rouvrir"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver abrir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riapri"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reabrir"
+          }
+        }
+      }
+    },
+    "report.reply" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respon"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reply"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Responder"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erantzun"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Répondre"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Responder"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rispondi"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Responder"
+          }
+        }
+      }
+    },
+    "report.replyPlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La teva resposta…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your reply…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu respuesta…"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zure erantzuna…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre réponse…"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A túa resposta…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tua risposta…"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A tua resposta…"
+          }
+        }
+      }
+    },
+    "report.resolve" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar com a resolta"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark as resolved"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar como resuelta"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konpondutzat eman"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marquer comme résolu"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar como resolta"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segna come risolta"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marcar como resolvido"
+          }
+        }
+      }
+    },
+    "report.resolvedAuto" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolta automàticament (algú ha dit que torna a rajar)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolved automatically (someone reported it flowing again)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resuelta automáticamente (alguien ha dicho que vuelve a manar)"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatikoki konponduta (norbaitek esan du berriro darioela)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Résolu automatiquement (quelqu'un a signalé que le problème coulait à nouveau)"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolta automaticamente (alguén dixo que volve a manar)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Risolta automaticamente (qualcuno ha detto che torna a sgorgare)"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolvido automaticamente (alguém disse que volta a fluir)"
+          }
+        }
+      }
+    },
+    "report.send" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envia"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bidali"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invia"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
+        }
+      }
+    },
+    "report.sending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviant…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando…"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bidaltzen…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi…"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invio…"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando…"
+          }
+        }
+      }
+    },
+    "report.submit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envia"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bidali"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invia"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar"
+          }
+        }
+      }
+    },
+    "report.unlike" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ja no m’agrada"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove like"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya no me gusta"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jada ez zait gustatzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je n’aime plus"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xa non me gusta"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non mi piace più"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Já não gosto"
+          }
+        }
+      }
+    },
+    "update.action" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualitza"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eguneratu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiorna"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualizar"
+          }
+        }
+      }
+    },
+    "update.available" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualització disponible"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualización disponible"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eguneratzea eskuragarri"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mise à jour disponible"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualización dispoñible"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento disponibile"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atualização disponível"
+          }
+        }
+      }
+    },
+    "update.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hi ha una versió nova de FontApp."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A new version of FontApp is ready."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hay una nueva versión de FontApp."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp-en bertsio berri bat dago."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une nouvelle version de FontApp est disponible."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai unha nova versión de FontApp."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C’è una nuova versione di FontApp."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Há uma nova versão de FontApp."
+          }
+        }
+      }
+    },
+    "update.failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'actualització encara no està disponible. Torna-ho a provar en un moment."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The update is not available yet. Try again in a moment."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La actualización todavía no está disponible. Prueba de nuevo en un momento."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eguneratzea oraindik ez dago erabilgarri. Saiatu berriro une batean."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La mise à jour n’est pas encore disponible. Réessayez dans un instant."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A actualización aínda non está dispoñible. Téntao de novo nun momento."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’aggiornamento non è ancora disponibile. Riprova tra un momento."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A atualização ainda não está disponível. Tenta novamente daqui a pouco."
+          }
+        }
+      }
+    },
+    "update.howNow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Com està la font ara?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How is the fountain now?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo está la fuente ahora?"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nola dago iturria orain?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment est la fontaine maintenant ?"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como está a fonte agora?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Com’è la fontana adesso?"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como está a fonte agora?"
+          }
+        }
+      }
+    },
+    "update.howNowOpt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Com està la font ara? (opcional)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How is the fountain now? (optional)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo está la fuente ahora? (opcional)"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nola dago iturria orain? (aukerakoa)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment est la fontaine maintenant ? (facultatif)"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como está a fonte agora? (opcional)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Com’è la fontana adesso? (facoltativo)"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como está a fonte agora? (opcional)"
+          }
+        }
+      }
+    },
+    "update.later" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Més tard"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Later"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más tarde"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geroago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus tard"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máis tarde"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Più tardi"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mais tarde"
+          }
+        }
+      }
+    },
+    "update.publish" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publica l'actualització"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post update"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publicar actualización"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Argitaratu eguneratzea"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publier la mise à jour"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publicar actualización"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pubblica l’aggiornamento"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publicar atualização"
+          }
+        }
+      }
+    },
+    "update.rating" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valoració:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rating:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valoración:"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Balorazioa:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notation:"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valoración:"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valutazione:"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaliação:"
+          }
+        }
+      }
+    },
+    "update.sending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviant…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando…"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bidaltzen…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi…"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invio…"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A enviar…"
+          }
+        }
+      }
+    },
+    "update.status" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estat:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado:"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Egoera:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statut:"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado:"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stato:"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado:"
+          }
+        }
+      }
+    },
+    "update.updating" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualitzant…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updating…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizando…"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eguneratzen…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mise à jour…"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizando…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiornamento…"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A atualizar…"
+          }
+        }
+      }
+    },
+    "update.willBeCover" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aquesta font encara no té foto: la que hi posis serà la seva."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This fountain has no photo yet — the one you add becomes its photo."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta fuente todavía no tiene foto: la que pongas será la suya."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iturri honek ez du argazkirik oraindik: jartzen duzuna berea izango da."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette fontaine n'a pas encore de photo : celle que tu ajoutes deviendra la sienne."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta fonte aínda non ten foto: a que poñas será a súa."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa fontana non ha ancora una foto: quella che metti sarà la sua."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta fonte ainda não tem foto: a que colocares será a sua."
           }
         }
       }
@@ -1001,6 +3227,9 @@
 
     },
     "%lld m" : {
+
+    },
+    "💧" : {
 
     },
     "activity.allRegions" : {
@@ -8052,6 +10281,112 @@
         }
       }
     },
+    "detail.nearWaterGo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veure-la"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verla"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ikusi"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La voir"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vela"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vederla"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver"
+          }
+        }
+      }
+    },
+    "detail.nearWaterTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hi ha una font amb aigua més a prop: {dist}"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There's a nearer fountain with water: {dist}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hay una fuente con agua más cercana: {dist}"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ura duen iturri hurbilago bat dago: {dist}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il y a une fontaine avec de l'eau plus proche : {dist}"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai unha fonte con auga máis preto: {dist}"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'è una fontana con acqua più vicina: {dist}"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Há uma fonte com água mais próxima: {dist}"
+          }
+        }
+      }
+    },
     "detail.noIncidents" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8260,6 +10595,112 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Substituir a foto"
+          }
+        }
+      }
+    },
+    "detail.share" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comparteix"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partekatu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partager"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Condividi"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partilhar"
+          }
+        }
+      }
+    },
+    "detail.shareText" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«{name}» a FontApp: com està l'aigua i com arribar-hi."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“{name}” on FontApp: how the water is and how to get there."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«{name}» en FontApp: cómo está el agua y cómo llegar."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«{name}» FontApp-en: nola dagoen ura eta nola iritsi."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« {name} » sur FontApp : l'état de l'eau et comment y aller."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«{name}» en FontApp: como está a auga e como chegar."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«{name}» su FontApp: com’è l’acqua e come arrivarci."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"{name}\" em FontApp: como está a água e como chegar."
           }
         }
       }
@@ -8525,6 +10966,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "— desconhecido —"
+          }
+        }
+      }
+    },
+    "detail.viewOnMap" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veure al mapa"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View on map"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver en el mapa"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ikusi mapan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voir sur la carte"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver no mapa"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vedi sulla mappa"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver no mapa"
           }
         }
       }
@@ -11974,6 +14468,589 @@
         }
       }
     },
+    "flag.confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reportar aquest contingut com a inapropiat?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report this content as inappropriate?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Reportar este contenido como inapropiado?"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eduki hau desegoki gisa salatu?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signaler ce contenu comme inapproprié ?"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reportar este contido como inapropiado?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segnalare questo contenuto come inappropriato?"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reportar este conteúdo como inapropriado?"
+          }
+        }
+      }
+    },
+    "flag.done" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contingut reportat. Gràcies."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Content reported. Thanks."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contenido reportado. Gracias."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edukia salatua. Eskerrik asko."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contenu signalé. Merci."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contido reportado. Grazas."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contenuto segnalato. Grazie."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conteúdo reportado. Obrigado."
+          }
+        }
+      }
+    },
+    "flag.font" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denuncia aquesta font"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report this fountain"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denunciar esta fuente"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iturri hau salatu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signaler cette fontaine"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denunciar esta fonte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segnala questa fontana"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denunciar esta fonte"
+          }
+        }
+      }
+    },
+    "flag.fontHelp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La denúncia és privada. Tres denúncies diferents la posen en quarantena fins que una persona moderadora la revisi."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your report is private. Three independent reports quarantine it until a moderator reviews it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La denuncia es privada. Tres denuncias distintas la ponen en cuarentena hasta que una persona moderadora la revise."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salaketa pribatua da. Hiru salaketa desberdinek berrogeialdian jarriko dute moderatzaile batek berrikusi arte."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le signalement est privé. Trois signalements distincts la mettent en quarantaine jusqu'à sa vérification."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A denuncia é privada. Tres denuncias distintas póñena en corentena ata que moderación a revise."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La segnalazione è privata. Tre segnalazioni distinte la mettono in quarantena finché una persona moderatrice non la esamina."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A denúncia é privada. Três denúncias diferentes colocam-na em quarentena até que uma pessoa moderadora a reveja."
+          }
+        }
+      }
+    },
+    "flag.fontTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Què passa amb aquesta font?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What is wrong with this fountain?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué ocurre con esta fuente?"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zer gertatzen da iturri honekin?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quel est le problème avec cette fontaine ?"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que ocorre con esta fonte?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa succede con questa fontana?"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que se passa com esta fonte?"
+          }
+        }
+      }
+    },
+    "flag.reason.abuse" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contingut ofensiu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offensive content"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contenido ofensivo"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eduki iraingarria"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contenu offensant"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contido ofensivo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contenuto offensivo"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conteúdo ofensivo"
+          }
+        }
+      }
+    },
+    "flag.reason.duplicate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Està duplicada"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It is a duplicate"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está duplicada"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bikoiztuta dago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est un doublon"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está duplicada"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È duplicata"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está duplicada"
+          }
+        }
+      }
+    },
+    "flag.reason.fake" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "És inventada o falsa"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It is made up or fake"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es inventada o falsa"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asmatua edo faltsua da"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elle est inventée ou fausse"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É inventada ou falsa"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È inventata o falsa"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É inventada ou falsa"
+          }
+        }
+      }
+    },
+    "flag.reason.nonexistent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No existeix"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It does not exist"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No existe"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ez da existitzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elle n'existe pas"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non existe"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non esiste"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não existe"
+          }
+        }
+      }
+    },
+    "flag.reason.spam" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "És publicitat o spam"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It is advertising or spam"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es publicidad o spam"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Publizitatea edo spama da"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est de la publicité ou du spam"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É publicidade ou spam"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È pubblicità o spam"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É publicidade ou spam"
+          }
+        }
+      }
+    },
+    "flag.report" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reporta"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reportar"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salatu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapport"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reportar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segnala"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reportar"
+          }
+        }
+      }
+    },
     "font.unnamed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12023,6 +15100,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fonte sem nome"
+          }
+        }
+      }
+    },
+    "form.cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel·la"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utzi"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulla"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         }
       }
@@ -23156,6 +26286,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Procurar fonte ou local"
+          }
+        }
+      }
+    },
+    "ios.search.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilatu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pesquisar"
           }
         }
       }

@@ -77,7 +77,10 @@ nonisolated struct MapResponse: Codable, Sendable {
 /// `lastWaterStatus`, `lastUpdate`, `statusConflict` and `mayor` (`FontController.FontDetail`).
 nonisolated struct FontDetail: Codable, Identifiable, Sendable {
     struct Creator: Codable, Sendable { let id: UUID? }
+    /// Who checked it most in the last 60 days; reconquerable, unlike the pioneer.
+    struct Mayor: Codable, Sendable { let userID: UUID?; let username: String; let reviews: Int }
     var creator: Creator? = nil
+    var mayor: Mayor? = nil
     let id: UUID
     let name: String?
     let latitude: Double
@@ -94,6 +97,34 @@ nonisolated struct FontDetail: Codable, Identifiable, Sendable {
     let lastWaterStatus: String?
     let lastUpdate: Date?
     let statusConflict: Bool?
+}
+
+/// A full review from the page: any of status, rating, text and photo (`NewComment`).
+nonisolated struct ComposedReview: Codable, Equatable, Sendable {
+    var waterStatus: String?
+    var rating: Int?
+    var body: String?
+    var image: String?
+}
+
+/// A comment, an incident ("the tap is broken"), or a reply to one (`parentID`).
+nonisolated struct NewReport: Encodable, Sendable {
+    let message: String
+    let isIncident: Bool
+    let incidentKind: String?
+    let parentID: UUID?
+}
+
+/// A photo or document of a fountain's gallery, besides its cover (`GET /fonts/:id/photos`).
+nonisolated struct FontPhoto: Codable, Identifiable, Sendable {
+    enum Kind: String, Codable, Sendable, CaseIterable { case fountain, document, context }
+    struct Uploader: Codable, Sendable { let id: UUID?; let username: String? }
+    let id: UUID
+    let url: String
+    let kind: Kind
+    let caption: String?
+    let createdAt: Date?
+    let uploader: Uploader?
 }
 
 /// `GET /fonts/:id/nearest-water`.
@@ -152,6 +183,7 @@ nonisolated struct CommentResponse: Codable, Identifiable, Sendable {
 /// A comment or an incident ("the tap is broken") about a fountain.
 nonisolated struct ReportResponse: Codable, Identifiable, Sendable {
     let id: UUID
+    var userID: UUID? = nil
     let username: String?
     let message: String
     let isIncident: Bool?

@@ -16,6 +16,18 @@ struct FontDetailView: View {
     @State private var notice: String?
     @State private var copied = false
     @Environment(\.showOnMap) private var showOnMap
+    @Environment(\.dismiss) private var dismiss
+    @State private var writesReview = false
+    @State private var reportTarget: ReportTarget?
+    @State private var suggestsDuplicate = false
+    @State private var confirmsDelete = false
+    @State private var creatorName: String?
+
+    /// A new comment, or a reply to one.
+    private struct ReportTarget: Identifiable {
+        let replyTo: ReportResponse?
+        var id: UUID { replyTo?.id ?? UUID(uuidString: "00000000-0000-0000-0000-000000000000")! }
+    }
     @Environment(LocationService.self) private var location
     /// What the caller already knows, shown while the rest loads.
     private let preview: FontSummary?
@@ -76,6 +88,30 @@ struct FontDetailView: View {
                 return
             }
             nearWater = try? await APIClient.shared.nearestWater(font.id)
+        }
+        .task(id: loadedFont?.creator?.id) {
+            creatorName = nil
+            guard let creator = loadedFont?.creator?.id else { return }
+            creatorName = try? await APIClient.shared.username(of: creator)
+        }
+        .sheet(isPresented: $writesReview) {
+            if let font = loadedFont {
+                ReviewSheet(fontID: font.id) { await model.load() }
+            }
+        }
+        .sheet(item: $reportTarget) { target in
+            if let font = loadedFont {
+                ReportSheet(fontID: font.id, replyTo: target.replyTo) { await model.load() }
+            }
+        }
+        .sheet(isPresented: $suggestsDuplicate) {
+            if let font = loadedFont {
+                DuplicateSheet(font: font) { notice = $0 }
+            }
+        }
+        .confirmationDialog(L10n.t("detail.confirmDeleteFont"), isPresented: $confirmsDelete, titleVisibility: .visible) {
+            Button(L10n.t("detail.delete"), role: .destructive, action: deleteFont)
+            Button(L10n.t("form.cancel"), role: .cancel) {}
         }
         .confirmationDialog(L10n.t("flag.fontTitle"), isPresented: $flagging, titleVisibility: .visible) {
             ForEach(["fake", "duplicate", "nonexistent", "spam", "abuse"], id: \.self) { reason in
@@ -142,11 +178,23 @@ struct FontDetailView: View {
             } label: {
                 Label(String(format: "%.6f, %.6f", font.latitude, font.longitude), systemImage: "doc.on.doc")
             }
+            if session.isSignedIn {
+                Button { suggestsDuplicate = true } label: {
+                    Label(L10n.t("dup.suggest"), systemImage: "square.on.square")
+                }
+            }
             // Not on your own fountain, and only with a session, as on the web.
             if let userID = session.userID, font.creator?.id != userID {
                 Divider()
                 Button(role: .destructive) { flagging = true } label: {
                     Label(L10n.t("flag.font"), systemImage: "flag")
+                }
+            }
+            // Deleting is for its creator or an admin.
+            if let userID = session.userID, font.creator?.id == userID || (session.user?.canManageFonts ?? false) {
+                Divider()
+                Button(role: .destructive) { confirmsDelete = true } label: {
+                    Label(L10n.t("detail.delete"), systemImage: "trash")
                 }
             }
         } label: {
@@ -161,6 +209,64 @@ struct FontDetailView: View {
         let lang = Bundle.main.preferredLocalizations.first?.split(separator: "-").first.map(String.init) ?? "ca"
         let link = "https://fontapp.net/fonts/\(font.id.uuidString.lowercased())?lang=\(lang)"
         return L10n.t("detail.shareText", ["name": L10n.fontName(font.name)]) + " " + link
+    }
+
+    private func deleteFont() {
+        guard let font = loadedFont else { return }
+        Task {
+            do {
+                try await APIClient.shared.deleteFont(font.id)
+                NotificationCenter.default.post(name: .fontChanged, object: font.id)
+                dismiss()
+            } catch {
+                notice = ErrorText.describe(error)
+            }
+        }
+    }
+
+    /// Who put it on the map, who reviewed it first and who looks after it now.
+    @ViewBuilder private func peopleSection(_ font: FontDetail) -> some View {
+        // By date, not by the server's order: the day it pages or caches, order breaks.
+        let pioneer = model.reviews.min { $0.createdAt < $1.createdAt }?.username
+        let showsPioneer = pioneer != nil && pioneer != creatorName
+        if creatorName != nil || showsPioneer || font.mayor != nil {
+            Section {
+                if let creatorName {
+                    LabeledContent(L10n.t("detail.createdBy"), value: "@\(creatorName)")
+                }
+                if showsPioneer, let pioneer {
+                    LabeledContent(L10n.t("detail.pioneerBy"), value: "@\(pioneer)")
+                }
+                if let mayor = font.mayor {
+                    LabeledContent {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(verbatim: "@\(mayor.username)")
+                            Text(L10n.t("detail.mayorReviews", ["n": mayor.reviews])).font(.caption)
+                        }
+                    } label: {
+                        Text(L10n.t("detail.mayorBy"))
+                    }
+                    .accessibilityHint(L10n.t("detail.mayorHelp"))
+                }
+            }
+        }
+    }
+
+    private func canResolve(_ report: ReportResponse) -> Bool {
+        guard let userID = session.userID else { return false }
+        return report.userID == userID || (session.user?.canManageFonts ?? false)
+    }
+
+    private func resolve(_ report: ReportResponse) {
+        guard let font = loadedFont else { return }
+        Task {
+            do {
+                _ = try await APIClient.shared.resolveReport(report.id, of: font.id, report.resolvedAt == nil)
+                await model.load()
+            } catch {
+                notice = ErrorText.describe(error)
+            }
+        }
     }
 
     private func flag(_ reason: String) {
@@ -246,10 +352,24 @@ struct FontDetailView: View {
                         .listRowInsets(EdgeInsets())
                 }
             }
+            Section {
+                NavigationLink {
+                    GalleryScreen(fontID: font.id)
+                } label: {
+                    Label(L10n.t("gallery.open"), systemImage: "photo.stack")
+                }
+            }
             factsSection(font)
-            if !model.reviews.isEmpty {
+            peopleSection(font)
+            do {
                 let confirmable = session.isSignedIn ? model.confirmable(by: session.user?.id) : nil
                 Section(L10n.t("detail.statusReviews")) {
+                    Button {
+                        if session.isSignedIn { writesReview = true } else { showsSignIn = true }
+                    } label: {
+                        Label(L10n.t("detail.newUpdate"), systemImage: "square.and.pencil")
+                    }
+                    .frame(minHeight: 44)
                     ForEach(model.reviews) { review in
                         ReviewRow(review: review)
                         if review.id == confirmable?.id {
@@ -265,7 +385,29 @@ struct FontDetailView: View {
                 if model.reports.isEmpty {
                     Text(L10n.t("detail.noIncidents")).foregroundStyle(.secondary)
                 }
-                ForEach(model.reports) { ReportRow(report: $0) }
+                ForEach(model.reports) { report in
+                    ReportRow(report: report)
+                    if session.isSignedIn {
+                        HStack(spacing: 16) {
+                            // Replies hang from the first message: one level, as on the web.
+                            if report.parentID == nil {
+                                Button(L10n.t("report.reply")) { reportTarget = ReportTarget(replyTo: report) }
+                            }
+                            if report.isIncident == true, report.parentID == nil, canResolve(report) {
+                                Button(L10n.t(report.resolvedAt == nil ? "report.resolve" : "report.reopen")) { resolve(report) }
+                            }
+                        }
+                        .buttonStyle(.borderless)
+                        .font(.footnote)
+                        .padding(.leading, report.parentID == nil ? 0 : 16)
+                    }
+                }
+                Button {
+                    if session.isSignedIn { reportTarget = ReportTarget(replyTo: nil) } else { showsSignIn = true }
+                } label: {
+                    Label(L10n.t("report.add"), systemImage: "exclamationmark.bubble")
+                }
+                .frame(minHeight: 44)
             }
         }
         .listStyle(.insetGrouped)

@@ -210,6 +210,54 @@ nonisolated struct APIClient: Sendable {
         try await get("/fonts/\(fontID.uuidString)/nearest-water")
     }
 
+    /// A review written on the page, with any of status, rating, text and photo.
+    func postComment(on fontID: UUID, _ review: ComposedReview) async throws -> CommentResponse {
+        try await send("POST", "/fonts/\(fontID.uuidString)/comments",
+                       body: .json(try JSONEncoder().encode(review)), timeout: writeTimeout)
+    }
+
+    /// A comment or an incident, or a reply. The server never stores a reply as an incident.
+    func postReport(on fontID: UUID, _ report: NewReport) async throws -> ReportResponse {
+        try await send("POST", "/fonts/\(fontID.uuidString)/report",
+                       body: .json(try JSONEncoder().encode(report)), timeout: writeTimeout)
+    }
+
+    /// Closes (`on`) or reopens an incident. Closing keeps it, with date and who.
+    func resolveReport(_ reportID: UUID, of fontID: UUID, _ on: Bool) async throws -> ReportResponse {
+        try await send(on ? "POST" : "DELETE", "/fonts/\(fontID.uuidString)/report/\(reportID.uuidString)/resolve",
+                       timeout: writeTimeout)
+    }
+
+    /// "This is the same as that one": a suggestion, sent as a comment, never an incident.
+    func suggestDuplicate(_ fontID: UUID, of other: UUID, message: String) async throws {
+        struct Body: Encodable { let message: String; let duplicateOf: UUID }
+        let _: Ignored = try await send("POST", "/fonts/\(fontID.uuidString)/report",
+                                        body: .json(try JSONEncoder().encode(Body(message: message, duplicateOf: other))),
+                                        timeout: writeTimeout)
+    }
+
+    /// Creator or admin only.
+    func deleteFont(_ id: UUID) async throws {
+        let _: Ignored = try await send("DELETE", "/fonts/\(id.uuidString)", timeout: writeTimeout)
+    }
+
+    /// The gallery. Asked only when opened: the map and lists pay nothing for it.
+    func fontPhotos(_ fontID: UUID) async throws -> [FontPhoto] { try await get("/fonts/\(fontID.uuidString)/photos") }
+
+    func addFontPhoto(_ fontID: UUID, url: String, kind: FontPhoto.Kind, caption: String?) async throws -> FontPhoto {
+        struct Body: Encodable { let url: String; let kind: FontPhoto.Kind; let caption: String? }
+        return try await send("POST", "/fonts/\(fontID.uuidString)/photos",
+                              body: .json(try JSONEncoder().encode(Body(url: url, kind: kind, caption: caption))),
+                              timeout: writeTimeout)
+    }
+
+    /// Someone's public profile; the page only needs the username of its creator.
+    func username(of id: UUID) async throws -> String? {
+        struct Public: Decodable { let username: String? }
+        let user: Public = try await get("/users/\(id.uuidString)")
+        return user.username
+    }
+
     /// Reports a fountain to the moderators. Private; three different people put it in
     /// quarantine until someone reviews it.
     func flagFont(_ fontID: UUID, reason: String) async throws {
