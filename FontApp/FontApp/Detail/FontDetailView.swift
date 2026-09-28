@@ -44,9 +44,14 @@ struct FontDetailView: View {
     /// What the caller already knows, shown while the rest loads.
     private let preview: FontSummary?
 
-    init(fontID: UUID, preview: FontSummary? = nil) {
+    /// Over the map: the close button sits in the header, beside the title, and there is
+    /// no navigation bar above it. Pushed in a list, the system back button stays.
+    private let onClose: (() -> Void)?
+
+    init(fontID: UUID, preview: FontSummary? = nil, onClose: (() -> Void)? = nil) {
         _model = State(initialValue: FontDetailModel(fontID: fontID, summary: preview))
         self.preview = preview
+        self.onClose = onClose
     }
 
     var body: some View {
@@ -68,28 +73,11 @@ struct FontDetailView: View {
                 content(font, offlineNote: message)
             }
         }
+        // The name is the header's, in full: a one-line bar title cut it ("Font de la quint…").
         .navigationTitle(L10n.fontName(loadedFont?.name ?? preview?.name))
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                if let font = loadedFont { star(font) }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                if let font = loadedFont { moreMenu(font) }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                if case .loaded(let font) = model.state, let userID = session.userID {
-                    Button {
-                        editor = FontEditModel(font: font, userID: userID)
-                    } label: {
-                        Label(L10n.t("detail.edit"), systemImage: "pencil")
-                    }
-                    .tint(session.isStaff ? Color.staff : .accentColor)
-                    .accessibilityHint(L10n.t("detail.editInfoHint"))
-                    .accessibilityIdentifier("fontDetail.edit")
-                }
-            }
-        }
+        .toolbar { ToolbarItem(placement: .principal) { Color.clear.frame(width: 1, height: 1) } }
+        .toolbarVisibility(onClose == nil ? .automatic : .hidden, for: .navigationBar)
         .task { await model.load() }
         // Dry, broken or gone: where the nearest water is, as the web says it. Only then:
         // a fountain that flows needs no alternative.
@@ -188,30 +176,113 @@ struct FontDetailView: View {
         .remoteReviewAlert(model.quickReview) { await model.load() }
     }
 
-    /// The star: one tap adds it to the Favourites tab. Signed out, it asks to sign in.
-    private func star(_ font: FontDetail) -> some View {
-        let on = favorites.contains(font.id)
-        return Button {
-            guard session.isSignedIn else { showsSignIn = true; return }
-            Task {
-                do { try await favorites.toggle(font.summary) } catch { favoriteError = ErrorText.describe(error) }
+    private var loadedFont: FontDetail? { model.font }
+
+    /// The place card's head, as Apple Maps opens a place: the name in full, where it is
+    /// and what kind, its state in one line, and a row of equal actions under the thumb.
+    /// Only one close button, and nothing else beside it.
+    private func header(_ font: FontDetail) -> some View {
+        Section {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(L10n.fontName(font.name))
+                            .font(.title2.bold())
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityAddTraits(.isHeader)
+                        let place = [font.source.map { "\($0.emoji) \(L10n.t("source.\($0.rawValue)"))" },
+                                     font.municipality ?? font.region].compactMap { $0 }
+                        if !place.isEmpty {
+                            Text(place.joined(separator: " · ")).font(.subheadline).foregroundStyle(.secondary)
+                        }
+                    }
+                    Spacer(minLength: 0)
+                    if let onClose {
+                        Button(action: onClose) {
+                            Image(systemName: "xmark").font(.body.weight(.semibold)).frame(width: 30, height: 30)
+                        }
+                        .buttonStyle(.glass)
+                        .buttonBorderShape(.circle)
+                        .accessibilityLabel(L10n.t("ios.close"))
+                    }
+                }
+                statusRow(font)
+                actions(font)
             }
-        } label: {
-            Label(L10n.t(on ? "favorite.saved" : "favorite.save"), systemImage: on ? "star.fill" : "star")
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4))
         }
-        .tint(on ? .yellow : nil)
-        .sensoryFeedback(.selection, trigger: on)
-        .accessibilityIdentifier("fontDetail.favorite")
     }
 
-    private var loadedFont: FontDetail? { model.font }
+    /// As Apple Maps' place card: the main action wide and with its words, the others
+    /// round icons of the same size. Four labelled buttons cut every label short.
+    private func actions(_ font: FontDetail) -> some View {
+        let starred = favorites.contains(font.id)
+        let tint = session.isStaff ? Color.staff : Color.accentColor
+        return GlassEffectContainer {
+            HStack(spacing: 10) {
+                Button {
+                    let item = MKMapItem(location: CLLocation(latitude: font.latitude, longitude: font.longitude), address: nil)
+                    item.name = L10n.fontName(font.name)
+                    item.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
+                } label: {
+                    Label(L10n.t("detail.directions"), systemImage: "figure.walk")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .glassEffect(.regular.tint(tint).interactive(), in: Capsule())
+                // Only away from the map (Favourites, the profile, the bell): over it, the
+                // fountain is already in view.
+                if let showOnMap {
+                    Button { showOnMap(FontSummary(font)) } label: { CircleIcon(systemImage: "map") }
+                        .buttonStyle(.plain)
+                        .glassEffect(.regular.interactive(), in: Circle())
+                        .accessibilityLabel(L10n.t("detail.viewOnMap"))
+                }
+                Button { toggleStar(font) } label: {
+                    CircleIcon(systemImage: starred ? "star.fill" : "star", color: starred ? .yellow : .primary)
+                }
+                .buttonStyle(.plain)
+                .glassEffect(.regular.interactive(), in: Circle())
+                .sensoryFeedback(.selection, trigger: starred)
+                .accessibilityLabel(L10n.t(starred ? "favorite.saved" : "favorite.save"))
+                .accessibilityIdentifier("fontDetail.favorite")
+                ShareLink(item: shareText(font)) { CircleIcon(systemImage: "square.and.arrow.up") }
+                    .buttonStyle(.plain)
+                    .glassEffect(.regular.interactive(), in: Circle())
+                    .accessibilityLabel(L10n.t("detail.share"))
+                moreMenu(font)
+                    .buttonStyle(.plain)
+                    .glassEffect(.regular.interactive(), in: Circle())
+            }
+        }
+    }
+
+    private func toggleStar(_ font: FontDetail) {
+        guard session.isSignedIn else { showsSignIn = true; return }
+        Task {
+            do { try await favorites.toggle(font.summary) } catch { favoriteError = ErrorText.describe(error) }
+        }
+    }
 
     /// Share, copy the coordinates and report: what the web has as a row of buttons, here
     /// in the "more" menu, where iOS keeps the actions nobody needs on every visit.
     private func moreMenu(_ font: FontDetail) -> some View {
         Menu {
-            ShareLink(item: shareText(font)) {
-                Label(L10n.t("detail.share"), systemImage: "square.and.arrow.up")
+            if case .loaded = model.state, let userID = session.userID {
+                Button {
+                    editor = FontEditModel(font: font, userID: userID)
+                } label: {
+                    Label(L10n.t("detail.edit"), systemImage: "pencil")
+                }
+                .accessibilityHint(L10n.t("detail.editInfoHint"))
+                .accessibilityIdentifier("fontDetail.edit")
             }
             Button {
                 UIPasteboard.general.string = String(format: "%.6f, %.6f", font.latitude, font.longitude)
@@ -242,8 +313,9 @@ struct FontDetailView: View {
                 }
             }
         } label: {
-            Label(L10n.t("detail.share"), systemImage: "ellipsis")
+            CircleIcon(systemImage: "ellipsis")
         }
+        .accessibilityLabel(L10n.t("ios.more"))
         .sensoryFeedback(.success, trigger: copied)
         .accessibilityIdentifier("fontDetail.more")
     }
@@ -521,26 +593,13 @@ struct FontDetailView: View {
             // The short card, what the sheet opens at (as the web's popup): the status in
             // one line, the three chips where the thumb is, and the way there. The rest is
             // one swipe up.
+            header(font)
             HiddenNotice(font: font)
-            statusLine(font)
             if let quick = model.quickReview {
                 QuickReviewSection(model: quick, onChange: { await model.load() },
                                    onSignIn: { showsSignIn = true })
             }
             if let nearWater { nearWaterSection(nearWater) }
-            Section {
-                directionsButton(font)
-                if let showOnMap {
-                    Button {
-                        showOnMap(FontSummary(font))
-                    } label: {
-                        WideButtonLabel(L10n.t("detail.viewOnMap"), systemImage: "map")
-                    }
-                    .buttonStyle(.bordered)
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 12, trailing: 16))
-                    .listRowSeparator(.hidden)
-                }
-            }
             statusSection(font)
             if font.image == nil, let upload = model.photoUpload {
                 PhotoSection(model: upload, onUploaded: { await model.load() },
@@ -648,24 +707,11 @@ struct FontDetailView: View {
         .accessibilityHint(L10n.t(active ? "confirm.titleActive" : "confirm.titleInactive"))
     }
 
-    private func directionsButton(_ font: FontDetail) -> some View {
-        Button {
-            let item = MKMapItem(location: CLLocation(latitude: font.latitude, longitude: font.longitude),
-                                 address: nil)
-            item.name = L10n.fontName(font.name)
-            item.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
-        } label: {
-            WideButtonLabel(L10n.t("detail.directions"), systemImage: "figure.walk")
-        }
-        .buttonStyle(.borderedProminent)
-        .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
-    }
-
     /// The status, how much to trust it and when, in one row: what the short card has room for.
-    private func statusLine(_ font: FontDetail) -> some View {
+    private func statusRow(_ font: FontDetail) -> some View {
         let evidence = model.evidence(for: font)
         let level = Confidence.level(of: evidence)
-        return Section {
+        return Group {
             HStack(spacing: 8) {
                 if let status = WaterStatus(evidence.lastWaterStatus) {
                     StatusBadge(status: status)
@@ -684,7 +730,6 @@ struct FontDetailView: View {
             }
             .accessibilityElement(children: .combine)
         }
-        .listSectionSpacing(.compact)
     }
 
     /// What the one-line status means, for whoever doubts it: below the short card.
@@ -745,6 +790,20 @@ extension EnvironmentValues {
     /// Goes to the map and shows a fountain there. `nil` where the page is already over
     /// the map, so "view on map" is not offered.
     @Entry var showOnMap: ((FontSummary) -> Void)? = nil
+}
+
+/// A round action of the place card, 48 pt, the web's thumb size.
+private struct CircleIcon: View {
+    let systemImage: String
+    var color: Color = .primary
+
+    var body: some View {
+        Image(systemName: systemImage)
+            .font(.body.weight(.semibold))
+            .foregroundStyle(color)
+            .frame(width: 48, height: 48)
+            .contentShape(Circle())
+    }
 }
 
 struct WideButtonLabel: View {

@@ -158,14 +158,9 @@ struct MapScreen: View {
         .onReceive(NotificationCenter.default.publisher(for: .fontChanged)) { _ in model.refresh() }
         .sheet(item: $selected) { font in
             NavigationStack {
-                FontDetailView(fontID: font.id, preview: font)
+                FontDetailView(fontID: font.id, preview: font, onClose: { selected = nil })
                     // Already over the map.
                     .environment(\.showOnMap, nil)
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button(role: .close) { selected = nil }
-                        }
-                    }
             }
             // Opens as the short card: status, the three chips and the way there, with the
             // map still in view. Up for the whole page.

@@ -156,6 +156,12 @@ const IOS_ONLY = {
   'ios.search.title': {
     ca: 'Cerca', es: 'Buscar', gl: 'Buscar', eu: 'Bilatu', en: 'Search', fr: 'Rechercher', pt: 'Pesquisar', it: 'Cerca',
   },
+  'ios.close': {
+    ca: 'Tanca', es: 'Cerrar', gl: 'Pechar', eu: 'Itxi', en: 'Close', fr: 'Fermer', pt: 'Fechar', it: 'Chiudi',
+  },
+  'ios.more': {
+    ca: 'Més', es: 'Más', gl: 'Máis', eu: 'Gehiago', en: 'More', fr: 'Plus', pt: 'Mais', it: 'Altro',
+  },
   'ios.search.fountains': {
     ca: 'Fonts', es: 'Fuentes', gl: 'Fontes', eu: 'Iturriak', en: 'Fountains', fr: 'Fontaines', pt: 'Fontes', it: 'Fontane',
   },
