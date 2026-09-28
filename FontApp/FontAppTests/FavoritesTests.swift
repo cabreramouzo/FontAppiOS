@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 import Testing
 @testable import FontApp
@@ -49,6 +50,51 @@ extension StubbedNetwork {
         StubProtocol.responses["DELETE \(path)"] = (-1, "")
         await #expect(throws: APIError.self) { try await favorites.toggle(font) }
         #expect(favorites.contains(fontID))
+    }
+
+    private var three: String {
+        #"[{"id":"00000000-0000-0000-0000-00000000000A","name":"Cova","latitude":41.8,"longitude":2.1},"# +
+        #"{"id":"00000000-0000-0000-0000-00000000000B","name":"Abeurador","latitude":41.9,"longitude":2.1},"# +
+        #"{"id":"00000000-0000-0000-0000-00000000000C","name":"Bassa","latitude":41.7,"longitude":2.1}]"#
+    }
+
+    @Test func pinsGoFirstAndOrderAndPinsSurviveAndStayPerAccount() async {
+        StubProtocol.responses = ["GET /auth/me/favorites": (200, three)]
+        let store = defaults()
+        let favorites = Favorites(api: StubProtocol.client(), defaults: store)
+        favorites.sessionChanged(to: me)
+        await favorites.reload()
+        let a = favorites.items[0].id, b = favorites.items[1].id, c = favorites.items[2].id
+
+        favorites.togglePin(c)
+        var shown = favorites.arranged(.mine, from: nil)
+        #expect(shown.pinned.map(\.id) == [c])
+        #expect(shown.rest.map(\.id) == [a, b])
+
+        favorites.move(pinnedGroup: false, visible: shown.rest, from: [1], to: 0)
+        shown = favorites.arranged(.mine, from: nil)
+        #expect(shown.rest.map(\.id) == [b, a])
+        #expect(favorites.arranged(.name, from: nil).rest.map(\.id) == [b, a])
+
+        let reopened = Favorites(api: StubProtocol.client(), defaults: store)
+        reopened.sessionChanged(to: me)
+        #expect(reopened.isPinned(c))
+        #expect(reopened.arranged(.mine, from: nil).rest.map(\.id) == [b, a])
+        reopened.sessionChanged(to: other)
+        #expect(!reopened.isPinned(c))
+    }
+
+    @Test func nearestSortsByDistanceButPinsStayOnTop() async {
+        StubProtocol.responses = ["GET /auth/me/favorites": (200, three)]
+        let favorites = Favorites(api: StubProtocol.client(), defaults: defaults())
+        favorites.sessionChanged(to: me)
+        await favorites.reload()
+        let a = favorites.items[0].id, b = favorites.items[1].id, c = favorites.items[2].id
+        favorites.togglePin(b)
+        let here = CLLocation(latitude: 41.69, longitude: 2.1)
+        let shown = favorites.arranged(.nearest, from: here)
+        #expect(shown.pinned.map(\.id) == [b])
+        #expect(shown.rest.map(\.id) == [c, a])
     }
 }
 }

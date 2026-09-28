@@ -121,6 +121,54 @@ const IOS_ONLY = {
     pt: 'Entra para guardar fontes com a estrela e tê-las aqui, também sem rede.',
     it: 'Accedi per salvare fontane con la stella e averle qui, anche senza campo.',
   },
+  'ios.favorites.pinned': {
+    ca: 'Fixades', es: 'Fijadas', gl: 'Fixadas', eu: 'Finkatuak', en: 'Pinned', fr: 'Épinglées', pt: 'Fixadas', it: 'Fissate',
+  },
+  'ios.favorites.pin': {
+    ca: 'Fixa-la', es: 'Fijar', gl: 'Fixar', eu: 'Finkatu', en: 'Pin', fr: 'Épingler', pt: 'Fixar', it: 'Fissa',
+  },
+  'ios.favorites.unpin': {
+    ca: 'Deixa de fixar-la', es: 'Dejar de fijar', gl: 'Deixar de fixar', eu: 'Kendu finkapena', en: 'Unpin',
+    fr: 'Désépingler', pt: 'Deixar de fixar', it: 'Non fissare più',
+  },
+  'ios.favorites.remove': {
+    ca: 'Treu de preferides', es: 'Quitar de favoritas', gl: 'Quitar de favoritas', eu: 'Kendu gogokoetatik',
+    en: 'Remove from favourites', fr: 'Retirer des favoris', pt: 'Tirar das favoritas', it: 'Togli dai preferiti',
+  },
+  'ios.favorites.removeN': {
+    ca: 'Treu-ne {n}', es: 'Quitar {n}', gl: 'Quitar {n}', eu: 'Kendu {n}', en: 'Remove {n}', fr: 'Retirer {n}',
+    pt: 'Tirar {n}', it: 'Togli {n}',
+  },
+  'ios.favorites.sort': {
+    ca: 'Ordena', es: 'Ordenar', gl: 'Ordenar', eu: 'Ordenatu', en: 'Sort', fr: 'Trier', pt: 'Ordenar', it: 'Ordina',
+  },
+  'ios.favorites.sortMine': {
+    ca: 'El meu ordre', es: 'Mi orden', gl: 'A miña orde', eu: 'Nire ordena', en: 'My order', fr: 'Mon ordre',
+    pt: 'A minha ordem', it: 'Il mio ordine',
+  },
+  'ios.favorites.sortNearest': {
+    ca: 'Més a prop', es: 'Más cerca', gl: 'Máis preto', eu: 'Hurbilenak', en: 'Nearest', fr: 'Les plus proches',
+    pt: 'Mais perto', it: 'Più vicine',
+  },
+  'ios.favorites.sortName': {
+    ca: 'Per nom', es: 'Por nombre', gl: 'Por nome', eu: 'Izenaren arabera', en: 'By name', fr: 'Par nom',
+    pt: 'Por nome', it: 'Per nome',
+  },
+  'ios.favorites.filter': {
+    ca: 'Filtra per nom o poble', es: 'Filtrar por nombre o pueblo', gl: 'Filtrar por nome ou vila',
+    eu: 'Iragazi izenaren edo herriaren arabera', en: 'Filter by name or town', fr: 'Filtrer par nom ou commune',
+    pt: 'Filtrar por nome ou localidade', it: 'Filtra per nome o paese',
+  },
+  'ios.favorites.manageHint': {
+    ca: 'Llisca a la dreta per fixar-ne una a dalt i a l’esquerra per treure-la. Amb Edita, arrossega-les per ordenar-les.',
+    es: 'Desliza a la derecha para fijar una arriba y a la izquierda para quitarla. Con Editar, arrástralas para ordenarlas.',
+    gl: 'Esvara á dereita para fixar unha arriba e á esquerda para quitala. Con Editar, arrástraas para ordenalas.',
+    eu: 'Irristatu eskuinera bat goian finkatzeko eta ezkerrera kentzeko. Editatu sakatuta, arrastatu ordenatzeko.',
+    en: 'Swipe right to pin one to the top, left to remove it. With Edit, drag them into your order.',
+    fr: 'Glisse vers la droite pour en épingler une en haut, vers la gauche pour la retirer. Avec Modifier, fais-les glisser pour les ordonner.',
+    pt: 'Desliza para a direita para fixar uma no topo e para a esquerda para a tirar. Com Editar, arrasta-as para as ordenar.',
+    it: 'Scorri a destra per fissarne una in alto, a sinistra per toglierla. Con Modifica, trascinale per ordinarle.',
+  },
   'ios.favorites.howTo': {
     ca: 'Toca l’estrella a la fitxa d’una font per afegir-la aquí.',
     es: 'Toca la estrella en la ficha de una fuente para añadirla aquí.',
