@@ -1703,6 +1703,377 @@
         }
       }
     },
+    "exif.daysBefore" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} dies abans de pujar-la"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} days before uploading it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} días antes de subirla"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "igo baino {n} egun lehenago"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} jours avant de le télécharger"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} días antes de subila"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} giorni prima di caricarla"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} dias antes de a carregar"
+          }
+        }
+      }
+    },
+    "exif.hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ho escriu el mòbil de qui la puja i es pot falsejar, així que serveix per mirar-s’ho, mai per treure punts tot sol. Que no en tingui és el més normal: el que passa per missatgeria arriba sense res. Només ho veus perquè ets admin."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The uploader’s phone writes this and it can be forged, so it is something to look at, never grounds to void points on its own. Missing it is the norm: anything sent through a messaging app arrives stripped. You only see this because you are an admin."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo escribe el móvil de quien la sube y se puede falsificar, así que sirve para mirarlo, nunca para quitar puntos por sí solo. Que no lo traiga es lo más normal: lo que pasa por mensajería llega sin nada. Solo lo ves porque eres admin."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Igotzen duenaren mugikorrak idazten du eta faltsutu daiteke: begiratzeko balio du, inoiz ez puntuak kentzeko berez. Ez ekartzea da ohikoena: mezularitzatik datorrena hutsik iristen da. Administratzailea zarelako ikusten duzu."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le téléphone du téléchargeur écrit ceci et il peut être falsifié, c'est donc quelque chose à regarder, qui ne justifie jamais d'annuler des points à lui seul. Le manquement est la norme : tout ce qui est envoyé via une application de messagerie arrive dépouillé. Vous ne voyez cela que parce que vous êtes un administrateur."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escríbeo o móbil de quen a sobe e pódese falsificar, así que serve para mirar, nunca para quitar puntos por si só. Que non o traia é o máis normal: o que pasa por mensaxaría chega sen nada. Só o ves porque es admin."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lo scrive il telefono di chi la carica e si può falsificare, quindi serve per dare un’occhiata, mai per togliere punti da solo. Che non ci sia è del tutto normale: quello che passa dalla messaggistica arriva senza niente. Lo vedi solo perché sei admin."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É escrita pelo telemóvel de quem a carrega e pode ser falsificada, por isso serve para consultar, nunca para retirar pontos por si só. Que não a traga é o mais normal: o que passa por mensagem chega sem nada. Só a vês porque és admin."
+          }
+        }
+      }
+    },
+    "exif.near" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "a {d} de la font"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{d} from the fountain"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "a {d} de la fuente"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iturritik {d}-ra"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{d} de la fontaine"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "a {d} da fonte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "a {d} dalla fontana"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "a {d} da fonte"
+          }
+        }
+      }
+    },
+    "exif.noDate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sense data a la foto"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no date in the photo"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sin fecha en la foto"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "argazkiak ez dakar datarik"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pas de date sur la photo"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sen data na foto"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "senza data nella foto"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sem data na foto"
+          }
+        }
+      }
+    },
+    "exif.noGps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sense coordenades"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no coordinates"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sin coordenadas"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "koordenaturik gabe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pas de coordonnées"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sen coordenadas"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "senza coordinate"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sem coordenadas"
+          }
+        }
+      }
+    },
+    "exif.sameDay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "el mateix dia que es va pujar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "the same day it was uploaded"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "el mismo día que se subió"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "igo zen egun berean"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "le jour même où il a été téléchargé"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o mesmo día que se subiu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lo stesso giorno del caricamento"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no mesmo dia em que foi carregada"
+          }
+        }
+      }
+    },
+    "exif.taken" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feta el {d}"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taken {d}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hecha el {d}"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{d} egina"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pris {d}"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feita o {d}"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scattata il {d}"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feita em {d}"
+          }
+        }
+      }
+    },
     "form.create" : {
       "extractionState" : "manual",
       "localizations" : {

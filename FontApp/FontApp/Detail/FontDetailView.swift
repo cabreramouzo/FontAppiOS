@@ -645,9 +645,22 @@ struct FontDetailView: View {
             if !photos.isEmpty {
                 Section {
                     // A photo saved with an offline zone is read from the phone.
-                    PhotoCarousel(name: L10n.fontName(font.name), photos: photos) {
-                        OfflineZones.shared.photoFile(for: $0) ?? APIClient.shared.imageURL($0)
-                    }
+                    PhotoCarousel(
+                        name: L10n.fontName(font.name), photos: photos,
+                        url: { OfflineZones.shared.photoFile(for: $0) ?? APIClient.shared.imageURL($0) },
+                        latestID: FountainPhoto.latestReviewPhoto(model.reviews),
+                        // As the review's menu: anyone while it has no cover; then its
+                        // creator or an admin.
+                        canPromote: { review in
+                            review.image != font.image && session.isSignedIn
+                                && (font.image == nil || isAdmin || font.creator?.id == session.userID)
+                        },
+                        onPromote: { review in
+                            reviewAction(font, { try await APIClient.shared.setCoverFromComment(review.id, on: font.id) },
+                                         done: L10n.t("detail.photoSetAsMain"))
+                        },
+                        exifFor: isAdmin
+                            ? CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude) : nil)
                     .listRowInsets(EdgeInsets())
                     if font.image != nil { coverControls(font) }
                 }

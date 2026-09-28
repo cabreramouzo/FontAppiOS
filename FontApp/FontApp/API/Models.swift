@@ -525,3 +525,19 @@ nonisolated struct ProfileUpdate: Encodable, Sendable {
         email = user.email ?? ""
     }
 }
+
+/// The EXIF kept apart when a photo was uploaded (re-encoding strips it).
+nonisolated struct PhotoExif: Decodable, Sendable {
+    let photoID: String
+    let takenAt: Date?
+    let uploadedAt: Date?
+    let latitude: Double?
+    let longitude: Double?
+
+    /// The photo's id is its file name: `/uploads/<uuid>.jpg`.
+    static func id(of url: String) -> String? {
+        let name = url.split(separator: "/").last.map(String.init) ?? ""
+        let stem = name.split(separator: ".").first.map(String.init) ?? ""
+        return UUID(uuidString: stem) == nil ? nil : stem.lowercased()
+    }
+}

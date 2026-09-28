@@ -1,3 +1,4 @@
+import CoreLocation
 import SwiftUI
 
 /// One photo of a fountain: the cover, or one a review brought.
@@ -18,6 +19,18 @@ nonisolated struct FountainPhoto: Identifiable, Sendable {
         }
         return photos
     }
+
+    /// The newest review's photo, when that review is under 30 days old. A newer review
+    /// without a photo must not make an older photo look current; confirmations refresh
+    /// the report, never the photograph's age.
+    static func latestReviewPhoto(_ reviews: [CommentResponse], now: Date = .now) -> String? {
+        let latest = reviews.max {
+            $0.createdAt != $1.createdAt ? $0.createdAt < $1.createdAt : $0.id.uuidString > $1.id.uuidString
+        }
+        guard let latest, latest.image != nil else { return nil }
+        let age = now.timeIntervalSince(latest.createdAt)
+        return age >= 0 && age <= 30 * 86_400 ? latest.id.uuidString : nil
+    }
 }
 
 /// Every photo of the fountain, one swipe apart, as the web's carousel. A tap opens them
@@ -26,9 +39,17 @@ struct PhotoCarousel: View {
     let name: String
     let photos: [FountainPhoto]
     let url: (String) -> URL?
+    /// The newest review's photo, offered with a button when another one is showing.
+    var latestID: String? = nil
+    /// Whether this review's photo may become the cover (the page decides who can).
+    var canPromote: (CommentResponse) -> Bool = { _ in false }
+    var onPromote: (CommentResponse) -> Void = { _ in }
+    /// Admins see what the camera wrote, to judge a doubtful photo; never to act alone.
+    var exifFor: CLLocationCoordinate2D? = nil
 
     @State private var index = 0
     @State private var viewing: Int?
+    @State private var meta: [String: PhotoExif] = [:]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -44,6 +65,14 @@ struct PhotoCarousel: View {
             .aspectRatio(4 / 3, contentMode: .fit)
             .accessibilityLabel(L10n.t("carousel.label"))
             caption.padding(.horizontal, 16).padding(.bottom, 8)
+        }
+        // After a new cover, the list changes under the index: back to the cover.
+        .onChange(of: photos.map(\.id)) { index = 0 }
+        .task(id: exifFor == nil ? [] : photos.map(\.image)) {
+            guard exifFor != nil else { return }
+            let ids = photos.compactMap { PhotoExif.id(of: $0.image) }
+            guard !ids.isEmpty, let rows = try? await APIClient.shared.photoExif(ids) else { return }
+            meta = Dictionary(rows.map { ($0.photoID.lowercased(), $0) }, uniquingKeysWith: { a, _ in a })
         }
         .fullScreenCover(item: Binding(get: { viewing.map(Viewing.init) }, set: { viewing = $0?.index })) { v in
             PhotoViewer(name: name, photos: photos, url: url, index: v.index)
@@ -81,7 +110,49 @@ struct PhotoCarousel: View {
                 }
             }
             .frame(minHeight: 20)
+            HStack(spacing: 16) {
+                if let latestID, latestID != photo.id, let i = photos.firstIndex(where: { $0.id == latestID }) {
+                    Button(L10n.t("carousel.latest")) { withAnimation { index = i } }
+                }
+                if let review = photo.review, canPromote(review) {
+                    Button(L10n.t("detail.useAsMainPhoto")) { onPromote(review) }
+                }
+            }
+            .buttonStyle(.borderless)
+            .font(.subheadline)
+            if let fountain = exifFor, let id = PhotoExif.id(of: photo.image), let m = meta[id] {
+                Label(exifLine(m, fountain: fountain), systemImage: "info.circle")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .accessibilityHint(L10n.t("exif.hint"))
+            }
         }
+    }
+
+    /// When, how long before upload, and how far from the fountain: a distance says more
+    /// than two numbers, and is less personal data on screen. Missing is normal
+    /// (messaging apps strip it), so it is said plainly.
+    private func exifLine(_ m: PhotoExif, fountain: CLLocationCoordinate2D) -> String {
+        var parts: [String] = []
+        if let taken = m.takenAt {
+            parts.append(L10n.t("exif.taken", ["d": taken.formatted(date: .numeric, time: .shortened)]))
+            if let up = m.uploadedAt {
+                let days = Int(up.timeIntervalSince(taken) / 86_400)
+                parts.append(days < 1 ? L10n.t("exif.sameDay") : L10n.t("exif.daysBefore", ["n": days]))
+            }
+        } else {
+            parts.append(L10n.t("exif.noDate"))
+        }
+        if let lat = m.latitude, let long = m.longitude {
+            let d = CLLocation(latitude: lat, longitude: long)
+                .distance(from: CLLocation(latitude: fountain.latitude, longitude: fountain.longitude))
+            let text = d < 1000 ? "\(Int(d.rounded())) m"
+                : Measurement(value: d / 1000, unit: UnitLength.kilometers)
+                    .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(1))))
+            parts.append(L10n.t("exif.near", ["d": text]))
+        } else {
+            parts.append(L10n.t("exif.noGps"))
+        }
+        return parts.joined(separator: " · ")
     }
 }
 

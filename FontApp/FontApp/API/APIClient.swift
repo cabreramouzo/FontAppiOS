@@ -313,6 +313,11 @@ nonisolated struct APIClient: Sendable {
         return r.username
     }
 
+    /// What the camera wrote in photos (admins only on screen): when, and where.
+    func photoExif(_ ids: [String]) async throws -> [PhotoExif] {
+        try await get("/images/meta", query: [URLQueryItem(name: "ids", value: ids.joined(separator: ","))])
+    }
+
     // MARK: Photos
 
     func photoRemovalStatus(_ fontID: UUID) async throws -> PhotoRemovalStatus {
