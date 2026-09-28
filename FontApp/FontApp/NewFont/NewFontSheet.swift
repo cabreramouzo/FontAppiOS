@@ -28,19 +28,14 @@ struct NewFontSheet: View {
                 Section {
                     PlacementMap(pin: $model.pin, layer: layer)
                         .frame(height: 240)
-                        .overlay(alignment: .topTrailing) {
-                            // A thumb needs room to place a pin: the whole screen, on demand.
-                            Button { placesFullScreen = true } label: {
-                                Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                    .font(.body.weight(.semibold))
-                                    .frame(width: 44, height: 44)
-                            }
-                            .buttonStyle(.plain)
-                            .glassEffect(.regular.interactive(), in: Circle())
-                            .padding(10)
-                            .accessibilityLabel(L10n.t("ios.newFont.bigMap"))
-                        }
                         .listRowInsets(EdgeInsets())
+                    // A thumb needs room to place a pin: the whole screen, on demand. Its own
+                    // row, not over the map, whose pan swallowed a finger that moved a little.
+                    Button { placesFullScreen = true } label: {
+                        Label(L10n.t("ios.newFont.bigMap"), systemImage: "arrow.up.left.and.arrow.down.right")
+                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
                     if let km = NewFontPlacement.remoteKm(pin: model.pin, me: location.location) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(L10n.t("newFont.remoteTitle", ["distance": km.formatted(.number.precision(.fractionLength(1)))]))
@@ -269,6 +264,16 @@ struct NewFontSheet: View {
 struct PlacementMap: UIViewRepresentable {
     @Binding var pin: CLLocationCoordinate2D
     let layer: MapLayer
+    /// The position read when the parent draws: reading it through the binding inside
+    /// updateUIView is not observed, so a pin moved from outside (the big map, the
+    /// photo's GPS) never redrew this map.
+    private let wanted: CLLocationCoordinate2D
+
+    init(pin: Binding<CLLocationCoordinate2D>, layer: MapLayer) {
+        _pin = pin
+        self.layer = layer
+        wanted = pin.wrappedValue
+    }
 
     func makeCoordinator() -> Coordinator { Coordinator(pin: $pin) }
 
@@ -315,8 +320,8 @@ struct PlacementMap: UIViewRepresentable {
     func updateUIView(_ map: MLNMapView, context: Context) {
         // The photo's GPS button moves the pin from outside.
         let current = map.centerCoordinate
-        if abs(current.latitude - pin.latitude) > 1e-6 || abs(current.longitude - pin.longitude) > 1e-6 {
-            map.setCenter(pin, animated: true)
+        if abs(current.latitude - wanted.latitude) > 1e-6 || abs(current.longitude - wanted.longitude) > 1e-6 {
+            map.setCenter(wanted, animated: true)
         }
     }
 
@@ -369,48 +374,44 @@ struct PlacementScreen: View {
     }
 
     var body: some View {
-        PlacementMap(pin: $working, layer: layer)
-            .ignoresSafeArea()
-            .overlay(alignment: .top) {
-                Text(L10n.t("ios.newFont.moveMap"))
-                    .font(.subheadline)
-                    .padding(.horizontal, 16).padding(.vertical, 10)
-                    .glassEffect(.regular, in: Capsule())
-                    .padding(.top, 8)
-                    .padding(.horizontal, 70)
-            }
-            .overlay(alignment: .topLeading) {
-                Button { dismiss() } label: {
-                    Image(systemName: "xmark").font(.body.weight(.semibold)).frame(width: 44, height: 44)
-                }
-                .buttonStyle(.plain)
-                .glassEffect(.regular.interactive(), in: Circle())
-                .padding(.leading, 12).padding(.top, 4)
-                .accessibilityLabel(L10n.t("ios.close"))
-            }
-            .overlay(alignment: .bottom) {
-                HStack(spacing: 12) {
-                    if location.isAuthorized, let here = location.location {
-                        Button { working = here.coordinate } label: {
-                            Image(systemName: "location.fill").font(.body.weight(.semibold)).frame(width: 52, height: 52)
-                        }
-                        .buttonStyle(.plain)
-                        .glassEffect(.regular.interactive(), in: Circle())
-                        .accessibilityLabel(L10n.t("relocate.useMyLocation"))
+        // System bars, not buttons drawn over the map: the map's own gestures took the
+        // touches of a finger that moved a little, and the close button sat by the island.
+        NavigationStack {
+            PlacementMap(pin: $working, layer: layer)
+                .ignoresSafeArea(edges: .bottom)
+                .navigationTitle(L10n.t("newFont.title"))
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button { dismiss() } label: { Image(systemName: "xmark") }
+                            .accessibilityLabel(L10n.t("ios.close"))
                     }
+                    if location.isAuthorized, let here = location.location {
+                        ToolbarItem(placement: .primaryAction) {
+                            Button { working = here.coordinate } label: { Image(systemName: "location.fill") }
+                                .accessibilityLabel(L10n.t("relocate.useMyLocation"))
+                        }
+                    }
+                }
+                .safeAreaInset(edge: .bottom) {
+                    VStack(spacing: 10) {
+                    Text(L10n.t("ios.newFont.moveMap"))
+                        .font(.subheadline)
+                        .padding(.horizontal, 14).padding(.vertical, 8)
+                        .glassEffect(.regular, in: Capsule())
                     Button {
                         pin = working
                         dismiss()
                     } label: {
-                        Text(L10n.t("ios.newFont.placeHere")).font(.headline).foregroundStyle(.white)
-                            .frame(maxWidth: .infinity, minHeight: 52)
+                        Text(L10n.t("ios.newFont.placeHere")).font(.headline)
+                            .frame(maxWidth: .infinity, minHeight: 44)
                     }
-                    .buttonStyle(.plain)
-                    .glassEffect(.regular.tint(.accentColor).interactive(), in: Capsule())
+                    .buttonStyle(.glassProminent)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-            }
+        }
     }
 }
 
