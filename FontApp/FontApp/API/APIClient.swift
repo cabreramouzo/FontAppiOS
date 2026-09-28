@@ -298,6 +298,74 @@ nonisolated struct APIClient: Sendable {
         return user.username
     }
 
+    // MARK: Photos
+
+    func photoRemovalStatus(_ fontID: UUID) async throws -> PhotoRemovalStatus {
+        try await get("/fonts/\(fontID.uuidString)/photo-removal-request")
+    }
+
+    /// Asks the moderators to take down the cover you put; `false` withdraws the request.
+    func requestPhotoRemoval(_ fontID: UUID, _ on: Bool) async throws {
+        let _: Ignored = try await send(on ? "POST" : "DELETE", "/fonts/\(fontID.uuidString)/photo-removal-request",
+                                        timeout: writeTimeout)
+    }
+
+    /// Undoes the cover you have just put, while the server still allows it.
+    func undoFontPhoto(_ fontID: UUID) async throws {
+        let _: Ignored = try await send("DELETE", "/fonts/\(fontID.uuidString)/photo", timeout: writeTimeout)
+    }
+
+    /// Takes the cover away (creator or admin): the details as they are, without image.
+    func removeCover(of font: FontDetail) async throws {
+        let body = NewFont(name: font.name, latitude: font.latitude, longitude: font.longitude, image: nil,
+                           description: font.description, source: font.source, drinkable: font.drinkable)
+        let _: Ignored = try await send("PUT", "/fonts/\(font.id.uuidString)", body: .json(try JSONEncoder().encode(body)),
+                                        timeout: writeTimeout)
+    }
+
+    /// Its uploader or an admin.
+    func deleteFontPhoto(_ photoID: UUID, of fontID: UUID) async throws {
+        let _: Ignored = try await send("DELETE", "/fonts/\(fontID.uuidString)/photos/\(photoID.uuidString)",
+                                        timeout: writeTimeout)
+    }
+
+    func updateFontPhoto(_ photoID: UUID, of fontID: UUID, caption: String?) async throws -> FontPhoto {
+        struct Body: Encodable { let caption: String? }
+        return try await send("PATCH", "/fonts/\(fontID.uuidString)/photos/\(photoID.uuidString)",
+                              body: .json(try JSONEncoder().encode(Body(caption: caption))), timeout: writeTimeout)
+    }
+
+    // MARK: Map maintenance (levels 4–6 and moderators)
+
+    func fontHistory(_ id: UUID) async throws -> [FontEditEntry] { try await get("/fonts/\(id.uuidString)/history") }
+
+    /// Hides this one as a copy of `other`. Reversible; nothing is deleted.
+    func markDuplicate(_ id: UUID, of other: UUID?) async throws {
+        struct Body: Encodable { let of: UUID }
+        if let other {
+            let _: Ignored = try await send("POST", "/fonts/\(id.uuidString)/duplicate-of",
+                                            body: .json(try JSONEncoder().encode(Body(of: other))), timeout: writeTimeout)
+        } else {
+            let _: Ignored = try await send("DELETE", "/fonts/\(id.uuidString)/duplicate-of", timeout: writeTimeout)
+        }
+    }
+
+    /// Takes a fountain that no longer exists off the map (needs two "gone" reports), or back.
+    func retireFont(_ id: UUID, _ on: Bool) async throws {
+        let _: Ignored = try await send(on ? "POST" : "DELETE", "/fonts/\(id.uuidString)/retire", timeout: writeTimeout)
+    }
+
+    /// Moderators: hides it for spam, fake or abuse (`reason`), or restores it with `nil`.
+    func hideForAbuse(_ id: UUID, reason: String?) async throws {
+        struct Body: Encodable { let reason: String }
+        if let reason {
+            let _: Ignored = try await send("POST", "/fonts/\(id.uuidString)/moderation/hide",
+                                            body: .json(try JSONEncoder().encode(Body(reason: reason))), timeout: writeTimeout)
+        } else {
+            let _: Ignored = try await send("DELETE", "/fonts/\(id.uuidString)/moderation/hide", timeout: writeTimeout)
+        }
+    }
+
     /// Reports a fountain to the moderators. Private; three different people put it in
     /// quarantine until someone reviews it.
     func flagFont(_ fontID: UUID, reason: String) async throws {

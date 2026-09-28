@@ -1,10 +1,16 @@
 import CoreLocation
 import SwiftUI
 
-/// "This is the same as that one", open to anyone signed in, as on the web. It hides
-/// nothing: it goes as a comment to whoever can decide, and never counts as an incident.
+/// Choosing the nearby fountain this one is a copy of. For anyone signed in it is a
+/// suggestion ("this is the same as that one") that hides nothing: it goes as a comment
+/// to whoever can decide, never as an incident. For whoever's level can decide, it marks
+/// it, which hides it from the map (reversible).
 struct DuplicateSheet: View {
     let font: FontDetail
+    var title = L10n.t("dup.suggest")
+    var help = L10n.t("dup.help")
+    /// Sends the choice; what it returns is said once done.
+    var pick: ((UUID) async throws -> String)?
     let onSent: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -16,7 +22,7 @@ struct DuplicateSheet: View {
         NavigationStack {
             List {
                 Section {
-                    Text(L10n.t("dup.help")).font(.footnote).foregroundStyle(.secondary)
+                    Text(help).font(.footnote).foregroundStyle(.secondary)
                 }
                 if let error {
                     Text(error).foregroundStyle(.red)
@@ -43,7 +49,7 @@ struct DuplicateSheet: View {
                     ProgressView().frame(maxWidth: .infinity)
                 }
             }
-            .navigationTitle(L10n.t("dup.suggest"))
+            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button(role: .close) { dismiss() } }
@@ -71,9 +77,15 @@ struct DuplicateSheet: View {
         Task {
             defer { sending = nil }
             do {
-                try await APIClient.shared.suggestDuplicate(font.id, of: other, message: L10n.t("dup.message"))
+                let done: String
+                if let pick {
+                    done = try await pick(other)
+                } else {
+                    try await APIClient.shared.suggestDuplicate(font.id, of: other, message: L10n.t("dup.message"))
+                    done = L10n.t("dup.sent")
+                }
                 dismiss()
-                onSent(L10n.t("dup.sent"))
+                onSent(done)
             } catch {
                 self.error = ErrorText.describe(error)
             }

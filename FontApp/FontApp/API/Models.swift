@@ -81,6 +81,10 @@ nonisolated struct FontDetail: Codable, Identifiable, Sendable {
     struct Mayor: Codable, Sendable { let userID: UUID?; let username: String; let reviews: Int }
     var creator: Creator? = nil
     var mayor: Mayor? = nil
+    /// Hidden from the map, and why: marked as a copy of this one, retired (gone), or
+    /// held by moderation (`pending`, `hidden`). Said to everyone who reaches the page.
+    var duplicateOf: UUID? = nil
+    var moderationState: String? = nil
     let id: UUID
     let name: String?
     let latitude: Double
@@ -125,6 +129,28 @@ nonisolated struct FontPhoto: Codable, Identifiable, Sendable {
     let caption: String?
     let createdAt: Date?
     let uploader: Uploader?
+}
+
+/// Whether you may ask to take down the cover you put, and whether you still can undo it.
+nonisolated struct PhotoRemovalStatus: Codable, Sendable {
+    let canRequest: Bool
+    let pending: Bool
+    let canUndo: Bool
+}
+
+/// One change to a fountain's details (`GET /fonts/:id/history`).
+nonisolated struct FontEditEntry: Codable, Identifiable, Sendable {
+    struct Snapshot: Codable, Sendable {
+        let name: String?
+        let description: String?
+        let source: String?
+        let drinkable: String?
+    }
+    let id: UUID
+    let editorName: String?
+    let before: Snapshot
+    let after: Snapshot
+    let createdAt: Date
 }
 
 /// `GET /fonts/:id/nearest-water`.

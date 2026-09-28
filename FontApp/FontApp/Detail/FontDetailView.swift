@@ -26,6 +26,11 @@ struct FontDetailView: View {
     @State private var editingReview: CommentResponse?
     @State private var editingReport: ReportResponse?
     @State private var deleting: Deletion?
+    @State private var photoRemoval: PhotoRemovalStatus?
+    @State private var coverAction: CoverAction?
+
+    /// Taking the cover down, or asking for it: both confirmed first.
+    private enum CoverAction { case remove, request }
 
     /// A review or a note waiting for "delete?" to be confirmed.
     private enum Deletion { case review(CommentResponse), report(ReportResponse) }
@@ -102,6 +107,19 @@ struct FontDetailView: View {
             creatorName = try? await APIClient.shared.username(of: creator)
         }
         .task(id: session.userID) { capabilities = await Capabilities.of(session.userID) }
+        .task(id: "\(session.userID?.uuidString ?? "")\(loadedFont?.image ?? "")") {
+            photoRemoval = nil
+            guard session.isSignedIn, let font = loadedFont, font.image != nil else { return }
+            photoRemoval = try? await APIClient.shared.photoRemovalStatus(font.id)
+        }
+        .confirmationDialog(L10n.t(coverAction == .remove ? "image.confirmRemove" : "image.confirmRequestRemoval"),
+                            isPresented: Binding(get: { coverAction != nil }, set: { if !$0 { coverAction = nil } }),
+                            titleVisibility: .visible) {
+            Button(L10n.t(coverAction == .remove ? "image.remove" : "image.requestRemoval"), role: .destructive) {
+                if let action = coverAction { cover(action) }
+            }
+            Button(L10n.t("form.cancel"), role: .cancel) {}
+        }
         .sheet(isPresented: $writesReview) {
             if let font = loadedFont {
                 ReviewSheet(fontID: font.id, fontName: font.name) { await model.load() }
@@ -286,6 +304,80 @@ struct FontDetailView: View {
 
     private var isAdmin: Bool { session.user?.canManageFonts ?? false }
 
+    /// Undo the cover you just put; take it down if the fountain is yours or you are an
+    /// admin; otherwise ask the moderators to, or withdraw the request.
+    @ViewBuilder private func coverControls(_ font: FontDetail) -> some View {
+        let manages = isAdmin || (session.userID != nil && font.creator?.id == session.userID)
+        if photoRemoval?.canUndo == true {
+            HStack {
+                Text(L10n.t("image.photoAddedUndo")).font(.subheadline)
+                Spacer()
+                Button(L10n.t("form.undo")) { undoCover(font) }.buttonStyle(.borderless)
+            }
+            .frame(minHeight: 44)
+        }
+        if manages {
+            Button(role: .destructive) { coverAction = .remove } label: {
+                Label(L10n.t("image.remove"), systemImage: "photo.badge.minus")
+            }
+            .frame(minHeight: 44)
+        } else if let status = photoRemoval, status.canRequest {
+            if status.pending {
+                HStack {
+                    Text(L10n.t("image.removalPending")).font(.subheadline).foregroundStyle(.secondary)
+                    Spacer()
+                    Button(L10n.t("form.cancel")) { withdrawRemoval(font) }.buttonStyle(.borderless)
+                }
+                .frame(minHeight: 44)
+            } else {
+                Button(role: .destructive) { coverAction = .request } label: {
+                    Label(L10n.t("image.requestRemoval"), systemImage: "photo.badge.minus")
+                }
+                .frame(minHeight: 44)
+            }
+        }
+    }
+
+    private func cover(_ action: CoverAction) {
+        guard let font = loadedFont else { return }
+        Task {
+            do {
+                switch action {
+                case .remove:
+                    try await APIClient.shared.removeCover(of: font)
+                    NotificationCenter.default.post(name: .fontChanged, object: font.id)
+                    await model.load()
+                case .request:
+                    try await APIClient.shared.requestPhotoRemoval(font.id, true)
+                    photoRemoval = try? await APIClient.shared.photoRemovalStatus(font.id)
+                    notice = L10n.t("image.removalRequested")
+                }
+            } catch {
+                notice = ErrorText.describe(error)
+            }
+        }
+    }
+
+    private func withdrawRemoval(_ font: FontDetail) {
+        Task {
+            do {
+                try await APIClient.shared.requestPhotoRemoval(font.id, false)
+                photoRemoval = try? await APIClient.shared.photoRemovalStatus(font.id)
+            } catch { notice = ErrorText.describe(error) }
+        }
+    }
+
+    private func undoCover(_ font: FontDetail) {
+        Task {
+            do {
+                try await APIClient.shared.undoFontPhoto(font.id)
+                notice = L10n.t("image.photoUndone")
+                NotificationCenter.default.post(name: .fontChanged, object: font.id)
+                await model.load()
+            } catch { notice = ErrorText.describe(error) }
+        }
+    }
+
     /// Your own note, within the hour: the server says when it is over.
     private func canEdit(_ report: ReportResponse) -> Bool {
         guard let userID = session.userID, report.userID == userID else { return false }
@@ -429,6 +521,7 @@ struct FontDetailView: View {
             // The short card, what the sheet opens at (as the web's popup): the status in
             // one line, the three chips where the thumb is, and the way there. The rest is
             // one swipe up.
+            HiddenNotice(font: font)
             statusLine(font)
             if let quick = model.quickReview {
                 QuickReviewSection(model: quick, onChange: { await model.load() },
@@ -458,6 +551,7 @@ struct FontDetailView: View {
                     PhotoView(url: OfflineZones.shared.photoFile(for: font.image)
                                 ?? APIClient.shared.imageURL(font.image))
                         .listRowInsets(EdgeInsets())
+                    coverControls(font)
                 }
             }
             Section {
@@ -534,6 +628,8 @@ struct FontDetailView: View {
                 }
                 .frame(minHeight: 44)
             }
+            MaintenanceSection(font: font, capabilities: capabilities, isModerator: session.isStaff,
+                               onChanged: { await model.load() }, onNotice: { notice = $0 })
         }
         .listStyle(.insetGrouped)
     }

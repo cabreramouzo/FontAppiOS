@@ -11,6 +11,15 @@ struct GalleryScreen: View {
     @State private var photos: [FontPhoto]?
     @State private var error: String?
     @State private var adding = false
+    @State private var captioning: FontPhoto?
+    @State private var caption = ""
+    @State private var removing: FontPhoto?
+
+    /// Its uploader or an admin.
+    private func canManage(_ photo: FontPhoto) -> Bool {
+        guard let userID = session.userID else { return false }
+        return photo.uploader?.id == userID || (session.user?.canManageFonts ?? false)
+    }
 
     var body: some View {
         List {
@@ -25,7 +34,20 @@ struct GalleryScreen: View {
                     let group = photos.filter { $0.kind == kind }
                     if !group.isEmpty {
                         Section(L10n.t("gallery.kind.\(kind.rawValue)")) {
-                            ForEach(group) { GalleryRow(photo: $0) }
+                            ForEach(group) { photo in
+                                GalleryRow(photo: photo)
+                                    .contextMenu {
+                                        if canManage(photo) {
+                                            Button {
+                                                caption = photo.caption ?? ""
+                                                captioning = photo
+                                            } label: { Label(L10n.t("gallery.caption"), systemImage: "text.cursor") }
+                                            Button(role: .destructive) { removing = photo } label: {
+                                                Label(L10n.t("image.remove"), systemImage: "trash")
+                                            }
+                                        }
+                                    }
+                            }
                         }
                     }
                 }
@@ -43,6 +65,34 @@ struct GalleryScreen: View {
             }
         }
         .task { await load() }
+        .alert(L10n.t("gallery.caption"), isPresented: Binding(get: { captioning != nil }, set: { if !$0 { captioning = nil } })) {
+            TextField(L10n.t("gallery.caption"), text: $caption)
+            Button(L10n.t("form.save")) {
+                guard let photo = captioning else { return }
+                let text = caption.trimmingCharacters(in: .whitespacesAndNewlines)
+                Task {
+                    do {
+                        _ = try await APIClient.shared.updateFontPhoto(photo.id, of: fontID, caption: text.isEmpty ? nil : text)
+                        await load()
+                    } catch { self.error = ErrorText.describe(error) }
+                }
+            }
+            Button(L10n.t("form.cancel"), role: .cancel) {}
+        }
+        .confirmationDialog(L10n.t("image.confirmRemove"),
+                            isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
+                            titleVisibility: .visible) {
+            Button(L10n.t("image.remove"), role: .destructive) {
+                guard let photo = removing else { return }
+                Task {
+                    do {
+                        try await APIClient.shared.deleteFontPhoto(photo.id, of: fontID)
+                        await load()
+                    } catch { self.error = ErrorText.describe(error) }
+                }
+            }
+            Button(L10n.t("form.cancel"), role: .cancel) {}
+        }
         .sheet(isPresented: $adding) {
             AddGalleryPhotoSheet(fontID: fontID) { await load() }
         }
