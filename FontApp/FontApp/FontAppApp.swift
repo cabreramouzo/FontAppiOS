@@ -8,6 +8,7 @@ struct FontAppApp: App {
     @State private var outbox: Outbox
     @State private var sync: OutboxSync
     @State private var bell = Bell()
+    @State private var favorites = Favorites()
 
     init() {
         let session = SessionStore()
@@ -27,15 +28,22 @@ struct FontAppApp: App {
                 .environment(outbox)
                 .environment(OfflineZones.shared)
                 .environment(bell)
+                .environment(favorites)
                 .task {
+                    favorites.sessionChanged(to: session.userID)
                     await session.refresh()
-                    if session.isSignedIn { await bell.reload() }
+                    if session.isSignedIn {
+                        async let inbox: Void = bell.reload()
+                        async let starred: Void = favorites.reload()
+                        _ = await (inbox, starred)
+                    }
                 }
                 .onChange(of: session.userID) { _, userID in
                     outbox.sessionChanged(to: userID)
                     sync.flush(reason: "session")
                     bell.clear()
-                    if userID != nil { Task { await bell.reload() } }
+                    favorites.sessionChanged(to: userID)
+                    if userID != nil { Task { await bell.reload(); await favorites.reload() } }
                 }
         }
         .onChange(of: scenePhase) { _, phase in

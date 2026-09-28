@@ -193,6 +193,12 @@ nonisolated struct APIClient: Sendable {
     func myFavorites() async throws -> [FontSummary] { try await get("/auth/me/favorites") }
     func myComments() async throws -> [MyComment] { try await get("/auth/me/comments") }
 
+    /// Stars (`on`) or unstars a fountain. Idempotent on the server.
+    func setFavorite(_ fontID: UUID, _ on: Bool) async throws {
+        let _: Ignored = try await send(on ? "POST" : "DELETE", "/fonts/\(fontID.uuidString)/favorite",
+                                        timeout: writeTimeout)
+    }
+
     /// `nil` when the game is switched off (204).
     func gamification() async throws -> GamificationSummary? { try await get("/gamification/me") }
     func guardedFonts() async throws -> [GuardedFont] { try await get("/gamification/guarded") }

@@ -5,6 +5,8 @@ import SwiftUI
 /// facts, reviews and reports.
 struct FontDetailView: View {
     @Environment(SessionStore.self) private var session
+    @Environment(Favorites.self) private var favorites
+    @State private var favoriteError: String?
     @State private var model: FontDetailModel
     @State private var showsSignIn = false
     @State private var showsCamera = false
@@ -41,6 +43,9 @@ struct FontDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                if let font = loadedFont { star(font) }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 if case .loaded(let font) = model.state, let userID = session.userID {
                     Button {
                         editor = FontEditModel(font: font, userID: userID)
@@ -54,6 +59,9 @@ struct FontDetailView: View {
             }
         }
         .task { await model.load() }
+        .alert(favoriteError ?? "", isPresented: Binding(get: { favoriteError != nil }, set: { if !$0 { favoriteError = nil } })) {
+            Button("OK", role: .cancel) {}
+        }
         .sheet(isPresented: $showsSignIn) { SignInView() }
         .sheet(item: $editor) { editor in
             FontEditSheet(model: editor) { font in
@@ -71,6 +79,22 @@ struct FontDetailView: View {
             .ignoresSafeArea()
         }
         .remoteReviewAlert(model.quickReview) { await model.load() }
+    }
+
+    /// The star: one tap adds it to the Favourites tab. Signed out, it asks to sign in.
+    private func star(_ font: FontDetail) -> some View {
+        let on = favorites.contains(font.id)
+        return Button {
+            guard session.isSignedIn else { showsSignIn = true; return }
+            Task {
+                do { try await favorites.toggle(font.summary) } catch { favoriteError = ErrorText.describe(error) }
+            }
+        } label: {
+            Label(L10n.t(on ? "favorite.saved" : "favorite.save"), systemImage: on ? "star.fill" : "star")
+        }
+        .tint(on ? .yellow : nil)
+        .sensoryFeedback(.selection, trigger: on)
+        .accessibilityIdentifier("fontDetail.favorite")
     }
 
     private var loadedFont: FontDetail? { model.font }

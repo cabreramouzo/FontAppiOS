@@ -42,7 +42,7 @@ const KEYS = [
   'detail.incidents', 'detail.noIncidents', 'detail.loading', 'detail.directions',
   'detail.addPhoto', 'detail.firstPhotoNote', 'nav.logout', 'nav.enter', 'staff.tag', 'settings.account', 'photo.failed',
   'profile.deleteAccount', 'profile.confirmDelete', 'profile.dangerZone', 'profile.dangerZoneHint',
-  'maintenance.recovered',
+  'maintenance.recovered', 'favorite.save', 'favorite.saved',
   'detail.noPhotoYet', 'detail.municipality', 'detail.region', 'detail.country', 'detail.stale',
 ]
 
@@ -106,6 +106,30 @@ const IOS_ONLY = {
   'ios.layer.world': {
     ca: 'Mapa (OpenStreetMap)', es: 'Mapa (OpenStreetMap)', gl: 'Mapa (OpenStreetMap)', eu: 'Mapa (OpenStreetMap)',
     en: 'Map (OpenStreetMap)', fr: 'Carte (OpenStreetMap)', pt: 'Mapa (OpenStreetMap)', it: 'Mappa (OpenStreetMap)',
+  },
+  'ios.tab.favorites': {
+    ca: 'Preferides', es: 'Favoritas', gl: 'Favoritas', eu: 'Gogokoak', en: 'Favourites',
+    fr: 'Favoris', pt: 'Favoritas', it: 'Preferiti',
+  },
+  'ios.favorites.signedOut': {
+    ca: 'Entra per desar fonts amb l’estrella i tenir-les aquí, també sense cobertura.',
+    es: 'Entra para guardar fuentes con la estrella y tenerlas aquí, también sin cobertura.',
+    gl: 'Entra para gardar fontes coa estrela e telas aquí, tamén sen cobertura.',
+    eu: 'Sartu iturriak izarrarekin gordetzeko eta hemen izateko, estaldurarik gabe ere.',
+    en: 'Sign in to star fountains and keep them here, even without signal.',
+    fr: 'Connecte-toi pour garder des fontaines avec l’étoile et les avoir ici, même sans réseau.',
+    pt: 'Entra para guardar fontes com a estrela e tê-las aqui, também sem rede.',
+    it: 'Accedi per salvare fontane con la stella e averle qui, anche senza campo.',
+  },
+  'ios.favorites.howTo': {
+    ca: 'Toca l’estrella a la fitxa d’una font per afegir-la aquí.',
+    es: 'Toca la estrella en la ficha de una fuente para añadirla aquí.',
+    gl: 'Toca a estrela na ficha dunha fonte para engadila aquí.',
+    eu: 'Ukitu izarra iturri baten fitxan hona gehitzeko.',
+    en: 'Tap the star on a fountain’s page to add it here.',
+    fr: 'Touche l’étoile sur la fiche d’une fontaine pour l’ajouter ici.',
+    pt: 'Toca na estrela na ficha de uma fonte para a juntar aqui.',
+    it: 'Tocca la stella nella scheda di una fontana per aggiungerla qui.',
   },
   'ios.layer.outside': {
     ca: '{layer} no cobreix aquesta zona.', es: '{layer} no cubre esta zona.', gl: '{layer} non cobre esta zona.',

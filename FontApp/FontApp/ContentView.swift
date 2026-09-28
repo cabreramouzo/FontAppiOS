@@ -4,7 +4,7 @@ struct ContentView: View {
     @Environment(Outbox.self) private var outbox
     @State private var tab = AppTab.map
 
-    enum AppTab: Hashable { case map, news, zones, me }
+    enum AppTab: Hashable { case map, news, favorites, me }
 
     var body: some View {
         TabView(selection: $tab) {
@@ -14,8 +14,9 @@ struct ContentView: View {
             Tab(L10n.t("news.title"), systemImage: "newspaper", value: AppTab.news) {
                 NewsScreen()
             }
-            Tab(L10n.t("zones.title"), systemImage: "globe.europe.africa", value: AppTab.zones) {
-                ComingSoonView(title: L10n.t("zones.title"), systemImage: "globe.europe.africa")
+            // Zones is on hold (28/09/2026): favourites are what people come back to on the way.
+            Tab(L10n.t("ios.tab.favorites"), systemImage: "star", value: AppTab.favorites) {
+                FavoritesScreen()
             }
             // The count of contributions still on the phone, where they can be seen and sent.
             Tab(L10n.t("nav.profile"), systemImage: "person.crop.circle", value: AppTab.me) {
@@ -51,4 +52,6 @@ struct ComingSoonView: View {
         .environment(SessionStore())
         .environment(Outbox.shared)
         .environment(OfflineZones.shared)
+        .environment(Favorites())
+        .environment(Bell())
 }

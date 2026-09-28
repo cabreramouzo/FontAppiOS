@@ -2,8 +2,8 @@ import CoreLocation
 import SwiftUI
 
 /// The "Me" tab: what is yours — who you are, your score and collection, the fountains
-/// that depend on you, your fountains, favourites and reviews — with the bell, signing
-/// out and deleting the account.
+/// that depend on you, your fountains and reviews — with the bell, signing out and
+/// deleting the account. Favourites have their own tab.
 struct MeScreen: View {
     @Environment(SessionStore.self) private var session
     @Environment(Outbox.self) private var outbox
@@ -68,9 +68,6 @@ struct MeScreen: View {
             if let failed = profile.failed {
                 Section { Text(failed).foregroundStyle(.secondary) }
             }
-            CappedSection(title: L10n.t("profile.myFavorites"), systemImage: "star",
-                          hint: L10n.t("profile.myFavoritesHint"), empty: L10n.t("profile.noFavorites"),
-                          items: profile.favorites) { ProfileFontRow(font: $0) }
             CappedSection(title: L10n.t("profile.myFonts"), systemImage: "mappin.and.ellipse",
                           hint: L10n.t("profile.myFontsHint"), empty: L10n.t("profile.noFonts"),
                           items: profile.fonts) { ProfileFontRow(font: $0) }
