@@ -298,6 +298,21 @@ nonisolated struct APIClient: Sendable {
         return user.username
     }
 
+    /// Someone's public badges; the fountain page only needs the creator's discoverer tier.
+    func badges(of id: UUID) async throws -> [BadgesPreview.Badge] {
+        struct Public: Decodable { let badges: [BadgesPreview.Badge] }
+        let r: Public = try await get("/users/\(id.uuidString)/badges")
+        return r.badges
+    }
+
+    /// Who put the cover, when it came by a review or an edit (the edit history is
+    /// moderation's, so the page cannot tell by itself).
+    func photoAuthor(_ fontID: UUID) async throws -> String? {
+        struct R: Decodable { let username: String? }
+        let r: R = try await get("/fonts/\(fontID.uuidString)/photo-author")
+        return r.username
+    }
+
     // MARK: Photos
 
     func photoRemovalStatus(_ fontID: UUID) async throws -> PhotoRemovalStatus {

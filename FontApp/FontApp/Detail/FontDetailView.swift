@@ -22,6 +22,8 @@ struct FontDetailView: View {
     @State private var suggestsDuplicate = false
     @State private var confirmsDelete = false
     @State private var creatorName: String?
+    @State private var creatorTier: String?
+    @State private var photoAuthor: String?
     @State private var capabilities: Set<String> = []
     @State private var editingReview: CommentResponse?
     @State private var editingReport: ReportResponse?
@@ -93,9 +95,15 @@ struct FontDetailView: View {
             nearWater = try? await APIClient.shared.nearestWater(font.id)
         }
         .task(id: loadedFont?.creator?.id) {
-            creatorName = nil
+            creatorName = nil; creatorTier = nil
             guard let creator = loadedFont?.creator?.id else { return }
             creatorName = try? await APIClient.shared.username(of: creator)
+            creatorTier = (try? await APIClient.shared.badges(of: creator))?.first { $0.family == "discoverer" }?.tier
+        }
+        .task(id: loadedFont.map { "\($0.id)\($0.image ?? "")" }) {
+            photoAuthor = nil
+            guard let font = loadedFont, font.image != nil else { return }
+            photoAuthor = try? await APIClient.shared.photoAuthor(font.id)
         }
         .task(id: session.userID) { capabilities = await Capabilities.of(session.userID) }
         .task(id: "\(session.userID?.uuidString ?? "")\(loadedFont?.image ?? "")") {
@@ -659,6 +667,14 @@ struct FontDetailView: View {
             }
             factsSection(font)
             peopleSection(font)
+            FontBadgesSection(
+                creatorName: creatorName, creatorTier: creatorTier,
+                pioneerCounts: font.creator?.id == nil,
+                pioneerName: model.reviews.min { $0.createdAt < $1.createdAt }?.username,
+                hasPhoto: font.image != nil, photoAuthor: photoAuthor,
+                daysSinceCheck: model.evidence(for: font).lastUpdate.map {
+                    Int(Date.now.timeIntervalSince($0) / 86_400)
+                })
             do {
                 let confirmable = session.isSignedIn ? model.confirmable(by: session.user?.id) : nil
                 Section(L10n.t("detail.statusReviews")) {
