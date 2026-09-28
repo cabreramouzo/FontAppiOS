@@ -222,21 +222,30 @@ struct FontDetailView: View {
         let tint = session.isStaff ? Color.staff : Color.accentColor
         return GlassEffectContainer {
             HStack(spacing: 10) {
-                Button {
-                    let item = MKMapItem(location: CLLocation(latitude: font.latitude, longitude: font.longitude), address: nil)
-                    item.name = L10n.fontName(font.name)
-                    item.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
-                } label: {
-                    Label(L10n.t("detail.directions"), systemImage: "figure.walk")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                        .contentShape(Capsule())
+                // Next to the fountain (most visits), the way there is noise and the page's
+                // weight belongs to the three chips; it only grows, with the distance,
+                // when the fountain is clearly elsewhere.
+                if let far = farDistance(font) {
+                    Button { openDirections(font) } label: {
+                        // The distance is what says it is worth it; "Directions" cut it short
+                        // in most languages, and VoiceOver still hears both.
+                        Label(far, systemImage: "figure.walk")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                            .contentShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .glassEffect(.regular.tint(tint).interactive(), in: Capsule())
+                    .accessibilityLabel("\(L10n.t("detail.directions")), \(far)")
+                } else {
+                    Button { openDirections(font) } label: { CircleIcon(systemImage: "figure.walk") }
+                        .buttonStyle(.plain)
+                        .glassEffect(.regular.interactive(), in: Circle())
+                        .accessibilityLabel(L10n.t("detail.directions"))
                 }
-                .buttonStyle(.plain)
-                .glassEffect(.regular.tint(tint).interactive(), in: Capsule())
                 // Away from the map it goes there; over the map it zooms onto the fountain.
                 if let showOnMap {
                     Button { showOnMap(FontSummary(font)) } label: { CircleIcon(systemImage: "map") }
@@ -261,6 +270,23 @@ struct FontDetailView: View {
                     .glassEffect(.regular.interactive(), in: Circle())
             }
         }
+    }
+
+    private func openDirections(_ font: FontDetail) {
+        let item = MKMapItem(location: CLLocation(latitude: font.latitude, longitude: font.longitude), address: nil)
+        item.name = L10n.fontName(font.name)
+        item.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
+    }
+
+    /// The distance, written, when the fountain is clearly elsewhere (beyond where a
+    /// new fountain counts as "here"); nil next to it or without a position.
+    private func farDistance(_ font: FontDetail) -> String? {
+        guard location.isAuthorized, let me = location.location else { return nil }
+        let d = me.distance(from: CLLocation(latitude: font.latitude, longitude: font.longitude))
+        guard d > NewFontPlacement.nearbyMeters else { return nil }
+        return d < 1000 ? "\(Int(d.rounded(.toNearestOrEven) / 10) * 10) m"
+            : Measurement(value: d / 1000, unit: UnitLength.kilometers)
+                .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(1))))
     }
 
     private func toggleStar(_ font: FontDetail) {
@@ -600,17 +626,22 @@ struct FontDetailView: View {
             }
             if let nearWater { nearWaterSection(nearWater) }
             statusSection(font)
+            let photos = FountainPhoto.all(cover: font.image, reviews: model.reviews)
+            if !photos.isEmpty {
+                Section {
+                    // A photo saved with an offline zone is read from the phone.
+                    PhotoCarousel(name: L10n.fontName(font.name), photos: photos) {
+                        OfflineZones.shared.photoFile(for: $0) ?? APIClient.shared.imageURL($0)
+                    }
+                    .listRowInsets(EdgeInsets())
+                    if font.image != nil { coverControls(font) }
+                }
+            }
             if font.image == nil, let upload = model.photoUpload {
                 PhotoSection(model: upload, onUploaded: { await model.load() },
                              onCamera: { showsCamera = true })
-            } else {
-                Section {
-                    // A photo saved with an offline zone is read from the phone.
-                    PhotoView(url: OfflineZones.shared.photoFile(for: font.image)
-                                ?? APIClient.shared.imageURL(font.image))
-                        .listRowInsets(EdgeInsets())
-                    coverControls(font)
-                }
+            } else if photos.isEmpty {
+                Section { PhotoView(url: nil) }
             }
             Section {
                 NavigationLink {
