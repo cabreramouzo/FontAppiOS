@@ -16,6 +16,11 @@ struct NewFontSheet: View {
     @State private var pickerItem: PhotosPickerItem?
     @State private var showsCamera = false
     @State private var confirmsDiscard = false
+    @State private var placesFullScreen = false
+    @State private var help: LegendHelp.Kind?
+    @State private var exemption: ExemptionState = .idle
+
+    enum ExemptionState { case idle, sending, sent }
 
     var body: some View {
         NavigationStack {
@@ -23,6 +28,18 @@ struct NewFontSheet: View {
                 Section {
                     PlacementMap(pin: $model.pin, layer: layer)
                         .frame(height: 240)
+                        .overlay(alignment: .topTrailing) {
+                            // A thumb needs room to place a pin: the whole screen, on demand.
+                            Button { placesFullScreen = true } label: {
+                                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                    .font(.body.weight(.semibold))
+                                    .frame(width: 44, height: 44)
+                            }
+                            .buttonStyle(.plain)
+                            .glassEffect(.regular.interactive(), in: Circle())
+                            .padding(10)
+                            .accessibilityLabel(L10n.t("ios.newFont.bigMap"))
+                        }
                         .listRowInsets(EdgeInsets())
                     if let km = NewFontPlacement.remoteKm(pin: model.pin, me: location.location) {
                         VStack(alignment: .leading, spacing: 2) {
@@ -45,30 +62,36 @@ struct NewFontSheet: View {
                 Section {
                     TextField(L10n.t("newFont.nameOpt"), text: $model.draft.name)
                         .textInputAutocapitalization(.words)
-                    Picker(L10n.t("detail.type").trimmingCharacters(in: CharacterSet(charactersIn: ": ")),
-                           selection: $model.draft.source) {
-                        Text(L10n.t("detail.unknownType")).tag(WaterSource?.none)
-                        ForEach([WaterSource.tap, .mountain, .spring, .well, .fountain, .other], id: \.self) {
-                            Text($0.emojiLabel).tag(WaterSource?.some($0))
+                    HStack {
+                        Picker(L10n.t("detail.type").trimmingCharacters(in: CharacterSet(charactersIn: ": ")),
+                               selection: $model.draft.source) {
+                            Text(L10n.t("detail.unknownType")).tag(WaterSource?.none)
+                            ForEach(LegendHelp.sources, id: \.self) {
+                                Text($0.emojiLabel).tag(WaterSource?.some($0))
+                            }
                         }
+                        helpButton(.source)
                     }
-                    Picker(L10n.t("detail.drinkability").trimmingCharacters(in: CharacterSet(charactersIn: ": ")),
-                           selection: $model.draft.drinkable) {
-                        Text(L10n.t("detail.unknownDrink")).tag(Drinkable?.none)
-                        ForEach([Drinkable.yes, .untreated, .conditional, .no], id: \.self) {
-                            Text($0.emojiLabel).tag(Drinkable?.some($0))
+                    HStack {
+                        Picker(L10n.t("detail.drinkability").trimmingCharacters(in: CharacterSet(charactersIn: ": ")),
+                               selection: $model.draft.drinkable) {
+                            Text(L10n.t("detail.unknownDrink")).tag(Drinkable?.none)
+                            ForEach(LegendHelp.drinkables, id: \.self) {
+                                Text($0.emojiLabel).tag(Drinkable?.some($0))
+                            }
                         }
+                        helpButton(.drinkable)
                     }
                     TextField(L10n.t("newFont.descriptionOpt"), text: $model.draft.description, axis: .vertical)
                         .lineLimit(2...5)
                 }
 
                 Section {
-                    // The same three as the chips, and optional: a fountain can be added
-                    // without knowing how it flows today.
+                    // Every status, as the web offers here, and optional: a fountain can be
+                    // added without knowing how it flows today.
                     Picker(L10n.t("popup.howIsIt"), selection: $model.draft.status) {
                         Text("—").tag(String?.none)
-                        ForEach(QuickReviewModel.chips, id: \.self) {
+                        ForEach(WaterStatus.allCases, id: \.self) {
                             Text("\($0.emoji) \(L10n.t($0.labelKey))").tag(String?.some($0.rawValue))
                         }
                     }
@@ -79,7 +102,18 @@ struct NewFontSheet: View {
                 }
 
                 if case .failed(let message) = model.state {
-                    Section { Text(message).foregroundStyle(.red) }
+                    Section {
+                        Text(message).foregroundStyle(.red)
+                        // Past a new account's daily limit: ask for it to be lifted.
+                        if model.limitReached {
+                            Button(L10n.t(exemption == .sent ? "sourceLimit.requested"
+                                          : exemption == .sending ? "sourceLimit.requesting" : "sourceLimit.request")) {
+                                requestExemption()
+                            }
+                            .disabled(exemption != .idle)
+                            .frame(minHeight: 44)
+                        }
+                    }
                 }
 
                 Section {
@@ -98,11 +132,12 @@ struct NewFontSheet: View {
                     if isBusy {
                         ProgressView()
                     } else {
-                        Button(role: .confirm) {
+                        // In words, as on the web: a bare tick does not say it publishes.
+                        Button(L10n.t("form.create")) {
                             Task { await model.submit() }
                         }
+                        .buttonStyle(.glassProminent)
                         .tint(session.isStaff ? Color.staff : .accentColor)
-                        .accessibilityLabel(L10n.plain("map.addFont"))
                     }
                 }
             }
@@ -131,6 +166,10 @@ struct NewFontSheet: View {
                 }
             }
             .interactiveDismissDisabled(isBusy)
+            .sheet(item: $help) { LegendHelp(kind: $0) }
+            .fullScreenCover(isPresented: $placesFullScreen) {
+                PlacementScreen(pin: $model.pin, layer: layer)
+            }
         }
     }
 
@@ -187,6 +226,27 @@ struct NewFontSheet: View {
         model.photo = prepared
     }
 
+    private func helpButton(_ kind: LegendHelp.Kind) -> some View {
+        Button { help = kind } label: {
+            Image(systemName: "questionmark.circle").imageScale(.large)
+        }
+        .buttonStyle(.borderless)
+        .frame(minWidth: 44, minHeight: 44)
+        .accessibilityLabel(L10n.t(kind == .source ? "waterHelp.title" : "drinkHelp.title"))
+    }
+
+    private func requestExemption() {
+        exemption = .sending
+        Task {
+            do {
+                try await APIClient.shared.requestSourceLimitExemption()
+                exemption = .sent
+            } catch {
+                exemption = .idle
+            }
+        }
+    }
+
     private var isBusy: Bool {
         model.state == .checking || model.state == .sending
     }
@@ -212,6 +272,9 @@ struct PlacementMap: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator(pin: $pin) }
 
+    /// The pin tip on the centre, with a shadow dot marking the exact spot while it is
+    /// lifted — the way Apple Maps shows a dropped pin being moved.
+
     func makeUIView(context: Context) -> MLNMapView {
         let map = MLNMapView(frame: .zero, styleURL: layer.styleURL)
         map.delegate = context.coordinator
@@ -221,17 +284,31 @@ struct PlacementMap: UIViewRepresentable {
         map.logoView.isHidden = true
         map.attributionButton.isHidden = true
         map.setCenter(pin, zoomLevel: 17, animated: false)
-        let marker = UIImageView(image: UIImage(systemName: "mappin",
-                                                withConfiguration: UIImage.SymbolConfiguration(pointSize: 34, weight: .bold)))
-        marker.tintColor = UIColor(Color.staff)
+        // The same balloon the map raises for a selected fountain: big enough to see
+        // under a thumb, with a sharp tip on the exact spot.
+        let marker = PinBalloon(color: UIColor(Color.staff))
         marker.translatesAutoresizingMaskIntoConstraints = false
         marker.isAccessibilityElement = false
+        marker.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
+        let spot = UIView()
+        spot.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        spot.layer.cornerRadius = 4
+        spot.translatesAutoresizingMaskIntoConstraints = false
+        spot.alpha = 0
+        map.addSubview(spot)
         map.addSubview(marker)
         NSLayoutConstraint.activate([
             marker.centerXAnchor.constraint(equalTo: map.centerXAnchor),
-            // The tip of the pin on the centre.
-            marker.bottomAnchor.constraint(equalTo: map.centerYAnchor),
+            // The tip of the pin on the centre (anchor at the bottom moves the frame down
+            // by half its height, so the constraint compensates).
+            marker.centerYAnchor.constraint(equalTo: map.centerYAnchor),
+            spot.centerXAnchor.constraint(equalTo: map.centerXAnchor),
+            spot.centerYAnchor.constraint(equalTo: map.centerYAnchor),
+            spot.widthAnchor.constraint(equalToConstant: 8),
+            spot.heightAnchor.constraint(equalToConstant: 8),
         ])
+        context.coordinator.marker = marker
+        context.coordinator.spot = spot
         return map
     }
 
@@ -245,11 +322,174 @@ struct PlacementMap: UIViewRepresentable {
 
     final class Coordinator: NSObject, MLNMapViewDelegate {
         let pin: Binding<CLLocationCoordinate2D>
+        weak var marker: UIView?
+        weak var spot: UIView?
+        private var lifted = false
 
         init(pin: Binding<CLLocationCoordinate2D>) { self.pin = pin }
 
+        /// Picked up while the map moves under it; the dot shows exactly where it will land.
+        func mapView(_ map: MLNMapView, regionWillChangeWith reason: MLNCameraChangeReason, animated: Bool) {
+            guard !reason.isEmpty, !reason.contains(.programmatic), !lifted else { return }
+            lifted = true
+            let reduce = UIAccessibility.isReduceMotionEnabled
+            UIView.animate(withDuration: 0.18) {
+                self.marker?.transform = reduce ? .identity : CGAffineTransform(translationX: 0, y: -14).scaledBy(x: 1.1, y: 1.1)
+                self.spot?.alpha = 1
+            }
+        }
+
         func mapView(_ map: MLNMapView, regionDidChangeAnimated animated: Bool) {
             pin.wrappedValue = map.centerCoordinate
+            guard lifted else { return }
+            lifted = false
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.45, initialSpringVelocity: 0.6) {
+                self.marker?.transform = .identity
+                self.spot?.alpha = 0
+            }
         }
     }
+}
+
+/// Placing the pin with the whole screen: the map, the pin at its centre, a button to
+/// go to where you are, and Done. The small map in the form follows what is chosen here.
+struct PlacementScreen: View {
+    @Binding var pin: CLLocationCoordinate2D
+    let layer: MapLayer
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(LocationService.self) private var location
+    @State private var working: CLLocationCoordinate2D
+
+    init(pin: Binding<CLLocationCoordinate2D>, layer: MapLayer) {
+        _pin = pin
+        self.layer = layer
+        _working = State(initialValue: pin.wrappedValue)
+    }
+
+    var body: some View {
+        PlacementMap(pin: $working, layer: layer)
+            .ignoresSafeArea()
+            .overlay(alignment: .top) {
+                Text(L10n.t("ios.newFont.moveMap"))
+                    .font(.subheadline)
+                    .padding(.horizontal, 16).padding(.vertical, 10)
+                    .glassEffect(.regular, in: Capsule())
+                    .padding(.top, 8)
+                    .padding(.horizontal, 70)
+            }
+            .overlay(alignment: .topLeading) {
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark").font(.body.weight(.semibold)).frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .glassEffect(.regular.interactive(), in: Circle())
+                .padding(.leading, 12).padding(.top, 4)
+                .accessibilityLabel(L10n.t("ios.close"))
+            }
+            .overlay(alignment: .bottom) {
+                HStack(spacing: 12) {
+                    if location.isAuthorized, let here = location.location {
+                        Button { working = here.coordinate } label: {
+                            Image(systemName: "location.fill").font(.body.weight(.semibold)).frame(width: 52, height: 52)
+                        }
+                        .buttonStyle(.plain)
+                        .glassEffect(.regular.interactive(), in: Circle())
+                        .accessibilityLabel(L10n.t("relocate.useMyLocation"))
+                    }
+                    Button {
+                        pin = working
+                        dismiss()
+                    } label: {
+                        Text(L10n.t("ios.newFont.placeHere")).font(.headline).foregroundStyle(.white)
+                            .frame(maxWidth: .infinity, minHeight: 52)
+                    }
+                    .buttonStyle(.plain)
+                    .glassEffect(.regular.tint(.accentColor).interactive(), in: Capsule())
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+            }
+    }
+}
+
+/// What each kind and each drinkability means, as the web's (?) buttons explain it.
+struct LegendHelp: View {
+    enum Kind: Identifiable { case source, drinkable; var id: Self { self } }
+    static let sources: [WaterSource] = [.tap, .mountain, .spring, .well, .fountain, .other]
+    /// Most guarantee first: with four options the order is information.
+    static let drinkables: [Drinkable] = [.yes, .untreated, .conditional, .no]
+
+    let kind: Kind
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                switch kind {
+                case .source:
+                    ForEach(Self.sources, id: \.self) { row($0.emoji, L10n.t("source.\($0.rawValue)"), L10n.t("waterHelp.\($0.rawValue)")) }
+                case .drinkable:
+                    ForEach(Self.drinkables, id: \.self) { row($0.emoji, L10n.t("drink.\($0.rawValue)"), L10n.t("drinkHelp.\($0.rawValue)")) }
+                    // Not a value, but the one most confused with "untreated".
+                    row("❔", L10n.t("detail.unknownDrink"), L10n.t("drinkHelp.unknown"))
+                    Text(L10n.t("drinkHelp.note")).font(.footnote).italic().foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle(L10n.t(kind == .source ? "waterHelp.title" : "drinkHelp.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button(role: .close) { dismiss() } } }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func row(_ emoji: String, _ label: String, _ about: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(emoji).font(.title2)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label).font(.headline)
+                Text(about).font(.subheadline).foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 2)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// A balloon pin: a round head with the drop and a tail ending in a point, 52 pt tall.
+final class PinBalloon: UIView {
+    init(color: UIColor, head size: CGFloat = 40) {
+        let tailHeight: CGFloat = 12
+        super.init(frame: CGRect(x: 0, y: 0, width: size, height: size + tailHeight))
+        let tail = CAShapeLayer()
+        let path = UIBezierPath()
+        path.move(to: CGPoint(x: size / 2 - 8, y: size - 6))
+        path.addLine(to: CGPoint(x: size / 2, y: size + tailHeight))
+        path.addLine(to: CGPoint(x: size / 2 + 8, y: size - 6))
+        path.close()
+        tail.path = path.cgPath
+        tail.fillColor = color.cgColor
+        layer.addSublayer(tail)
+        let head = UIView(frame: CGRect(x: 0, y: 0, width: size, height: size))
+        head.backgroundColor = color
+        head.layer.cornerRadius = size / 2
+        head.layer.borderColor = UIColor.white.cgColor
+        head.layer.borderWidth = 3
+        addSubview(head)
+        let glyph = UIImageView(image: UIImage(systemName: "drop.fill",
+                                               withConfiguration: UIImage.SymbolConfiguration(pointSize: 17, weight: .bold)))
+        glyph.tintColor = .white
+        glyph.contentMode = .center
+        glyph.frame = head.bounds
+        head.addSubview(glyph)
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.3
+        layer.shadowRadius = 4
+        layer.shadowOffset = CGSize(width: 0, height: 3)
+        widthAnchor.constraint(equalToConstant: size).isActive = true
+        heightAnchor.constraint(equalToConstant: size + tailHeight).isActive = true
+    }
+
+    required init?(coder: NSCoder) { fatalError("not coded") }
 }

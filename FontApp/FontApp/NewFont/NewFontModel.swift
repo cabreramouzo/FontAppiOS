@@ -74,6 +74,8 @@ final class NewFontModel {
         didSet { if draft != oldValue { draft.save(defaults) } }
     }
     var photo: PhotoPreparer.Prepared?
+    /// New accounts may add a few fountains a day; past that, one can ask for an exception.
+    private(set) var limitReached = false
     private(set) var state: State = .editing
 
     @ObservationIgnored private let api: APIClient
@@ -162,6 +164,7 @@ final class NewFontModel {
                 state = .failed(ErrorText.describe(error))
             }
         } catch {
+            limitReached = (error as? APIError)?.code == "font.newAccountLimit"
             state = .failed(ErrorText.describe(error))
         }
     }

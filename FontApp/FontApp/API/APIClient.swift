@@ -366,6 +366,11 @@ nonisolated struct APIClient: Sendable {
         }
     }
 
+    /// Past the daily limit of a new account: asks a moderator to lift it.
+    func requestSourceLimitExemption() async throws {
+        let _: Ignored = try await send("POST", "/users/source-limit-exemption-request", timeout: writeTimeout)
+    }
+
     /// Reports a fountain to the moderators. Private; three different people put it in
     /// quarantine until someone reviews it.
     func flagFont(_ fontID: UUID, reason: String) async throws {

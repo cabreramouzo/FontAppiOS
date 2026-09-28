@@ -7,6 +7,430 @@
     " → %@" : {
 
     },
+    "drinkHelp.conditional" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es pot beure amb alguna salvetat: només en certa època, o bullint-la. Explica quina a la descripció."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drinkable with a caveat: only in season, or after boiling. Say which one in the description."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se puede beber con alguna salvedad: solo en cierta época, o hirviéndola. Explica cuál en la descripción."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salbuespenen batekin edan daiteke: sasoi jakin batean bakarrik, edo irakinda. Azaldu zein deskribapenean."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potable sous réserve : seulement à certaine saison, ou après ébullition. Précisez laquelle dans la description."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pódese beber con algunha salvidade: só en certa época, ou fervéndoa. Explica cal na descrición."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si può bere con qualche riserva: solo in certi periodi, o bollendola. Spiega quale nella descrizione."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pode ser bebida com alguma ressalva: apenas em determinada época ou fervendo-a. Explica qual na descrição."
+          }
+        }
+      }
+    },
+    "drinkHelp.no" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hi ha un rètol o un motiu conegut que diu que no se'n pot beure."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is a sign or a known reason saying you should not drink it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hay un cartel o un motivo conocido que dice que no se puede beber."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kartel bat edo arrazoi ezagun bat dago edan ezin dela dioena."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un panneau ou une raison connue indique qu'il ne faut pas la boire."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai un cartel ou un motivo coñecido que di que non se pode beber."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C’è un cartello o un motivo noto che dice che non si può bere."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Há um cartaz ou um motivo conhecido que diz que não se pode beber."
+          }
+        }
+      }
+    },
+    "drinkHelp.note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cap font natural no té garantia sanitària: l'aigua subterrània indica la qualitat de l'aqüífer, no que se'n pugui beure. Davant del dubte, «no tractada»."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No natural spring carries a health guarantee: groundwater tells you the quality of the aquifer, not that you can drink it. When in doubt, «untreated»."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguna fuente natural tiene garantía sanitaria: el agua subterránea indica la calidad del acuífero, no que se pueda beber. Ante la duda, «no tratada»."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iturri naturalek ez dute inoiz osasun bermerik: lur azpiko urak akuiferoaren kalitatea adierazten du, ez edan daitekeenik. Zalantzarik izanez gero, «tratatu gabea»."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune source naturelle n'a de garantie sanitaire : l'eau souterraine indique la qualité de la nappe, pas qu'on puisse la boire. Dans le doute, « non traitée »."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningunha fonte natural ten garantía sanitaria: a auga subterránea indica a calidade do acuífero, non que se poida beber. Ante a dúbida, «non tratada»."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna fontana naturale ha garanzia sanitaria: l’acqua sotterranea indica la qualità della falda, non che si possa bere. Nel dubbio, «non trattata»."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhuma fonte natural tem garantia sanitária: a água subterrânea indica a qualidade do aquífero, não que se possa beber. Na dúvida, «não tratada»."
+          }
+        }
+      }
+    },
+    "drinkHelp.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potabilitat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potability"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potabilidad"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edangarritasuna"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potabilité"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potabilidade"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potabilità"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potabilidade"
+          }
+        }
+      }
+    },
+    "drinkHelp.unknown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningú ho ha mirat encara. Si ho saps, digue-ho: és el que més s'agraeix."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nobody has checked yet. If you know, say so: it is the most useful thing you can add."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nadie lo ha mirado todavía. Si lo sabes, dilo: es lo que más se agradece."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inork ez du oraindik begiratu. Baldin badakizu, esan: hori da gehien eskertzen dena."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personne ne l'a encore vérifié. Si vous le savez, dites-le : c'est ce qui aide le plus."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguén o mirou aínda. Se o sabes, dío: é o que máis se agradece."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuno l’ha ancora verificato. Se lo sai, dillo: è quello che si apprezza di più."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguém olhou ainda. Se sabes, diz: é o que mais se agradece."
+          }
+        }
+      }
+    },
+    "drinkHelp.untreated" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aigua subterrània que ningú tracta ni controla. És el que escau a la majoria de fonts de muntanya: no vol dir que sigui dolenta, vol dir que no hi ha cap garantia."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Groundwater that nobody treats or tests. This is what fits most mountain fountains: it does not mean the water is bad, it means there is no guarantee."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agua subterránea que nadie trata ni controla. Es lo que le toca a la mayoría de fuentes de montaña: no significa que sea mala, significa que no hay ninguna garantía."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inork tratatzen edo kontrolatzen ez duen lur azpiko ura. Mendiko iturri gehienei dagokiena da: ez du esan nahi txarra denik, bermerik ez dagoela baizik."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eau souterraine que personne ne traite ni ne contrôle. C'est ce qui convient à la plupart des fontaines de montagne : cela ne veut pas dire qu'elle est mauvaise, mais qu'il n'y a aucune garantie."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auga subterránea que ninguén trata nin controla. É o que lle corresponde á maioría das fontes de montaña: non significa que sexa mala, significa que non hai ningunha garantía."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acqua sotterranea che nessuno tratta né controlla. È il caso della maggior parte delle fontane di montagna: non vuol dire che sia cattiva, vuol dire che non c’è nessuna garanzia."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Água subterrânea que ninguém trata nem controla. É o que acontece com a maioria das fontes de montanha: não significa que seja má, significa que não há garantia."
+          }
+        }
+      }
+    },
+    "drinkHelp.yes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Declarada apta per beure: xarxa municipal o rètol de l'autoritat sanitària."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Declared fit to drink: mains supply or a health authority sign."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Declarada apta para beber: red municipal o cartel de la autoridad sanitaria."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edateko egokitzat jotakoa: udal sarea edo osasun agintaritzaren kartela."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déclarée potable : réseau communal ou panneau de l'autorité sanitaire."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Declarada apta para beber: rede municipal ou cartel da autoridade sanitaria."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dichiarata adatta a bere: rete comunale o cartello dell’autorità sanitaria."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Considerada adequada para beber: rede municipal ou cartel da autoridade sanitária."
+          }
+        }
+      }
+    },
+    "form.create" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortu"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Criar"
+          }
+        }
+      }
+    },
     "ios.close" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -692,6 +1116,695 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mais"
+          }
+        }
+      }
+    },
+    "ios.newFont.bigMap" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa gran"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Large map"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa grande"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa handia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grande carte"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa grande"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mappa grande"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa grande"
+          }
+        }
+      }
+    },
+    "ios.newFont.placeHere" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posa-la aquí"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put it here"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponerla aquí"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hemen jarri"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La mettre ici"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poñela aquí"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettila qui"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pô-la aqui"
+          }
+        }
+      }
+    },
+    "sourceLimit.request" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔥 Estic on fire, dona’m una excepció!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔥 I’m on fire, give me an exception!"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔥 Estoy on fire, ¡dame una excepción!"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔥 Sutan nago, eman salbuespen bat!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔥 Je suis on fire, accordez-moi une exception !"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔥 Estou on fire, dáme unha excepción!"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔥 Sono lanciato, fatemi un’eccezione!"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🔥 Estou on fire, dá-me uma exceção!"
+          }
+        }
+      }
+    },
+    "sourceLimit.requested" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sol·licitud enviada a l’administrador"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request sent to the administrator"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitud enviada al administrador"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eskaera administratzaileari bidali zaio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demande envoyée à l’administrateur"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitude enviada ao administrador"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta inviata all’amministratore"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pedido enviado ao administrador"
+          }
+        }
+      }
+    },
+    "sourceLimit.requesting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviant…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando…"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bidaltzen…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi…"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invio…"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A enviar…"
+          }
+        }
+      }
+    },
+    "waterHelp.close" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tanca"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Itxi"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pechar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar"
+          }
+        }
+      }
+    },
+    "waterHelp.fountain" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decorativa: no està pensada per beure."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decorative: not meant for drinking."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decorativa: no está pensada para beber."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apaingarria: ez dago edateko pentsatuta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décoratif : non destiné à être bu."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decorativa: non está pensada para beber."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decorativa: non è pensata per bere."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Decorativa: não é pensada para beber."
+          }
+        }
+      }
+    },
+    "waterHelp.mountain" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deu captada: raja per un broc o cau en una pica. Cabal estacional i potabilitat no garantida."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A captured spring: piped through a spout or into a basin. Seasonal flow, potability not guaranteed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manantial captado: sale por un caño o cae en una pila. Caudal estacional y potabilidad no garantizada."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hartutako iturburua: txorrotatik dario edo aska batera erortzen da. Emaria sasoikakoa eta edangarritasuna ez dago bermatuta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une source captée : canalisée par un bec verseur ou dans un bassin. Débit saisonnier, potabilité non garantie."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manancial captado: sae por un canón ou cae nunha pía. Caudal estacional e potabilidade non garantida."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sorgente captata: esce da una cannella o cade in una vasca. Portata stagionale e potabilità non garantita."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascimento captado: sai por um cano ou cai numa bacia. Caudal sazonal e potabilidade não garantida."
+          }
+        }
+      }
+    },
+    "waterHelp.other" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qualsevol altre punt d'aigua."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any other water point."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cualquier otro punto de agua."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beste edozein ur-puntu."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout autre point d'eau."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calquera outro punto de auga."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qualsiasi altro punto d’acqua."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qualquer outro ponto de água."
+          }
+        }
+      }
+    },
+    "waterHelp.spring" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'aigua brolla sola del terra o la roca, sense obra. Pot ser un filet o un bassal."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Water surfaces on its own from ground or rock, unmodified. May be a trickle or a puddle."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El agua brota sola del suelo o la roca, sin obra. Puede ser un hilo o un charco."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ura bere kabuz sortzen da lurretik edo harritik, obrarik gabe. Hari bat edo putzu bat izan daiteke."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'eau fait surface seule, à partir du sol ou de la roche, sans modification. Peut-être un filet ou une flaque d'eau."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A auga brota soa do chan ou da rocha, sen obra. Pode ser un fío ou unha poza."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’acqua sgorga da sola dal terreno o dalla roccia, senza opere. Può essere un filo o una pozza."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A água brota sozinha do solo ou da rocha, sem obra. Pode ser um fio ou uma poça."
+          }
+        }
+      }
+    },
+    "waterHelp.tap" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aixeta pública connectada a la xarxa municipal. Aigua tractada i cabal tot l'any."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public tap on the municipal mains. Treated water, flowing all year."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grifo público conectado a la red municipal. Agua tratada y caudal todo el año."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Udal sarera konektatutako iturri publikoa. Ur tratatua eta emaria urte osoan."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Robinet public sur le réseau communal. Eau traitée, qui coule toute l'année."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Billa pública conectada á rede municipal. Auga tratada e caudal todo o ano."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rubinetto pubblico collegato alla rete comunale. Acqua trattata e portata tutto l’anno."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bica pública ligada à rede municipal. Água tratada e caudal durante todo o ano."
+          }
+        }
+      }
+    },
+    "waterHelp.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipus de font"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fountain types"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipos de fuente"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iturri motak"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Types de fontaines"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipos de fonte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipi di fontana"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipos de fonte"
+          }
+        }
+      }
+    },
+    "waterHelp.well" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aigua subterrània que cal treure (pou)."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Groundwater you have to draw up (a well)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agua subterránea que hay que extraer (pozo)."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lur azpiko ura, atera behar dena (putzua)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les eaux souterraines doivent être puisées (un puits)."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auga subterránea que hai que extraer (pozo)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acqua sotterranea che va estratta (pozzo)."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Água subterrânea que precisa ser extraída (poço)."
           }
         }
       }
