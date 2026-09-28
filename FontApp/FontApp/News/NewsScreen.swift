@@ -8,20 +8,19 @@ struct NewsScreen: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                scopePicker
-                content
-            }
+            // The list is the root, so the large title folds away on scrolling. The filters
+            // live in one toolbar menu and the choice in effect reads under the title: two
+            // pickers stacked above the list took a third of the screen for good.
+            content
             .navigationTitle(L10n.t("news.title"))
+            .navigationSubtitle(filterSummary)
             .navigationDestination(for: UUID.self) { FontDetailView(fontID: $0) }
             .toolbar {
-                if model.effectiveScope(location: location.location) == .near {
-                    ToolbarItem(placement: .topBarTrailing) { radiusMenu }
-                }
+                ToolbarItem(placement: .topBarTrailing) { filterMenu }
             }
             .refreshable { await model.reload(location: location.location) }
         }
-        .task(id: ReloadKey(scope: model.effectiveScope(location: location.location), km: model.km)) {
+        .task(id: ReloadKey(scope: model.effectiveScope(location: location.location), km: model.km, country: model.country)) {
             await model.reload(location: location.location)
         }
     }
@@ -30,6 +29,7 @@ struct NewsScreen: View {
     private struct ReloadKey: Equatable {
         let scope: NewsModel.Scope
         let km: Double
+        let country: String
     }
 
     @ViewBuilder private var content: some View {
@@ -116,32 +116,57 @@ struct NewsScreen: View {
         }
     }
 
-    /// "Near me" only with a position; without one the feed is global and says so.
-    private var scopePicker: some View {
-        // Shows the scope in use: without a position that is "everywhere", whatever was
-        // chosen, and the choice itself is kept for when the position comes back.
-        Picker(selection: Binding(get: { model.effectiveScope(location: location.location) },
-                                  set: { model.scope = $0 })) {
-            Text(L10n.t("activity.nearMe")).tag(NewsModel.Scope.near)
-            Text(L10n.t("activity.everywhere")).tag(NewsModel.Scope.everywhere)
-        } label: {
-            EmptyView()
+    /// What the feed shows, under the title: "Near me · 5 km", "Everywhere · Spain".
+    private var filterSummary: String {
+        if model.effectiveScope(location: location.location) == .near {
+            return "\(L10n.t("activity.nearMe")) · \(Int(model.km)) km"
         }
-        .pickerStyle(.segmented)
-        .disabled(location.location == nil)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        return "\(L10n.t("activity.everywhere")) · \(countryName)"
     }
 
-    private var radiusMenu: some View {
+    private var countryName: String {
+        model.country == NewsModel.allCountries
+            ? L10n.t("zones.allCountries")
+            : L10n.lookup("country.\(model.country)") ?? model.country
+    }
+
+    /// Scope, then the radius or the country that goes with it. "Near me" only with a
+    /// position; without one the feed is global and the menu says so by disabling it.
+    private var filterMenu: some View {
         Menu {
-            Picker(L10n.t("activity.radius"), selection: $model.km) {
-                ForEach(NewsModel.radii, id: \.self) { km in
-                    Text("\(Int(km)) km").tag(km)
+            Picker(selection: Binding(get: { model.effectiveScope(location: location.location) },
+                                      set: { model.scope = $0 })) {
+                Label(L10n.t("activity.nearMe"), systemImage: "location").tag(NewsModel.Scope.near)
+                Label(L10n.t("activity.everywhere"), systemImage: "globe").tag(NewsModel.Scope.everywhere)
+            } label: {
+                EmptyView()
+            }
+            .pickerStyle(.inline)
+            .disabled(location.location == nil)
+            if model.effectiveScope(location: location.location) == .near {
+                Picker(selection: $model.km) {
+                    ForEach(NewsModel.radii, id: \.self) { km in
+                        Text("\(Int(km)) km").tag(km)
+                    }
+                } label: {
+                    Label(L10n.t("activity.radius"), systemImage: "scope")
+                    Text("\(Int(model.km)) km")
                 }
+                .pickerStyle(.menu)
+            } else {
+                Picker(selection: $model.country) {
+                    Text(L10n.t("zones.allCountries")).tag(NewsModel.allCountries)
+                    ForEach(NewsModel.countries, id: \.self) { country in
+                        Text(L10n.lookup("country.\(country)") ?? country).tag(country)
+                    }
+                } label: {
+                    Label(L10n.t("activity.country"), systemImage: "flag")
+                    Text(countryName)
+                }
+                .pickerStyle(.menu)
             }
         } label: {
-            Label("\(L10n.t("activity.radius")): \(Int(model.km)) km", systemImage: "scope")
+            Label(L10n.t("map.filters"), systemImage: "line.3.horizontal.decrease")
         }
     }
 }

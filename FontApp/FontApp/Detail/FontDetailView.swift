@@ -8,6 +8,7 @@ struct FontDetailView: View {
     @State private var model: FontDetailModel
     @State private var showsSignIn = false
     @State private var showsCamera = false
+    @State private var editor: FontEditModel?
     @Environment(LocationService.self) private var location
     /// What the caller already knows, shown while the rest loads.
     private let preview: FontSummary?
@@ -38,8 +39,28 @@ struct FontDetailView: View {
         }
         .navigationTitle(L10n.fontName(loadedFont?.name ?? preview?.name))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if case .loaded(let font) = model.state, let userID = session.userID {
+                    Button {
+                        editor = FontEditModel(font: font, userID: userID)
+                    } label: {
+                        Label(L10n.t("detail.edit"), systemImage: "pencil")
+                    }
+                    .tint(session.isStaff ? Color.staff : .accentColor)
+                    .accessibilityHint(L10n.t("detail.editInfoHint"))
+                    .accessibilityIdentifier("fontDetail.edit")
+                }
+            }
+        }
         .task { await model.load() }
         .sheet(isPresented: $showsSignIn) { SignInView() }
+        .sheet(item: $editor) { editor in
+            FontEditSheet(model: editor) { font in
+                model.didEdit(font)
+                Task { await model.load() }
+            }
+        }
         .fullScreenCover(isPresented: $showsCamera) {
             CameraPicker { jpeg in
                 showsCamera = false

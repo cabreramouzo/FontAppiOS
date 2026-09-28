@@ -418,9 +418,16 @@ struct LeftoverTests {
         #expect(first.scope == .near && first.km == 5)
         first.scope = .everywhere
         first.km = 25
+        first.country = "France"
         let again = NewsModel(defaults: defaults)
         #expect(again.scope == .everywhere)
         #expect(again.km == 25)
+        #expect(again.country == "France")
+        #expect(again.effectiveScope(location: nil) == .everywhere)
+        again.country = NewsModel.allCountries
+        #expect(NewsModel(defaults: defaults).country == NewsModel.allCountries)
+        again.country = "invalid-country"
+        #expect(NewsModel(defaults: defaults).country == NewsModel.allCountries)
     }
 }
 

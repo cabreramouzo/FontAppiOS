@@ -69,6 +69,14 @@ final class FontDetailModel {
         }
     }
 
+    func didEdit(_ font: FontDetail) {
+        state = .loaded(font)
+        // Coordinates and name captured by contribution models must follow the edit.
+        quickReview = nil
+        photoUpload = nil
+        prepareContributions(for: font)
+    }
+
     private func prepareContributions(for font: FontDetail) {
         if photoUpload == nil {
             photoUpload = PhotoUploadModel(fontID: fontID, fontName: font.name)

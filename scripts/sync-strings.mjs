@@ -18,10 +18,17 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 // Web language code → Apple localization. The web's Portuguese is European.
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
-const PREFIXES = ['layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
+const PREFIXES = ['country.', 'layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
   'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.', 'gpx.', 'gpxIn.', 'newFont.', 'draft.', 'mission.']
 const KEYS = [
-  'font.unnamed', 'nav.map', 'nav.profile', 'zones.title', 'review.anon',
+  'map.geoDenied', 'map.geoUnavailable',
+  'detail.edit', 'detail.editInfoHint', 'detail.editInfoNote', 'detail.editingTitle', 'detail.replacePhoto',
+  'form.save', 'form.saving', 'form.discard', 'form.discardTitle', 'form.discardBody', 'form.keepEditing',
+  'relocate.title', 'relocate.useMyLocation', 'relocate.locating', 'relocate.undo', 'relocate.moved',
+  'relocate.notYours', 'relocate.accuracy', 'relocate.poorAccuracy',
+  'cap.blocked.restricted', 'cap.blocked.optedOut', 'cap.blocked.unavailable',
+  'cap.blocked.recentlyVoided', 'cap.blocked.activeDays',
+  'zones.allCountries', 'font.unnamed', 'nav.map', 'nav.profile', 'zones.title', 'review.anon',
   'report.resolved', 'report.resolvedBy',
   'source.tap', 'source.mountain', 'source.spring', 'source.well', 'source.fountain', 'source.other',
   'map.layers', 'map.filters', 'map.onlyWater', 'map.onlyReliable', 'map.hideNonPotable',

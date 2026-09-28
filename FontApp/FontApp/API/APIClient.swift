@@ -96,13 +96,14 @@ nonisolated struct APIClient: Sendable {
 
     /// Recent activity. With `near`, only what happened within `km` of that point.
     func activity(limit: Int = 30, near: (latitude: Double, longitude: Double)? = nil,
-                  km: Double? = nil, before: Double? = nil) async throws -> [ActivityItem] {
+                  km: Double? = nil, country: String? = nil, before: Double? = nil) async throws -> [ActivityItem] {
         var query = [URLQueryItem(name: "limit", value: String(limit))]
         if let near {
             query.append(URLQueryItem(name: "lat", value: String(near.latitude)))
             query.append(URLQueryItem(name: "long", value: String(near.longitude)))
             if let km { query.append(URLQueryItem(name: "km", value: String(km))) }
         }
+        if near == nil, let country { query.append(URLQueryItem(name: "country", value: country)) }
         if let before { query.append(URLQueryItem(name: "before", value: String(before))) }
         return try await get("/activity", query: query)
     }
@@ -132,6 +133,18 @@ nonisolated struct APIClient: Sendable {
     func createFont(_ font: NewFont, queuedOffline: Bool = false) async throws -> FontDetail {
         try await send("POST", "/fonts", body: .json(try JSONEncoder().encode(font)),
                        queuedOffline: queuedOffline, timeout: writeTimeout)
+    }
+
+    func updateFont(_ id: UUID, _ font: NewFont, token: String) async throws -> FontDetail {
+        try await send("PUT", "/fonts/\(id.uuidString)", body: .json(try JSONEncoder().encode(font)),
+                       authorization: "Bearer \(token)", timeout: writeTimeout)
+    }
+
+    /// A 204 means the account opted out. Never derive grants from its points locally.
+    func fontEditGrant() async throws -> FontEditGrant? {
+        struct Profile: Decodable { let grant: FontEditGrant? }
+        let profile: Profile? = try await get("/gamification/me")
+        return profile?.grant
     }
 
     /// Fountains by name. The server requires a term and, for the public, caps the pages.
@@ -197,7 +210,7 @@ nonisolated struct APIClient: Sendable {
 
     /// Uploads a JPEG and returns its URL. The EXIF travels as separate fields because the
     /// re-encoded JPEG no longer carries it.
-    func uploadImage(_ jpeg: Data, meta: PhotoMeta) async throws -> String {
+    func uploadImage(_ jpeg: Data, meta: PhotoMeta, token: String? = nil) async throws -> String {
         var form = MultipartForm()
         if let takenAt = meta.takenAt { form.add("takenAt", takenAt.formatted(.iso8601)) }
         if let latitude = meta.latitude, let longitude = meta.longitude {
@@ -206,7 +219,8 @@ nonisolated struct APIClient: Sendable {
         }
         form.addFile("file", filename: "photo.jpg", contentType: "image/jpeg", data: jpeg)
         struct Uploaded: Decodable { let url: String }
-        let uploaded: Uploaded = try await send("POST", "/images", body: .multipart(form), timeout: uploadTimeout)
+        let uploaded: Uploaded = try await send("POST", "/images", body: .multipart(form),
+                                               authorization: token.map { "Bearer \($0)" }, timeout: uploadTimeout)
         return uploaded.url
     }
 
@@ -287,7 +301,7 @@ nonisolated struct APIClient: Sendable {
                              retryAfter: http.value(forHTTPHeaderField: "Retry-After"))
         }
         if T.self == Ignored.self { return Ignored() as! T }
-        return try Self.decoder.decode(T.self, from: data)
+        return try Self.decoder.decode(T.self, from: data.isEmpty ? Data("null".utf8) : data)
     }
 
     static func error(status: Int, data: Data, retryAfter: String?) -> APIError {

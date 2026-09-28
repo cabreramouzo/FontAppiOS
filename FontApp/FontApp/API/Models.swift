@@ -62,6 +62,8 @@ nonisolated struct MapResponse: Codable, Sendable {
 /// `GET /fonts/:id`. Not the bare `Font` that `docs/api.md` describes: the server adds
 /// `lastWaterStatus`, `lastUpdate`, `statusConflict` and `mayor` (`FontController.FontDetail`).
 nonisolated struct FontDetail: Codable, Identifiable, Sendable {
+    struct Creator: Codable, Sendable { let id: UUID? }
+    var creator: Creator? = nil
     let id: UUID
     let name: String?
     let latitude: Double
@@ -195,6 +197,9 @@ nonisolated struct UserResponse: Codable, Equatable, Sendable {
     let name: String
     let username: String
     let role: UserRole?
+    var isAdmin: Bool? = nil
+
+    var canManageFonts: Bool { role.map { $0 >= .admin } ?? (isAdmin == true) }
 }
 
 nonisolated struct LoginResponse: Codable, Sendable {
