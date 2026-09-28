@@ -45,7 +45,15 @@ final class SessionStore {
     }
 
     func signIn(user name: String, password: String) async throws {
-        let response = try await api.login(user: name, password: password)
+        start(try await api.login(user: name, password: password))
+    }
+
+    /// Face ID and no password: the system offers the account's passkey.
+    func signInWithPasskey() async throws {
+        start(try await PasskeySheet.signIn(api: api))
+    }
+
+    private func start(_ response: LoginResponse) {
         keychain.save(response.token)
         api.credentials.set(response.token)
         hasToken = true

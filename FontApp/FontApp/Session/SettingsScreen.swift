@@ -13,6 +13,11 @@ struct SettingsScreen: View {
     @State private var isSaving = false
     @State private var error: String?
     @State private var saved = false
+    @State private var passkeys: [PasskeySummary] = []
+    @State private var naming = false
+    @State private var passkeyLabel = ""
+    @State private var addingPasskey = false
+    @State private var removing: PasskeySummary?
 
     var body: some View {
         Form {
@@ -21,6 +26,7 @@ struct SettingsScreen: View {
             }
             if let user = session.user {
                 account(user)
+                if Passkeys.available(for: APIClient.shared.baseURL) { passkeySection }
                 switches(user)
             } else {
                 ProgressView()
@@ -63,6 +69,79 @@ struct SettingsScreen: View {
                 Text(L10n.t("profile.usernameWarning"))
             } else {
                 Text(L10n.t("profile.usernameRules"))
+            }
+        }
+    }
+
+    /// Next to the account, as on the web: a way to sign in, like the password.
+    private var passkeySection: some View {
+        Section {
+            ForEach(passkeys) { key in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(key.label)
+                    if let date = key.lastUsedAt ?? key.createdAt {
+                        Text(RelativeTime.string(since: date)).font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                .frame(minHeight: 44)
+                .swipeActions {
+                    Button(L10n.t("detail.delete"), role: .destructive) { removing = key }
+                }
+            }
+            Button {
+                passkeyLabel = L10n.t("passkey.defaultLabel")
+                naming = true
+            } label: {
+                HStack {
+                    Label(L10n.t("passkey.add"), systemImage: "person.badge.key")
+                    if addingPasskey { Spacer(); ProgressView() }
+                }
+                .frame(minHeight: 44)
+            }
+            .disabled(addingPasskey)
+        } header: {
+            Text(L10n.t("passkey.title"))
+        } footer: {
+            Text(L10n.t("passkey.intro"))
+        }
+        .task { passkeys = (try? await APIClient.shared.passkeys()) ?? [] }
+        .alert(L10n.t("passkey.namePrompt"), isPresented: $naming) {
+            TextField(L10n.t("passkey.defaultLabel"), text: $passkeyLabel)
+            Button(L10n.t("passkey.add"), action: addPasskey)
+            Button(L10n.t("form.cancel"), role: .cancel) {}
+        }
+        .confirmationDialog(L10n.t("passkey.confirmDelete"),
+                            isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
+                            titleVisibility: .visible, presenting: removing) { key in
+            Button(L10n.t("detail.delete"), role: .destructive) { removePasskey(key) }
+        }
+    }
+
+    private func addPasskey() {
+        let label = passkeyLabel.trimmingCharacters(in: .whitespacesAndNewlines)
+        addingPasskey = true
+        error = nil
+        Task {
+            defer { addingPasskey = false }
+            do {
+                let key = try await PasskeySheet.add(label: label.isEmpty ? L10n.t("passkey.defaultLabel") : label,
+                                                     api: .shared)
+                passkeys.insert(key, at: 0)
+                saved.toggle()
+            } catch where PasskeySheet.wasCancelled(error) {
+            } catch {
+                self.error = ErrorText.describe(error)
+            }
+        }
+    }
+
+    private func removePasskey(_ key: PasskeySummary) {
+        Task {
+            do {
+                try await APIClient.shared.deletePasskey(key.id)
+                passkeys.removeAll { $0.id == key.id }
+            } catch {
+                self.error = ErrorText.describe(error)
             }
         }
     }

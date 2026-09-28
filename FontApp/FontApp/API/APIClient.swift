@@ -193,6 +193,37 @@ nonisolated struct APIClient: Sendable {
         try await get("/auth/me")
     }
 
+    // MARK: Passkeys
+
+    func passkeyLoginOptions() async throws -> Passkeys.Start<Passkeys.RequestOptions> {
+        try await send("POST", "/auth/passkeys/authentication/options", timeout: writeTimeout)
+    }
+
+    func passkeyLogin(requestID: UUID, credential: Passkeys.Credential) async throws -> LoginResponse {
+        struct Body: Encodable { let requestID: UUID; let credential: Passkeys.Credential }
+        return try await send("POST", "/auth/passkeys/authentication/verify",
+                              body: .json(try JSONEncoder().encode(Body(requestID: requestID, credential: credential))),
+                              timeout: writeTimeout)
+    }
+
+    func passkeyRegistrationOptions() async throws -> Passkeys.Start<Passkeys.CreationOptions> {
+        try await send("POST", "/auth/passkeys/registration/options", timeout: writeTimeout)
+    }
+
+    func passkeyRegister(requestID: UUID, label: String, credential: Passkeys.Credential) async throws -> PasskeySummary {
+        struct Body: Encodable { let requestID: UUID; let label: String; let credential: Passkeys.Credential }
+        return try await send("POST", "/auth/passkeys/registration/verify",
+                              body: .json(try JSONEncoder().encode(Body(requestID: requestID, label: label,
+                                                                        credential: credential))),
+                              timeout: writeTimeout)
+    }
+
+    func passkeys() async throws -> [PasskeySummary] { try await get("/auth/passkeys") }
+
+    func deletePasskey(_ id: UUID) async throws {
+        let _: Ignored = try await send("DELETE", "/auth/passkeys/\(id.uuidString)", timeout: writeTimeout)
+    }
+
     /// This iPhone's APNs token, so the account's notices reach it.
     func registerPushToken(_ token: String, sandbox: Bool) async throws {
         struct Body: Encodable { let token: String; let sandbox: Bool }

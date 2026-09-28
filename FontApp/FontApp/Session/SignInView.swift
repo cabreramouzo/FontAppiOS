@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Username (or email) and password, and the way to create an account. Password
+/// Username (or email) and password, or a passkey, and the way to create an account. Password
 /// recovery stays on the web: it works through a link sent by email.
 struct SignInView: View {
     @Environment(SessionStore.self) private var session
@@ -54,6 +54,17 @@ struct SignInView: View {
                     }
                     .disabled(!canSubmit)
                 }
+                if Passkeys.available(for: APIClient.shared.baseURL) {
+                    Section {
+                        Button(action: passkey) {
+                            Label(L10n.t("passkey.login"), systemImage: "person.badge.key")
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                        }
+                        .disabled(isSending)
+                    } footer: {
+                        Text(L10n.t("passkey.intro"))
+                    }
+                }
                 Section {
                     NavigationLink(L10n.t("login.noAccount") + L10n.t("login.signup")) {
                         SignUpView { dismiss() }
@@ -87,6 +98,25 @@ struct SignInView: View {
             do {
                 try await session.signIn(user: user.trimmingCharacters(in: .whitespaces), password: password)
                 dismiss()
+            } catch let e as APIError where e.status == 401 {
+                error = L10n.t("login.badCredentials")
+            } catch {
+                self.error = ErrorText.describe(error)
+            }
+        }
+    }
+
+    private func passkey() {
+        isSending = true
+        error = nil
+        Task {
+            defer { isSending = false }
+            do {
+                try await session.signInWithPasskey()
+                dismiss()
+            } catch where PasskeySheet.wasCancelled(error) {
+                // Also what the sheet answers when this iPhone has no passkey for FontApp.
+                self.error = L10n.t("passkey.cancelled")
             } catch let e as APIError where e.status == 401 {
                 error = L10n.t("login.badCredentials")
             } catch {
