@@ -412,6 +412,46 @@ nonisolated struct GamificationSummary: Decodable, Sendable {
     /// What your level opens (phase 6): `markDuplicate`, `resolveIncident`…
     struct Grant: Decodable, Sendable { let capabilities: [String] }
     var grant: Grant? = nil
+    /// The ladder of levels, the badge families with their progress, and the specials.
+    var levels: [LevelStanding]? = nil
+    var collection: [BadgeSlot]? = nil
+    var special: [SpecialStanding]? = nil
+}
+
+nonisolated struct LevelStanding: Decodable, Identifiable, Sendable {
+    let key: String
+    let from: Int
+    let reached: Bool
+    let current: Bool
+    var id: String { key }
+}
+
+/// One badge family: the tier you have (`nil` if none yet) and how far to the next.
+nonisolated struct BadgeSlot: Decodable, Identifiable, Sendable {
+    let family: String
+    let tier: String?
+    let progress: Int
+    let threshold: Int
+    let thresholds: [Int]
+    /// The tier you will have once the pending contributions settle, when it is better.
+    let pendingTier: String?
+    var id: String { family }
+    var maxed: Bool { progress >= (thresholds.last ?? .max) }
+}
+
+/// A special badge: no progress, you have it or not; some have a limited number of places.
+nonisolated struct SpecialStanding: Decodable, Identifiable, Sendable {
+    let key: String
+    let earnedAt: Date?
+    let remaining: Int?
+    var id: String { key }
+}
+
+/// What you have earned, counting what is still settling (`/gamification/badges/preview`).
+nonisolated struct BadgesPreview: Decodable, Sendable {
+    struct Badge: Decodable, Hashable, Sendable { let family: String; let tier: String }
+    var badges: [Badge]? = nil
+    var level: String? = nil
 }
 
 /// A fountain whose latest review is yours (`GET /gamification/guarded`), the most

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "fourSeasons.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

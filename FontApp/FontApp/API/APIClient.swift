@@ -378,6 +378,8 @@ nonisolated struct APIClient: Sendable {
     /// `nil` when the game is switched off (204).
     func gamification() async throws -> GamificationSummary? { try await get("/gamification/me") }
     func guardedFonts() async throws -> [GuardedFont] { try await get("/gamification/guarded") }
+    /// For the celebration: what you have now, counting what is still settling.
+    func badgesPreview() async throws -> BadgesPreview { try await get("/gamification/badges/preview") }
 
     /// With a position, adds the local goal ("N of the ones around you"). Only pass one
     /// the app already has permission for. `nil` when the game is off.

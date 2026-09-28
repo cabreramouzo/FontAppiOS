@@ -30,6 +30,11 @@ struct GameSection: View {
                     .padding(.vertical, 4)
                 }
                 score
+                NavigationLink {
+                    BadgesScreen()
+                } label: {
+                    Label(L10n.t("badges.title"), systemImage: "rosette")
+                }
             } header: {
                 Label(L10n.t("game.title"), systemImage: "drop")
             } footer: {

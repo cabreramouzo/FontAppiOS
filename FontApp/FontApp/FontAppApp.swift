@@ -9,6 +9,7 @@ struct FontAppApp: App {
     @State private var sync: OutboxSync
     @State private var bell = Bell()
     @State private var favorites = Favorites()
+    @State private var celebrations = BadgeCelebrations()
 
     init() {
         let session = SessionStore()
@@ -29,9 +30,23 @@ struct FontAppApp: App {
                 .environment(OfflineZones.shared)
                 .environment(bell)
                 .environment(favorites)
+                // A badge or a level you did not have: over everything, with confetti.
+                .overlay {
+                    if let novelty = celebrations.current {
+                        BadgeCelebrationView(novelty: novelty) { withAnimation { celebrations.dismiss() } }
+                            .environment(session)
+                            .transition(.opacity)
+                    }
+                }
+                .animation(.easeInOut(duration: 0.25), value: celebrations.current)
+                // Right after contributing is when it matters: the fountain is still there.
+                .onReceive(NotificationCenter.default.publisher(for: .fontChanged)) { _ in
+                    celebrations.contributed(session.userID)
+                }
                 .task {
                     favorites.sessionChanged(to: session.userID)
                     await session.refresh()
+                    celebrations.checkAtLaunch(session.userID)
                     if session.isSignedIn {
                         async let inbox: Void = bell.reload()
                         async let starred: Void = favorites.reload()
@@ -44,12 +59,14 @@ struct FontAppApp: App {
                     bell.clear()
                     favorites.sessionChanged(to: userID)
                     if userID != nil { Task { await bell.reload(); await favorites.reload() } }
+                    celebrations.checkAtLaunch(userID)
                 }
         }
         .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .active:
                 sync.flush(reason: "foreground")
+                celebrations.checkAtLaunch(session.userID)
                 if session.isSignedIn { Task { await bell.reload() } }
             case .background: sync.scheduleBackgroundFlush()
             default: break
