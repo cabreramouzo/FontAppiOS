@@ -18,7 +18,7 @@ struct NotificationTextTests {
     @Test func codesBecomeWordsInTheReadersLanguage() {
         #expect(NotificationText.title(notice("reviewConfirmed"), bundle: es) == "marta_r confirma tu reseña")
         #expect(NotificationText.body(notice("fontUpdate", excerpt: "review:dry"), bundle: es)
-            == L10n.t("notif.fontUpdate.reviewWithStatus", ["user": "marta_r", "status": L10n.t("status.dry", bundle: es)], bundle: es))
+            == L10n.t("notif.fontUpdate.reviewWithStatus", ["user": "marta_r", "status": "🚱 " + L10n.t("status.dry", bundle: es)], bundle: es))
         #expect(NotificationText.body(notice("fontUpdate", excerpt: "hidden:retired"), bundle: es)
             == "Se ha retirado: ya no está.")
         #expect(NotificationText.body(notice("fontUpdate", excerpt: "resolved"), bundle: es)

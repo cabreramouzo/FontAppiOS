@@ -24,6 +24,25 @@ nonisolated enum WaterSource: String, Codable, Sendable {
 /// Declared drinkability (`fonts.drinkable`).
 nonisolated enum Drinkable: String, Codable, Sendable {
     case yes, no, conditional, untreated
+
+    /// The web's (`DRINKABLE_EMOJI`): untreated is a drop, not a warning — no verdict.
+    var emoji: String {
+        switch self {
+        case .yes: "✅"
+        case .no: "🚱"
+        case .conditional: "⚠️"
+        case .untreated: "💧"
+        }
+    }
+}
+
+extension WaterSource {
+    /// "🚰 Urban tap (mains)", as the web writes a kind wherever it names one.
+    var emojiLabel: String { "\(emoji) \(L10n.t("source.\(rawValue)"))" }
+}
+
+extension Drinkable {
+    var emojiLabel: String { "\(emoji) \(L10n.t("drink.\(rawValue)"))" }
 }
 
 /// A fountain plus the summary of its latest water status, as the map returns it.

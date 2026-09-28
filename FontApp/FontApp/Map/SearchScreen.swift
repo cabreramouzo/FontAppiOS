@@ -133,22 +133,23 @@ struct SearchScreen: View {
 }
 
 /// A nearby fountain: unlike search results, `/fonts/near` carries the status, so the
-/// pin colour and its confidence are shown.
+/// status and its confidence are shown, with their emojis as on the web.
 private struct NearbyRow: View {
     let font: FontSummary
     let from: CLLocation?
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "mappin.circle.fill")
-                .font(.title2)
-                .foregroundStyle(.white, WaterStatus.color(for: font.lastWaterStatus))
-                .accessibilityHidden(true)
+            Text(font.source?.emoji ?? "💧").font(.title2).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(L10n.fontName(font.name))
                 let level = Confidence.level(of: font.evidence)
-                Text([distance, "\(level.emoji) \(L10n.t(level.labelKey))"].compactMap { $0 }.joined(separator: " · "))
-                    .font(.footnote).foregroundStyle(.secondary)
+                let status = WaterStatus(font.lastWaterStatus).map { "\($0.emoji) \(L10n.t($0.labelKey))" }
+                Text([status, "\(level.emoji) \(L10n.t(level.labelKey))"].compactMap { $0 }.joined(separator: " · "))
+                    .font(.footnote)
+                if let distance {
+                    Text(distance).font(.footnote).foregroundStyle(.secondary)
+                }
             }
         }
         .frame(minHeight: 44)
@@ -167,12 +168,9 @@ private struct FountainResultRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            // Neutral: `/fonts` does not carry the water status, and a status colour here
-            // would call every result "unchecked".
-            Image(systemName: "drop.circle.fill")
-                .font(.title2)
-                .foregroundStyle(.white, Color.accentColor)
-                .accessibilityHidden(true)
+            // Its kind, not a status: `/fonts` does not carry the water status, and showing
+            // one would call every result "unchecked".
+            Text(font.source?.emoji ?? "💧").font(.title2).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(L10n.fontName(font.name))
                 // Many fountains share a name; distance and area tell them apart. What is

@@ -55,7 +55,9 @@ nonisolated enum NotificationText {
         switch parts.first {
         case "review":
             if let detail, let status = L10n.lookup("status.\(detail)", bundle: bundle) {
-                return L10n.t("notif.fontUpdate.reviewWithStatus", ["user": who, "status": status], bundle: bundle)
+                // With its emoji, as the status reads everywhere else in the app.
+                let shown = WaterStatus(detail).map { "\($0.emoji) \(status)" } ?? status
+                return L10n.t("notif.fontUpdate.reviewWithStatus", ["user": who, "status": shown], bundle: bundle)
             }
             return L10n.t("notif.fontUpdate.review", ["user": who], bundle: bundle)
         case "recovered": return L10n.t("maintenance.recovered", ["user": who], bundle: bundle)

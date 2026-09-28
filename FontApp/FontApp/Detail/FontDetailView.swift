@@ -191,7 +191,7 @@ struct FontDetailView: View {
                             .lineLimit(3)
                             .fixedSize(horizontal: false, vertical: true)
                             .accessibilityAddTraits(.isHeader)
-                        let place = [font.source.map { "\($0.emoji) \(L10n.t("source.\($0.rawValue)"))" },
+                        let place = [font.source?.emojiLabel,
                                      font.municipality ?? font.region].compactMap { $0 }
                         if !place.isEmpty {
                             Text(place.joined(separator: " · ")).font(.subheadline).foregroundStyle(.secondary)
@@ -756,9 +756,9 @@ struct FontDetailView: View {
     private func factsSection(_ font: FontDetail) -> some View {
         Section {
             LabeledContent(label("detail.type"),
-                           value: font.source.map { L10n.t("source.\($0.rawValue)") } ?? L10n.t("detail.unknownType"))
+                           value: font.source?.emojiLabel ?? L10n.t("detail.unknownType"))
             LabeledContent(label("detail.drinkability"),
-                           value: font.drinkable.map { L10n.t("drink.\($0.rawValue)") } ?? L10n.t("detail.unknownDrink"))
+                           value: font.drinkable?.emojiLabel ?? L10n.t("detail.unknownDrink"))
             if let municipality = font.municipality {
                 LabeledContent(label("detail.municipality"), value: municipality)
             }

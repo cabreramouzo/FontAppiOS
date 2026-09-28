@@ -118,7 +118,7 @@ struct FiltersSheet: View {
                     Picker(selection: $filters.source) {
                         Text(L10n.t("map.allTypes")).tag(WaterSource?.none)
                         ForEach([WaterSource.tap, .mountain, .spring, .well, .fountain, .other], id: \.self) { source in
-                            Text(L10n.t("source.\(source.rawValue)")).tag(WaterSource?.some(source))
+                            Text(source.emojiLabel).tag(WaterSource?.some(source))
                         }
                     } label: {
                         Label(L10n.t("map.filterType"), systemImage: "square.grid.2x2")

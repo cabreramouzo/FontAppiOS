@@ -43,13 +43,13 @@ struct FontEditSheet: View {
                     Picker(label("detail.type"), selection: $model.fields.source) {
                         Text(L10n.t("detail.unknownType")).tag(WaterSource?.none)
                         ForEach([WaterSource.tap, .mountain, .spring, .well, .fountain, .other], id: \.self) {
-                            Text(L10n.t("source.\($0.rawValue)")).tag(WaterSource?.some($0))
+                            Text($0.emojiLabel).tag(WaterSource?.some($0))
                         }
                     }
                     Picker(label("detail.drinkability"), selection: $model.fields.drinkable) {
                         Text(L10n.t("detail.unknownDrink")).tag(Drinkable?.none)
                         ForEach([Drinkable.yes, .untreated, .conditional, .no], id: \.self) {
-                            Text(L10n.t("drink.\($0.rawValue)")).tag(Drinkable?.some($0))
+                            Text($0.emojiLabel).tag(Drinkable?.some($0))
                         }
                     }
                 }
