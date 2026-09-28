@@ -5,7 +5,7 @@ import Foundation
 // Optional fields are omitted from the JSON when null, so every one is `?` here.
 
 /// Kind of water point (`fonts.source`).
-nonisolated enum WaterSource: String, Codable, Sendable {
+nonisolated enum WaterSource: String, Codable, Sendable, CaseIterable {
     case tap, mountain, spring, well, fountain, other
 
     /// Fixed per kind, as `SOURCE_EMOJI` in `web/src/lib/waterType.ts`.
@@ -22,7 +22,7 @@ nonisolated enum WaterSource: String, Codable, Sendable {
 }
 
 /// Declared drinkability (`fonts.drinkable`).
-nonisolated enum Drinkable: String, Codable, Sendable {
+nonisolated enum Drinkable: String, Codable, Sendable, CaseIterable {
     case yes, no, conditional, untreated
 
     /// The web's (`DRINKABLE_EMOJI`): untreated is a drop, not a warning — no verdict.

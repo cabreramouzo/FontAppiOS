@@ -77,7 +77,12 @@ final class QuickReviewModel {
         return await send(question.status, remoteDistanceM: question.meters)
     }
 
+    /// The last review was sent from clearly far away: whoever wrote it cannot tell
+    /// what the fountain is like, so nothing more is asked.
+    private(set) var lastWasRemote = false
+
     private func send(_ status: WaterStatus, remoteDistanceM: Int?) async -> Bool {
+        lastWasRemote = remoteDistanceM != nil
         state = .sending(status)
         let review = NewReview(waterStatus: status.rawValue, confirmIfUnchanged: true,
                                remoteDistanceM: remoteDistanceM)

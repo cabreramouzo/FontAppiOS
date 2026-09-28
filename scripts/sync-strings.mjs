@@ -207,6 +207,33 @@ const IOS_ONLY = {
   'ios.close': {
     ca: 'Tanca', es: 'Cerrar', gl: 'Pechar', eu: 'Itxi', en: 'Close', fr: 'Fermer', pt: 'Fechar', it: 'Chiudi',
   },
+  'ios.fill.ask.drinkable': {
+    ca: 'Saps si l’aigua és potable?', es: '¿Sabes si el agua es potable?', gl: 'Sabes se a auga é potable?', eu: 'Badakizu ura edangarria den?', en: 'Do you know if the water is drinkable?', fr: 'Savez-vous si l’eau est potable ?', pt: 'Sabe se a água é potável?', it: 'Sai se l’acqua è potabile?',
+  },
+  'ios.fill.ask.source': {
+    ca: 'Quin tipus de font és?', es: '¿Qué tipo de fuente es?', gl: 'Que tipo de fonte é?', eu: 'Zer iturri mota da?', en: 'What kind of fountain is it?', fr: 'Quel type de fontaine est-ce ?', pt: 'Que tipo de fonte é?', it: 'Che tipo di fontana è?',
+  },
+  'ios.fill.ask.name': {
+    ca: 'Té nom aquesta font?', es: '¿Tiene nombre esta fuente?', gl: 'Ten nome esta fonte?', eu: 'Iturri honek izenik al du?', en: 'Does this fountain have a name?', fr: 'Cette fontaine a-t-elle un nom ?', pt: 'Esta fonte tem nome?', it: 'Questa fontana ha un nome?',
+  },
+  'ios.fill.add.drinkable': {
+    ca: 'Afegeix la potabilitat', es: 'Añadir potabilidad', gl: 'Engadir potabilidade', eu: 'Gehitu edangarritasuna', en: 'Add drinkability', fr: 'Ajouter la potabilité', pt: 'Adicionar potabilidade', it: 'Aggiungi potabilità',
+  },
+  'ios.fill.add.source': {
+    ca: 'Afegeix el tipus', es: 'Añadir tipo', gl: 'Engadir tipo', eu: 'Gehitu mota', en: 'Add kind', fr: 'Ajouter le type', pt: 'Adicionar tipo', it: 'Aggiungi tipo',
+  },
+  'ios.fill.add.name': {
+    ca: 'Afegeix el nom', es: 'Añadir nombre', gl: 'Engadir nome', eu: 'Gehitu izena', en: 'Add name', fr: 'Ajouter le nom', pt: 'Adicionar nome', it: 'Aggiungi nome',
+  },
+  'ios.fill.nameLabel': {
+    ca: 'Nom', es: 'Nombre', gl: 'Nome', eu: 'Izena', en: 'Name', fr: 'Nom', pt: 'Nome', it: 'Nome',
+  },
+  'ios.fill.namePlaceholder': {
+    ca: 'El nom de la font', es: 'El nombre de la fuente', gl: 'O nome da fonte', eu: 'Iturriaren izena', en: 'The fountain’s name', fr: 'Le nom de la fontaine', pt: 'O nome da fonte', it: 'Il nome della fontana',
+  },
+  'ios.fill.dontKnow': {
+    ca: 'No ho sé', es: 'No lo sé', gl: 'Non o sei', eu: 'Ez dakit', en: 'I don’t know', fr: 'Je ne sais pas', pt: 'Não sei', it: 'Non lo so',
+  },
   'ios.showAll': {
     ca: 'Mostra-les totes ({n})', es: 'Mostrar todas ({n})', gl: 'Amosalas todas ({n})', eu: 'Erakutsi guztiak ({n})', en: 'Show all ({n})', fr: 'Tout afficher ({n})', pt: 'Mostrar todas ({n})', it: 'Mostra tutte ({n})',
   },

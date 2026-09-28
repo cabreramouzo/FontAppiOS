@@ -24,6 +24,8 @@ struct FontDetailView: View {
     @State private var creatorName: String?
     @State private var creatorTier: String?
     @State private var photoAuthor: String?
+    /// The one question asked after a quick review, while it is on screen.
+    @State private var followUp: MissingFact?
     @State private var capabilities: Set<String> = []
     @State private var editingReview: CommentResponse?
     @State private var editingReport: ReportResponse?
@@ -82,6 +84,16 @@ struct FontDetailView: View {
         .toolbar { ToolbarItem(placement: .principal) { Color.clear.frame(width: 1, height: 1) } }
         .toolbarVisibility(onClose == nil ? .automatic : .hidden, for: .navigationBar)
         .task { await model.load() }
+        // Right after a review lands, on the spot: the most valuable thing missing, once
+        // per fountain and person.
+        .onChange(of: model.quickReview?.state) { _, state in
+            guard case .sent = state, let quick = model.quickReview, !quick.lastWasRemote,
+                  let userID = session.userID, let font = loadedFont,
+                  let fact = MissingFact.all(of: font).first,
+                  !FollowUpAsked.contains(font.id, user: userID) else { return }
+            FollowUpAsked.insert(font.id, user: userID)
+            withAnimation { followUp = fact }
+        }
         .profileNavigation()
         .onAppear { approach.start() }
         .onDisappear { approach.stop() }
@@ -645,6 +657,17 @@ struct FontDetailView: View {
                 QuickReviewSection(model: quick, onChange: { await model.load() },
                                    onSignIn: { showsSignIn = true })
             }
+            if let followUp {
+                FollowUpQuestion(font: font, fact: followUp) { saved in
+                    withAnimation { self.followUp = nil }
+                    // The answer shows in the page's facts at once; a tap of success says
+                    // it landed without another thing to read.
+                    if saved {
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        Task { await model.load() }
+                    }
+                }
+            }
             if let nearWater { nearWaterSection(nearWater) }
             statusSection(font)
             let photos = FountainPhoto.all(cover: font.image, reviews: model.reviews)
@@ -827,10 +850,24 @@ struct FontDetailView: View {
 
     private func factsSection(_ font: FontDetail) -> some View {
         Section {
-            LabeledContent(label("detail.type"),
-                           value: font.source?.emojiLabel ?? L10n.t("detail.unknownType"))
-            LabeledContent(label("detail.drinkability"),
-                           value: font.drinkable?.emojiLabel ?? L10n.t("detail.unknownDrink"))
+            // What is missing reads as something to add, in colour, filled in place.
+            let reload: () -> Void = { Task { await model.load() } }
+            let signIn: (() -> Void)? = session.isSignedIn ? nil : { showsSignIn = true }
+            if font.name?.isEmpty ?? true {
+                MissingFactRow(font: font, fact: .name, label: L10n.t("ios.fill.nameLabel"),
+                               onSaved: reload, onSignIn: signIn)
+            }
+            if let source = font.source {
+                LabeledContent(label("detail.type"), value: source.emojiLabel)
+            } else {
+                MissingFactRow(font: font, fact: .source, label: label("detail.type"), onSaved: reload, onSignIn: signIn)
+            }
+            if let drinkable = font.drinkable {
+                LabeledContent(label("detail.drinkability"), value: drinkable.emojiLabel)
+            } else {
+                MissingFactRow(font: font, fact: .drinkable, label: label("detail.drinkability"),
+                               onSaved: reload, onSignIn: signIn)
+            }
             if let municipality = font.municipality {
                 LabeledContent(label("detail.municipality"), value: municipality)
             }
