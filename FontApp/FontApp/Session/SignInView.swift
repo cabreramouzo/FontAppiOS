@@ -1,10 +1,12 @@
+import AuthenticationServices
 import SwiftUI
 
-/// Username (or email) and password, or a passkey, and the way to create an account. Password
+/// Username (or email) and password, Apple or a passkey, and the way to create an account. Password
 /// recovery stays on the web: it works through a link sent by email.
 struct SignInView: View {
     @Environment(SessionStore.self) private var session
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @State private var user = ""
     @State private var password = ""
     @State private var isSending = false
@@ -54,6 +56,17 @@ struct SignInView: View {
                     }
                     .disabled(!canSubmit)
                 }
+                Section {
+                    SignInWithAppleButton(.signIn) { request in
+                        request.requestedScopes = [.fullName, .email]
+                    } onCompletion: { result in
+                        apple(result)
+                    }
+                    .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+                    .frame(minHeight: 48)
+                    .listRowInsets(EdgeInsets())
+                    .disabled(isSending)
+                }
                 if Passkeys.available(for: APIClient.shared.baseURL) {
                     Section {
                         Button(action: passkey) {
@@ -102,6 +115,27 @@ struct SignInView: View {
                 error = L10n.t("login.badCredentials")
             } catch {
                 self.error = ErrorText.describe(error)
+            }
+        }
+    }
+
+    private func apple(_ result: Result<ASAuthorization, any Error>) {
+        switch result {
+        case .failure(let error):
+            // Closing Apple's sheet is not an error worth a red sentence.
+            if (error as? ASAuthorizationError)?.code != .canceled { self.error = ErrorText.describe(error) }
+        case .success(let authorization):
+            guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
+            isSending = true
+            error = nil
+            Task {
+                defer { isSending = false }
+                do {
+                    try await session.signInWithApple(credential)
+                    dismiss()
+                } catch {
+                    self.error = ErrorText.describe(error)
+                }
             }
         }
     }

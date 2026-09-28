@@ -7,6 +7,165 @@
     " → %@" : {
 
     },
+    "err.auth.appleInvalid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La identificació d’Apple no és vàlida."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple’s sign-in could not be verified."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La identificación de Apple no es válida."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appleren identifikazioa ez da baliozkoa."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’identification Apple n’est pas valide."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A identificación de Apple non é válida."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’identificazione di Apple non è valida."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A identificação da Apple não é válida."
+          }
+        }
+      }
+    },
+    "err.auth.appleLinkRequired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aquest correu ja té un compte. Entra amb la contrasenya."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This email already has an account. Sign in with your password."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este correo ya tiene cuenta. Entra con tu contraseña."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posta honek badu kontu bat. Sartu zure pasahitzarekin."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet e-mail a déjà un compte. Connectez-vous avec votre mot de passe."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este correo xa ten conta. Entra co teu contrasinal."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa email ha già un account. Accedi con la password."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este e-mail já tem conta. Entre com a sua palavra-passe."
+          }
+        }
+      }
+    },
+    "err.auth.appleNoEmail" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple no ha compartit cap correu. Torna-ho a provar i deixa que en comparteixi un (pot ser l’ocult)."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple did not share an email. Try again and let it share one (the hidden one is fine)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple no ha compartido ningún correo. Vuelve a probar y deja que comparta uno (puede ser el oculto)."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applek ez du posta elektronikorik partekatu. Saiatu berriro eta utzi bat partekatzen (ezkutukoa izan daiteke)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple n’a partagé aucun e-mail. Réessayez en le laissant en partager un (l’adresse masquée convient)."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple non compartiu ningún correo. Téntao de novo e deixa que comparta un (pode ser o oculto)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple non ha condiviso alcuna email. Riprova e lascia che ne condivida una (va bene quella nascosta)."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Apple não partilhou nenhum e-mail. Tente de novo e deixe partilhar um (pode ser o oculto)."
+          }
+        }
+      }
+    },
     "footer.legal" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -5,6 +5,11 @@
 	<!-- Push through APNs. Xcode signs "production" when exporting for TestFlight. -->
 	<key>aps-environment</key>
 	<string>development</string>
+	<!-- Sign in with Apple. The server side is POST /auth/apple in FontAppBE. -->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
 	<!-- fontapp.net links open in the app; the site's passkeys are offered in it. The
 	     other half is web/public/.well-known/apple-app-site-association in FontAppBE. -->
 	<key>com.apple.developer.associated-domains</key>

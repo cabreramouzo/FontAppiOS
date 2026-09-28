@@ -193,6 +193,19 @@ nonisolated struct APIClient: Sendable {
         try await get("/auth/me")
     }
 
+    /// Sign in with Apple (`POST /auth/apple`): Apple's signed token, the one-time code
+    /// the server keeps to revoke access if the account is deleted, and the name, which
+    /// Apple gives only the first time.
+    func appleLogin(identityToken: String, authorizationCode: String?, name: String?,
+                    lang: String?) async throws -> LoginResponse {
+        struct Body: Encodable {
+            let identityToken: String; let authorizationCode: String?; let name: String?; let lang: String?
+            let source = "ios"
+        }
+        let body = Body(identityToken: identityToken, authorizationCode: authorizationCode, name: name, lang: lang)
+        return try await send("POST", "/auth/apple", body: .json(try JSONEncoder().encode(body)), timeout: writeTimeout)
+    }
+
     // MARK: Passkeys
 
     func passkeyLoginOptions() async throws -> Passkeys.Start<Passkeys.RequestOptions> {

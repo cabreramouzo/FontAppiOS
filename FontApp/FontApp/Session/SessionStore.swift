@@ -1,3 +1,4 @@
+import AuthenticationServices
 import Foundation
 import Observation
 
@@ -51,6 +52,18 @@ final class SessionStore {
     /// Face ID and no password: the system offers the account's passkey.
     func signInWithPasskey() async throws {
         start(try await PasskeySheet.signIn(api: api))
+    }
+
+    /// Sign in with Apple: creates the account the first time, as the server decides.
+    func signInWithApple(_ credential: ASAuthorizationAppleIDCredential) async throws {
+        guard let token = credential.identityToken.flatMap({ String(data: $0, encoding: .utf8) }) else {
+            throw APIError(status: 401, reason: nil, code: "auth.appleInvalid", retryAfter: nil)
+        }
+        let name = credential.fullName.map { PersonNameComponentsFormatter().string(from: $0) }
+        start(try await api.appleLogin(identityToken: token,
+                                       authorizationCode: credential.authorizationCode.flatMap { String(data: $0, encoding: .utf8) },
+                                       name: name?.isEmpty == false ? name : nil,
+                                       lang: SignUpRules.webLanguage()))
     }
 
     private func start(_ response: LoginResponse) {
