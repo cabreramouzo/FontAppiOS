@@ -48,4 +48,8 @@ the server it uses (Debug builds only) for that reason. To test on a phone:
    (System Settings → Wi-Fi → Details shows the IP). Phone and Mac on the same Wi-Fi.
 3. iOS asks for local network access the first time; allow it.
 
+The server passed with `-FontAppAPI` is remembered: the app keeps using it when opened
+from the home screen, where Xcode's launch arguments do not reach. Launch once with
+`-FontAppAPI local` to go back to `127.0.0.1`.
+
 Don't point a Debug build at production to test writes: reviews and photos would be real.

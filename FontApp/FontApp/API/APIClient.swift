@@ -19,21 +19,39 @@ nonisolated struct APIError: Error, Equatable, Sendable {
 /// Debug builds use the local backend (`swift run App serve` in FontAppBE), whose data is
 /// seeded: writing reviews and photos while developing must never reach production. Pass
 /// `-FontAppAPI https://fontapp.fly.dev` as a launch argument to point a Debug build
-/// elsewhere (a phone cannot reach the Mac's 127.0.0.1). Release always uses production.
+/// elsewhere (a phone cannot reach the Mac's 127.0.0.1); it is remembered, also when the
+/// app is opened from the home screen, until `-FontAppAPI local`. Release always uses
+/// production.
 nonisolated enum APIEnvironment {
     static let production = URL(string: "https://fontapp.fly.dev")!
     static let local = URL(string: "http://127.0.0.1:8080")!
+    private static let rememberedKey = "api.server"
 
     static var baseURL: URL {
         #if DEBUG
-        if let override = UserDefaults.standard.string(forKey: "FontAppAPI"),
-           let url = URL(string: override) {
+        // A launch argument only exists when Xcode launches the app: opened from the
+        // home screen, the phone fell back to 127.0.0.1 (itself) and said "no connection".
+        // So the choice is remembered until another one is passed; `-FontAppAPI local`
+        // goes back to the Mac.
+        let defaults = UserDefaults.standard
+        if let argument = ProcessInfo.processInfo.arguments.value(after: "-FontAppAPI") {
+            if argument == "local" { defaults.removeObject(forKey: rememberedKey) }
+            else { defaults.set(argument, forKey: rememberedKey) }
+        }
+        if let remembered = defaults.string(forKey: rememberedKey), let url = URL(string: remembered) {
             return url
         }
         return local
         #else
         return production
         #endif
+    }
+}
+
+private extension Array where Element == String {
+    func value(after flag: String) -> String? {
+        guard let i = firstIndex(of: flag), indices.contains(i + 1) else { return nil }
+        return self[i + 1]
     }
 }
 
