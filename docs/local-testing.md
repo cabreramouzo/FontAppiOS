@@ -24,6 +24,18 @@ curl -X POST http://127.0.0.1:8080/users -H 'Content-Type: application/json' \
 
 Sign-ups are limited to 5 an hour per IP (429), also locally.
 
+## Where the simulator is
+
+The simulator starts in Cupertino, where the ICGC and IGN layers have no data and there
+are no fountains: the map looks empty (it says so now, with a button to the world map).
+Running from Xcode, the shared scheme `FontApp` simulates Moià instead
+(`FontApp/Simulator/Moia.gpx`, Run → Options → Default Location). Launched any other way
+(the simulator tools, `simctl launch`), set it by hand:
+
+```sh
+xcrun simctl location booted set 41.8108,2.0967
+```
+
 ## On a real iPhone
 
 A Debug build asks `127.0.0.1`, which on a phone is the phone itself: signing in fails

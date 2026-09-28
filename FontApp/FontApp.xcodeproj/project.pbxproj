@@ -31,6 +31,7 @@
 		044F28773068858800D0EF7B /* FontApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FontApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		044F28863068858A00D0EF7B /* FontAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FontAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044F28903068858A00D0EF7B /* FontAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FontAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		04A1B2C3D4E5F60718293A50 /* Moia.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = Moia.gpx; path = Simulator/Moia.gpx; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -83,6 +84,7 @@
 				044F28793068858800D0EF7B /* FontApp */,
 				044F28893068858A00D0EF7B /* FontAppTests */,
 				044F28933068858A00D0EF7B /* FontAppUITests */,
+				04A1B2C3D4E5F60718293A50 /* Moia.gpx */,
 				044F28783068858800D0EF7B /* Products */,
 			);
 			sourceTree = "<group>";

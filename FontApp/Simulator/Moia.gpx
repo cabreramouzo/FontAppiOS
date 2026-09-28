@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- Where the simulator starts when running from Xcode (scheme FontApp → Run → Options →
+     Default Location). Moià: ICGC and IGN layers both cover it, and the local seed has
+     fountains around. Not part of the app bundle. -->
+<gpx version="1.1" creator="FontApp">
+    <wpt lat="41.8108" lon="2.0967">
+        <name>Moià</name>
+    </wpt>
+</gpx>
