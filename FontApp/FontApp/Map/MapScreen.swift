@@ -41,6 +41,7 @@ struct MapScreen: View {
         }
     }
     @State private var selected: FontSummary?
+    @State private var detent: PresentationDetent = .shortCard
     @State private var followRequest = 0
     @State private var didAutoLocate = false
 
@@ -164,9 +165,12 @@ struct MapScreen: View {
                         }
                     }
             }
-            .presentationDetents([.medium, .large])
-            .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+            // Opens as the short card: status, the three chips and the way there, with the
+            // map still in view. Up for the whole page.
+            .presentationDetents([.shortCard, .large], selection: $detent)
+            .presentationBackgroundInteraction(.enabled(upThrough: .shortCard))
         }
+        .onChange(of: selected?.id) { detent = .shortCard }
     }
 
     private func showFocus() {
@@ -326,6 +330,11 @@ private extension View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
     }
+}
+
+extension PresentationDetent {
+    /// A fountain's short card: title, status line, chips and directions.
+    static let shortCard = PresentationDetent.height(420)
 }
 
 extension UTType {

@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// "How is it now?" with the three chips, the thanks and a 10-second undo.
-/// Without a session there is nothing to tap, only a way to sign in.
+/// Without a session the chips are still there, and tapping one asks to sign in: seeing
+/// them is how people find out that anyone can say how a fountain is.
 struct QuickReviewSection: View {
     @Bindable var model: QuickReviewModel
     /// Reloads the fountain after a review lands or is undone.
@@ -15,12 +16,10 @@ struct QuickReviewSection: View {
 
     var body: some View {
         Section(L10n.t("popup.howIsIt")) {
+            chips
             if session.isSignedIn {
-                chips
                 feedback
             } else {
-                Button(L10n.t("nav.enter"), action: onSignIn)
-                    .frame(minHeight: 44)
                 Text(L10n.t("ios.signInPrompt")).font(.footnote).foregroundStyle(.secondary)
             }
         }
@@ -30,6 +29,7 @@ struct QuickReviewSection: View {
         HStack(spacing: 8) {
             ForEach(QuickReviewModel.chips, id: \.self) { status in
                 Button {
+                    guard session.isSignedIn else { onSignIn(); return }
                     // The position only counts if permission was already given.
                     let fix = location.isAuthorized ? location.location : nil
                     Task { if await model.tap(status, fix: fix) { await onChange() } }
@@ -42,6 +42,9 @@ struct QuickReviewSection: View {
                         }
                         Text(L10n.t(status.labelKey))
                             .font(.footnote.weight(.semibold))
+                            // The tint on its own tinted fill was unreadable in dark mode;
+                            // the emoji already carries the status.
+                            .foregroundStyle(Color.primary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
                     }

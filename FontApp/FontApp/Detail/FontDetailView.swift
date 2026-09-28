@@ -115,14 +115,16 @@ struct FontDetailView: View {
                         .frame(minHeight: 44)
                 }
             }
-            // What decides whether to walk there comes first; at half height the sheet
-            // shows the status and the way there, and the photo is one swipe away.
-            statusSection(font)
+            // The short card, what the sheet opens at (as the web's popup): the status in
+            // one line, the three chips where the thumb is, and the way there. The rest is
+            // one swipe up.
+            statusLine(font)
             if let quick = model.quickReview {
                 QuickReviewSection(model: quick, onChange: { await model.load() },
                                    onSignIn: { showsSignIn = true })
             }
             Section { directionsButton(font) }
+            statusSection(font)
             if font.image == nil, let upload = model.photoUpload {
                 PhotoSection(model: upload, onUploaded: { await model.load() },
                              onCamera: { showsCamera = true })
@@ -186,24 +188,39 @@ struct FontDetailView: View {
         .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
     }
 
+    /// The status, how much to trust it and when, in one row: what the short card has room for.
+    private func statusLine(_ font: FontDetail) -> some View {
+        let evidence = model.evidence(for: font)
+        let level = Confidence.level(of: evidence)
+        return Section {
+            HStack(spacing: 8) {
+                if let status = WaterStatus(evidence.lastWaterStatus) {
+                    StatusBadge(status: status)
+                }
+                Text("\(level.emoji) \(L10n.t(level.labelKey))")
+                    .font(.subheadline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Spacer(minLength: 0)
+                if let date = evidence.lastUpdate {
+                    Text(RelativeTime.string(since: date))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            .accessibilityElement(children: .combine)
+        }
+        .listSectionSpacing(.compact)
+    }
+
+    /// What the one-line status means, for whoever doubts it: below the short card.
     private func statusSection(_ font: FontDetail) -> some View {
         let evidence = model.evidence(for: font)
         let level = Confidence.level(of: evidence)
-        let status = WaterStatus(evidence.lastWaterStatus)
         // A stale status is still shown, but not as the current one.
         let title = level == .stale ? "detail.lastReportedStatus" : "detail.currentStatus"
         return Section(L10n.t(title)) {
-            if let status {
-                HStack {
-                    StatusBadge(status: status)
-                    Spacer()
-                    if let date = evidence.lastUpdate {
-                        Text(RelativeTime.string(since: date))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(level.emoji) \(L10n.t(level.labelKey))").font(.headline)
                 Text(L10n.t(level.detailKey)).font(.subheadline).foregroundStyle(.secondary)
@@ -277,6 +294,8 @@ struct StatusBadge: View {
     var body: some View {
         Text("\(status.emoji) \(L10n.t(status.labelKey))")
             .font(.subheadline.weight(.semibold))
+            .lineLimit(1)
+            .fixedSize()
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
             .background(status.color.opacity(0.18), in: Capsule())
