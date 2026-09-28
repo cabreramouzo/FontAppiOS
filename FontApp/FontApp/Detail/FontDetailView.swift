@@ -304,7 +304,12 @@ struct FontDetailView: View {
     private func toggleStar(_ font: FontDetail) {
         guard session.isSignedIn else { showsSignIn = true; return }
         Task {
-            do { try await favorites.toggle(font.summary) } catch { favoriteError = ErrorText.describe(error) }
+            do {
+                let adding = !favorites.contains(font.id)
+                try await favorites.toggle(font.summary)
+                // Following a fountain is when "it went dry" becomes worth a notice.
+                if adding { PushNotifications.shared.askIfUseful() }
+            } catch { favoriteError = ErrorText.describe(error) }
         }
     }
 

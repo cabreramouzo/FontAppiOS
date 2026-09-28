@@ -99,6 +99,8 @@ struct ReportSheet: View {
                     _ = try await APIClient.shared.updateReport(editing.id, on: fontID, message: report.message)
                 } else {
                     _ = try await APIClient.shared.postReport(on: fontID, report)
+                    // Writing to people is when their answer becomes worth a notice.
+                    PushNotifications.shared.askIfUseful()
                 }
                 FormDraft.save(Draft?.none, key: draftKey)
                 await onPosted()

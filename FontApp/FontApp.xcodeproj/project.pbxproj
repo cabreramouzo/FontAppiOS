@@ -415,6 +415,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				CODE_SIGN_ENTITLEMENTS = FontApp.entitlements;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "FontApp uses the camera to take the photo of a fountain.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "FontApp uses your location to show you the fountains and news near you.";
@@ -449,6 +450,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				CODE_SIGN_ENTITLEMENTS = FontApp.entitlements;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "FontApp uses the camera to take the photo of a fountain.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "FontApp uses your location to show you the fountains and news near you.";

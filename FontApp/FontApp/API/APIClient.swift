@@ -193,6 +193,21 @@ nonisolated struct APIClient: Sendable {
         try await get("/auth/me")
     }
 
+    /// This iPhone's APNs token, so the account's notices reach it.
+    func registerPushToken(_ token: String, sandbox: Bool) async throws {
+        struct Body: Encodable { let token: String; let sandbox: Bool }
+        let _: Ignored = try await send("POST", "/push/apns",
+                                        body: .json(try JSONEncoder().encode(Body(token: token, sandbox: sandbox))),
+                                        timeout: writeTimeout)
+    }
+
+    /// Before signing out: this phone stops receiving that account's notices.
+    func removePushToken(_ token: String) async throws {
+        struct Body: Encodable { let token: String }
+        let _: Ignored = try await send("POST", "/push/apns/remove",
+                                        body: .json(try JSONEncoder().encode(Body(token: token))), timeout: writeTimeout)
+    }
+
     func logout() async throws {
         let _: Ignored = try await send("POST", "/auth/logout", timeout: writeTimeout)
     }

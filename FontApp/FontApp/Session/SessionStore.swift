@@ -71,6 +71,9 @@ final class SessionStore {
     /// Revokes the token on the server when possible, and forgets it here in any case:
     /// signing out must work without signal.
     func signOut() async {
+        // First, while the token still authenticates: this phone stops getting the
+        // account's notices.
+        await PushNotifications.shared.signingOut()
         try? await api.logout()
         clear()
     }

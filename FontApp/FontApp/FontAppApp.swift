@@ -2,6 +2,7 @@ import SwiftUI
 
 @main
 struct FontAppApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @State private var location = LocationService()
     @State private var session: SessionStore
@@ -44,6 +45,8 @@ struct FontAppApp: App {
                     celebrations.contributed(session.userID)
                 }
                 .task {
+                    PushNotifications.shared.sessionChanged(to: session.userID)
+                    await PushNotifications.shared.refresh()
                     favorites.sessionChanged(to: session.userID)
                     await session.refresh()
                     celebrations.checkAtLaunch(session.userID)
@@ -54,6 +57,7 @@ struct FontAppApp: App {
                     }
                 }
                 .onChange(of: session.userID) { _, userID in
+                    PushNotifications.shared.sessionChanged(to: userID)
                     outbox.sessionChanged(to: userID)
                     sync.flush(reason: "session")
                     bell.clear()
@@ -66,6 +70,7 @@ struct FontAppApp: App {
             switch phase {
             case .active:
                 sync.flush(reason: "foreground")
+                Task { await PushNotifications.shared.refresh() }
                 celebrations.checkAtLaunch(session.userID)
                 if session.isSignedIn { Task { await bell.reload() } }
             case .background: sync.scheduleBackgroundFlush()

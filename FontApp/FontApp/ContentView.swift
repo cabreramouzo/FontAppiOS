@@ -5,6 +5,8 @@ struct ContentView: View {
     @State private var tab = AppTab.map
 
     @State private var focus: MapFocus?
+    /// A fontapp.net link or a tapped notice, shown over whatever tab is open.
+    @State private var deepLink: DeepLink?
 
     enum AppTab: Hashable { case map, news, favorites, me, search }
 
@@ -51,7 +53,27 @@ struct ContentView: View {
             }
         }
         // A GPX opened from another app is a route to show on the map.
-        .onOpenURL { url in if url.isFileURL { tab = .map } }
+        .onOpenURL { url in
+            if url.isFileURL { tab = .map } else { deepLink = DeepLink(url) }
+        }
+        .onChange(of: PushNotifications.shared.opened) { _, url in
+            guard let url else { return }
+            deepLink = DeepLink(url)
+            PushNotifications.shared.opened = nil
+        }
+        .sheet(item: $deepLink) { link in
+            NavigationStack {
+                Group {
+                    switch link {
+                    case .fountain(let id): FontDetailView(fontID: id)
+                    case .profile(let handle): UserProfileScreen(handle: handle).profileNavigation()
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) { Button(role: .close) { deepLink = nil } }
+                }
+            }
+        }
     }
 }
 
