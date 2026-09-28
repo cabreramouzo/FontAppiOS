@@ -214,8 +214,9 @@ struct MapScreen: View {
             showsSignIn = true
             return
         }
-        // A half-filled form comes back as it was left, pin included.
-        let draft = NewFontDraft.load() ?? {
+        // A half-filled form comes back as it was left, pin included. One with nothing
+        // written is not a draft: its pin would pin every new fountain to the same spot.
+        let draft = NewFontDraft.load().flatMap { $0.isEmpty ? nil : $0 } ?? {
             let center = controller.mapView?.centerCoordinate ?? CLLocationCoordinate2D(latitude: 41.8, longitude: 2.1)
             let start = NewFontPlacement.start(mapCenter: center, me: location.isAuthorized ? location.location : nil)
             return NewFontDraft(latitude: start.latitude, longitude: start.longitude)
