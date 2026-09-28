@@ -4,6 +4,271 @@
     "" : {
 
     },
+    "ios.deleteAccount.pending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abans s’enviarà el que tens pendent en aquest telèfon ({n}); el que no es pugui enviar es perdrà."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What is still waiting on this phone ({n}) is sent first; anything that can’t be sent is lost."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antes se enviará lo que tienes pendiente en este teléfono ({n}); lo que no se pueda enviar se perderá."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lehenik, telefono honetan zain duzuna bidaliko da ({n}); bidali ezin dena galdu egingo da."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce qui attend encore sur ce téléphone ({n}) est d’abord envoyé ; ce qui ne peut pas l’être est perdu."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antes enviarase o que tes pendente neste teléfono ({n}); o que non se poida enviar perderase."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prima viene inviato ciò che hai in sospeso su questo telefono ({n}); ciò che non si può inviare va perso."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primeiro é enviado o que tens pendente neste telemóvel ({n}); o que não for possível enviar perde-se."
+          }
+        }
+      }
+    },
+    "profile.confirmDelete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segur? S'eliminaran les teves dades personals i el compte. Les teves aportacions (fonts i ressenyes) es conservaran de forma anònima. Aquesta acció no es pot desfer."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure? Your personal data and account will be deleted. Your contributions (fountains and reviews) will be kept anonymously. This cannot be undone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Seguro? Se eliminarán tus datos personales y la cuenta. Tus aportaciones (fuentes y reseñas) se conservarán de forma anónima. Esta acción no se puede deshacer."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziur? Zure datu pertsonalak eta kontua ezabatuko dira. Zure ekarpenak (iturriak eta iruzkinak) modu anonimoan gordeko dira. Ekintza hau ezin da desegin."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es-tu sûr? Vos données personnelles et votre compte seront supprimés. Vos contributions (fontaines et avis) seront conservées de manière anonyme. Cela ne peut pas être annulé."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seguro? Eliminaranse os teus datos persoais e a conta. As túas achegas (fontes e reseñas) conservaranse de forma anónima. Esta acción non se pode desfacer."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sei sicuro? Verranno eliminati i tuoi dati personali e l’account. I tuoi contributi (fontane e recensioni) resteranno in forma anonima. Questa azione non si può annullare."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tens a certeza? Os teus dados pessoais e a conta serão eliminados. As tuas contribuições (fontes e avaliações) serão mantidas de forma anónima. Esta ação não pode ser desfeita."
+          }
+        }
+      }
+    },
+    "profile.dangerZone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zona de perill"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danger zone"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zona de peligro"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrisku eremua"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zone dangereuse"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zona de perigo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zona di pericolo"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zona de perigo"
+          }
+        }
+      }
+    },
+    "profile.dangerZoneHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "S'eliminaran les teves dades personals. Les teves aportacions es conservaran de forma anònima."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your personal data will be deleted. Your contributions will be kept anonymously."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se eliminarán tus datos personales. Tus aportaciones se conservarán de forma anónima."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zure datu pertsonalak ezabatuko dira. Zure ekarpenak modu anonimoan gordeko dira."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos données personnelles seront supprimées. Vos contributions seront conservées de manière anonyme."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminaranse os teus datos persoais. As túas achegas conservaranse de forma anónima."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verranno eliminati i tuoi dati personali. I tuoi contributi resteranno in forma anonima."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os teus dados pessoais serão eliminados. As tuas contribuições serão mantidas de forma anónima."
+          }
+        }
+      }
+    },
+    "profile.deleteAccount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esborra el meu compte"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete my account"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar mi cuenta"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ezabatu nire kontua"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer mon compte"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar a miña conta"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina il mio account"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apagar a minha conta"
+          }
+        }
+      }
+    },
     "—" : {
 
     },

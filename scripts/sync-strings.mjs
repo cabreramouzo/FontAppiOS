@@ -8,7 +8,7 @@
 // Keys keep the web names (`status.flowing`) and the web placeholders (`{n}`), which
 // `L10n.t` fills in. Strings that exist only in the app live in IOS_ONLY below.
 
-import { writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -41,10 +41,21 @@ const KEYS = [
   'detail.confirmedByOne', 'detail.confirmedByMany', 'detail.statusReviews', 'detail.beFirst',
   'detail.incidents', 'detail.noIncidents', 'detail.loading', 'detail.directions',
   'detail.addPhoto', 'detail.firstPhotoNote', 'nav.logout', 'nav.enter', 'staff.tag', 'settings.account', 'photo.failed',
+  'profile.deleteAccount', 'profile.confirmDelete', 'profile.dangerZone', 'profile.dangerZoneHint',
   'detail.noPhotoYet', 'detail.municipality', 'detail.region', 'detail.country', 'detail.stale',
 ]
 
 const IOS_ONLY = {
+  'ios.deleteAccount.pending': {
+    ca: 'Abans s’enviarà el que tens pendent en aquest telèfon ({n}); el que no es pugui enviar es perdrà.',
+    es: 'Antes se enviará lo que tienes pendiente en este teléfono ({n}); lo que no se pueda enviar se perderá.',
+    gl: 'Antes enviarase o que tes pendente neste teléfono ({n}); o que non se poida enviar perderase.',
+    eu: 'Lehenik, telefono honetan zain duzuna bidaliko da ({n}); bidali ezin dena galdu egingo da.',
+    en: 'What is still waiting on this phone ({n}) is sent first; anything that can’t be sent is lost.',
+    fr: 'Ce qui attend encore sur ce téléphone ({n}) est d’abord envoyé ; ce qui ne peut pas l’être est perdu.',
+    pt: 'Primeiro é enviado o que tens pendente neste telemóvel ({n}); o que não for possível enviar perde-se.',
+    it: 'Prima viene inviato ciò che hai in sospeso su questo telefono ({n}); ciò che non si può inviare va perso.',
+  },
   'ios.comingSoon': {
     ca: 'Aviat', es: 'Próximamente', gl: 'Proximamente', eu: 'Laster', en: 'Coming soon',
     fr: 'Bientôt', pt: 'Brevemente', it: 'Prossimamente',
@@ -210,5 +221,37 @@ for (const [key, texts] of Object.entries(IOS_ONLY)) {
 
 const here = dirname(fileURLToPath(import.meta.url))
 const out = join(here, '../FontApp/FontApp/Localizable.xcstrings')
-writeFileSync(out, JSON.stringify({ sourceLanguage: 'ca', strings, version: '1.0' }, null, 2) + '\n')
-console.log(`${Object.keys(strings).length} keys → ${out}`)
+
+// Keep what Xcode extracted by itself (format strings like "%lld km", with no
+// translations), and write the file the way Xcode does: same key order, " : " and
+// blank empty objects. Otherwise every run and every build rewrite the whole file.
+const previous = existsSync(out) ? JSON.parse(readFileSync(out, 'utf8')).strings : {}
+for (const [key, entry] of Object.entries(previous)) {
+  if (!(key in strings) && entry.extractionState !== 'manual') strings[key] = entry
+}
+// Xcode's order is its own (roughly case-insensitive): keep the keys it placed where they
+// are, and slot new ones in before the first key that sorts after them.
+const order = Object.keys(previous).filter((k) => k in strings)
+for (const key of Object.keys(strings).sort(xcodeOrder)) {
+  if (order.includes(key)) continue
+  const at = order.findIndex((k) => xcodeOrder(k, key) > 0)
+  order.splice(at === -1 ? order.length : at, 0, key)
+}
+const ordered = {}
+for (const key of order) ordered[key] = sortKeys(strings[key])
+const json = JSON.stringify({ sourceLanguage: 'ca', strings: ordered, version: '1.0' }, null, 2)
+  .replace(/^(\s*"(?:[^"\\]|\\.)*"): /gm, '$1 : ')
+  .replace(/^(\s*)(.*)\{\}(,?)$/gm, '$1$2{\n\n$1}$3')
+writeFileSync(out, json)
+console.log(`${Object.keys(ordered).length} keys → ${out}`)
+
+// Inside an entry Xcode sorts plainly: languages, then "state" before "value".
+function sortKeys(value) {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return value
+  return Object.fromEntries(Object.keys(value).sort().map((k) => [k, sortKeys(value[k])]))
+}
+
+function xcodeOrder(a, b) {
+  const x = a.toLowerCase(), y = b.toLowerCase()
+  return x < y ? -1 : x > y ? 1 : 0
+}

@@ -75,6 +75,14 @@ final class SessionStore {
         clear()
     }
 
+    /// Deletes (anonymises) the account on the server, then forgets it here. Unlike
+    /// signing out it needs signal: nothing is forgotten until the server has agreed.
+    func deleteAccount() async throws {
+        guard let userID else { return }
+        try await api.deleteAccount(userID)
+        clear()
+    }
+
     private func tokenWasRejected(_ token: String?) {
         // A late 401 for a token already replaced by a new sign-in must not end it.
         guard let token, token == api.credentials.current else { return }

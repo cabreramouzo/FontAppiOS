@@ -179,6 +179,12 @@ nonisolated struct APIClient: Sendable {
         let _: Ignored = try await send("POST", "/auth/logout", timeout: writeTimeout)
     }
 
+    /// Anonymises the account (`DELETE /users/:id`): name, email and sign-ins go, the
+    /// fountains and reviews stay without a name. The server revokes every token.
+    func deleteAccount(_ userID: UUID) async throws {
+        let _: Ignored = try await send("DELETE", "/users/\(userID.uuidString)", timeout: writeTimeout)
+    }
+
     // MARK: Contributing
 
     /// `queuedOffline`: it was written without signal and sent later from the outbox.

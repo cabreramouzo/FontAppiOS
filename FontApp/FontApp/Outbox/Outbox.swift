@@ -139,6 +139,11 @@ final class Outbox {
         for item in items where !onlyOthers || !isMine(item) { remove(item.id) }
     }
 
+    /// After deleting an account: what it left here can never be sent under it again.
+    func discard(queuedBy userID: UUID) {
+        for item in items where item.userID == userID { remove(item.id) }
+    }
+
     func photoData(of item: OutboxItem) -> Data? {
         item.photoFile.flatMap { try? Data(contentsOf: directory.appending(path: $0)) }
     }
