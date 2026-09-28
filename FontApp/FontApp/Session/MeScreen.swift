@@ -30,7 +30,10 @@ struct MeScreen: View {
                             Text(L10n.t("ios.signInPrompt"))
                         }
                         PendingSection()
-                        Section { LegalLink() }
+                        Section {
+                            NavigationLink(L10n.t("nav.guide")) { GuideScreen() }
+                            LegalLink()
+                        }
                     }
                 } else {
                     ContentUnavailableView {
@@ -41,6 +44,8 @@ struct MeScreen: View {
                         Button(L10n.t("nav.enter")) { showsSignIn = true }
                             .buttonStyle(.borderedProminent)
                             .controlSize(.large)
+                        // Before an account: what it is for, and the rules of the game.
+                        NavigationLink(L10n.t("nav.guide")) { GuideScreen() }
                         LegalLink()
                     }
                 }
@@ -98,7 +103,15 @@ struct MeScreen: View {
                 }
                 .disabled(isSigningOut || isDeleting)
             }
-            Section { LegalLink() }
+            Section {
+                NavigationLink { GuideScreen() } label: {
+                    Label(L10n.t("nav.guide"), systemImage: "questionmark.circle").frame(minHeight: 44)
+                }
+                NavigationLink { GamificationGuideScreen() } label: {
+                    Label(L10n.t("gamePage.title"), systemImage: "drop").frame(minHeight: 44)
+                }
+                LegalLink()
+            }
             deletion
         }
         .refreshable { await reload() }
