@@ -3,6 +3,7 @@ import SwiftUI
 /// What has happened lately: new fountains, reviews and reports, with a photo.
 struct NewsScreen: View {
     @Environment(LocationService.self) private var location
+    @Environment(SessionStore.self) private var session
     @State private var model = NewsModel()
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -16,6 +17,7 @@ struct NewsScreen: View {
             .navigationSubtitle(filterSummary)
             .navigationDestination(for: UUID.self) { FontDetailView(fontID: $0) }
             .toolbar {
+                if session.isSignedIn { ToolbarItem(placement: .topBarLeading) { BellButton() } }
                 ToolbarItem(placement: .topBarTrailing) { filterMenu }
             }
             .refreshable { await model.reload(location: location.location) }

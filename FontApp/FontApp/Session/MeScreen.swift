@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The "Me" tab: the account, signing out and deleting the account. The rest of the web's
-/// profile comes later.
+/// The "Me" tab: the account, the bell, signing out and deleting the account. The rest of
+/// the web's profile comes later.
 struct MeScreen: View {
     @Environment(SessionStore.self) private var session
     @Environment(Outbox.self) private var outbox
@@ -40,6 +40,9 @@ struct MeScreen: View {
                 }
             }
             .navigationTitle(L10n.t("nav.profile"))
+            .toolbar {
+                if session.isSignedIn { ToolbarItem(placement: .topBarTrailing) { BellButton() } }
+            }
             .sheet(isPresented: $showsSignIn) { SignInView() }
         }
     }

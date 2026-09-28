@@ -19,7 +19,7 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
 const PREFIXES = ['country.', 'layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
-  'login.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.', 'gpx.', 'gpxIn.', 'newFont.', 'draft.', 'mission.']
+  'login.', 'notif.', 'popup.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.', 'gpx.', 'gpxIn.', 'newFont.', 'draft.', 'mission.']
 const KEYS = [
   'map.geoDenied', 'map.geoUnavailable',
   'detail.edit', 'detail.editInfoHint', 'detail.editInfoNote', 'detail.editingTitle', 'detail.replacePhoto',
@@ -42,6 +42,7 @@ const KEYS = [
   'detail.incidents', 'detail.noIncidents', 'detail.loading', 'detail.directions',
   'detail.addPhoto', 'detail.firstPhotoNote', 'nav.logout', 'nav.enter', 'staff.tag', 'settings.account', 'photo.failed',
   'profile.deleteAccount', 'profile.confirmDelete', 'profile.dangerZone', 'profile.dangerZoneHint',
+  'maintenance.recovered',
   'detail.noPhotoYet', 'detail.municipality', 'detail.region', 'detail.country', 'detail.stale',
 ]
 
@@ -55,6 +56,16 @@ const IOS_ONLY = {
     fr: 'Ce qui attend encore sur ce téléphone ({n}) est d’abord envoyé ; ce qui ne peut pas l’être est perdu.',
     pt: 'Primeiro é enviado o que tens pendente neste telemóvel ({n}); o que não for possível enviar perde-se.',
     it: 'Prima viene inviato ciò che hai in sospeso su questo telefono ({n}); ciò che non si può inviare va perso.',
+  },
+  'ios.bell.empty': {
+    ca: 'Aquí veuràs quan algú et mencioni, confirmi la teva ressenya o passi alguna cosa a una font que segueixes.',
+    es: 'Aquí verás cuándo alguien te menciona, confirma tu reseña o pasa algo en una fuente que sigues.',
+    gl: 'Aquí verás cando alguén te menciona, confirma a túa reseña ou pasa algo nunha fonte que segues.',
+    eu: 'Hemen ikusiko duzu norbaitek aipatzen zaituenean, zure iritzia berresten duenean edo jarraitzen duzun iturri batean zerbait gertatzen denean.',
+    en: 'Here you’ll see when someone mentions you, confirms your review or something happens at a fountain you follow.',
+    fr: 'Ici, vous verrez quand quelqu’un vous mentionne, confirme votre avis ou quand il se passe quelque chose à une fontaine que vous suivez.',
+    pt: 'Aqui vais ver quando alguém te menciona, confirma a tua avaliação ou acontece algo numa fonte que segues.',
+    it: 'Qui vedrai quando qualcuno ti menziona, conferma la tua recensione o succede qualcosa a una fontana che segui.',
   },
   'ios.comingSoon': {
     ca: 'Aviat', es: 'Próximamente', gl: 'Proximamente', eu: 'Laster', en: 'Coming soon',

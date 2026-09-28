@@ -266,3 +266,22 @@ nonisolated struct NewAccount: Encodable, Equatable, Sendable {
     /// Language of the welcome email (the web's codes: ca, es, gl, eu, en, fr, pt, it).
     let lang: String?
 }
+
+/// A notice in the in-app bell (`GET /notifications`). `excerpt` is often a code, not a
+/// sentence (`review:dry`, `7|6|142`): the server does not know the reader's language.
+nonisolated struct NotificationItem: Codable, Identifiable, Equatable, Sendable {
+    let id: UUID
+    let kind: String
+    let actorName: String
+    /// `nil` when the fountain was deleted: the notice stays, but no longer links.
+    let fontID: UUID?
+    let fontName: String?
+    let excerpt: String
+    let read: Bool
+    let createdAt: Date?
+}
+
+nonisolated struct NotificationInbox: Codable, Sendable {
+    let unread: Int
+    let items: [NotificationItem]
+}

@@ -7,6 +7,7 @@ struct FontAppApp: App {
     @State private var session: SessionStore
     @State private var outbox: Outbox
     @State private var sync: OutboxSync
+    @State private var bell = Bell()
 
     init() {
         let session = SessionStore()
@@ -25,15 +26,23 @@ struct FontAppApp: App {
                 .environment(session)
                 .environment(outbox)
                 .environment(OfflineZones.shared)
-                .task { await session.refresh() }
+                .environment(bell)
+                .task {
+                    await session.refresh()
+                    if session.isSignedIn { await bell.reload() }
+                }
                 .onChange(of: session.userID) { _, userID in
                     outbox.sessionChanged(to: userID)
                     sync.flush(reason: "session")
+                    bell.clear()
+                    if userID != nil { Task { await bell.reload() } }
                 }
         }
         .onChange(of: scenePhase) { _, phase in
             switch phase {
-            case .active: sync.flush(reason: "foreground")
+            case .active:
+                sync.flush(reason: "foreground")
+                if session.isSignedIn { Task { await bell.reload() } }
             case .background: sync.scheduleBackgroundFlush()
             default: break
             }

@@ -185,6 +185,18 @@ nonisolated struct APIClient: Sendable {
         let _: Ignored = try await send("DELETE", "/users/\(userID.uuidString)", timeout: writeTimeout)
     }
 
+    // MARK: Bell
+
+    /// The in-app notifications. Reading them does **not** mark them read: that happens
+    /// when the bell is opened, or any launch would empty it before it was looked at.
+    func notifications() async throws -> NotificationInbox {
+        try await get("/notifications")
+    }
+
+    func markNotificationsRead() async throws {
+        let _: Ignored = try await send("POST", "/notifications/read", timeout: writeTimeout)
+    }
+
     // MARK: Contributing
 
     /// `queuedOffline`: it was written without signal and sent later from the outbox.

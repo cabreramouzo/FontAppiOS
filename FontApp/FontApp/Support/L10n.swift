@@ -31,8 +31,8 @@ nonisolated enum L10n {
 
     /// A fountain's display name. Names are never translated or invented: an imported
     /// point without one reads "unnamed fountain" in the reader's language.
-    static func fontName(_ name: String?) -> String {
+    static func fontName(_ name: String?, bundle: Bundle = .main) -> String {
         if let name, !name.trimmingCharacters(in: .whitespaces).isEmpty { return name }
-        return t("font.unnamed")
+        return t("font.unnamed", bundle: bundle)
     }
 }
