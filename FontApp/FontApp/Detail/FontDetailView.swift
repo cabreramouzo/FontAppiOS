@@ -180,8 +180,7 @@ struct FontDetailView: View {
             item.name = L10n.fontName(font.name)
             item.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
         } label: {
-            Label(L10n.t("detail.directions"), systemImage: "figure.walk")
-                .frame(maxWidth: .infinity, minHeight: 44)
+            WideButtonLabel(L10n.t("detail.directions"), systemImage: "figure.walk")
         }
         .buttonStyle(.borderedProminent)
         .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
@@ -246,6 +245,29 @@ struct FontDetailView: View {
     /// The web labels end in a colon ("Tipus:"); a `LabeledContent` row does not need it.
     private func label(_ key: String) -> String {
         L10n.t(key).trimmingCharacters(in: CharacterSet(charactersIn: ": "))
+    }
+}
+
+/// Icon and title centred together in a full-width button. A `Label` inside a list row
+/// takes the list's label style: the icon goes missing and the title keeps its column,
+/// so it sits off centre.
+struct WideButtonLabel: View {
+    let title: String
+    let systemImage: String
+
+    init(_ title: String, systemImage: String) {
+        self.title = title
+        self.systemImage = systemImage
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+            Text(title)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity, minHeight: 44)
     }
 }
 

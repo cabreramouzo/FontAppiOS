@@ -45,14 +45,12 @@ struct PhotoSection: View {
             HStack(spacing: 8) {
                 if cameraAvailable {
                     Button(action: onCamera) {
-                        Label(L10n.t("ios.takePhoto"), systemImage: "camera")
-                            .frame(maxWidth: .infinity, minHeight: 44)
+                        WideButtonLabel(L10n.t("ios.takePhoto"), systemImage: "camera")
                     }
                     .buttonStyle(.borderedProminent)
                 }
                 PhotosPicker(selection: $pickerItem, matching: .images) {
-                    Label(L10n.t("ios.choosePhoto"), systemImage: "photo.on.rectangle")
-                        .frame(maxWidth: .infinity, minHeight: 44)
+                    WideButtonLabel(L10n.t("ios.choosePhoto"), systemImage: "photo.on.rectangle")
                 }
                 .buttonStyle(.bordered)
                 .onChange(of: pickerItem) { _, item in
