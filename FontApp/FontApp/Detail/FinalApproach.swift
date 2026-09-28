@@ -59,9 +59,10 @@ final class ApproachTracker: NSObject, CLLocationManagerDelegate {
 
     /// Never asks: without permission already given nobody knows you are near, and a
     /// prompt on every page ends in a "deny" that stays.
-    func start() {
-        let status = manager.authorizationStatus
-        guard status == .authorizedWhenInUse || status == .authorizedAlways else { return }
+    /// `authorized` comes from the app's `LocationService`, which already knows: asking
+    /// the manager here would wait for the system's location service on the main thread.
+    func start(authorized: Bool) {
+        guard authorized else { return }
         manager.startUpdatingLocation()
         if CLLocationManager.headingAvailable() { manager.startUpdatingHeading() }
     }

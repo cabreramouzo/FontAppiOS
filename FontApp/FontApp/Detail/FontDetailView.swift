@@ -95,7 +95,9 @@ struct FontDetailView: View {
             withAnimation { followUp = fact }
         }
         .profileNavigation()
-        .onAppear { approach.start() }
+        .onAppear { approach.start(authorized: location.isAuthorized) }
+        // Permission granted while the page is open, or known only after launch.
+        .onChange(of: location.isAuthorized) { _, on in approach.start(authorized: on) }
         .onDisappear { approach.stop() }
         // Dry, broken or gone: where the nearest water is, as the web says it. Only then:
         // a fountain that flows needs no alternative.

@@ -14,7 +14,10 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     }
 
     override init() {
-        authorization = manager.authorizationStatus
+        // Not read here: `authorizationStatus` waits for the system's location service,
+        // and at launch that froze the app on a blank screen whenever the service was
+        // slow. CoreLocation reports it right after the delegate is set, below.
+        authorization = .notDetermined
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
