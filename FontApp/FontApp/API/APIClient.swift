@@ -204,6 +204,21 @@ nonisolated struct APIClient: Sendable {
                                         timeout: writeTimeout)
     }
 
+    /// The nearest fountain with confirmed water, for a page whose last report says it is
+    /// dry, broken or gone. `nil` when there is none (204).
+    func nearestWater(_ fontID: UUID) async throws -> NearestWater? {
+        try await get("/fonts/\(fontID.uuidString)/nearest-water")
+    }
+
+    /// Reports a fountain to the moderators. Private; three different people put it in
+    /// quarantine until someone reviews it.
+    func flagFont(_ fontID: UUID, reason: String) async throws {
+        struct Flag: Encodable { let targetType = "font"; let targetID: UUID; let fontID: UUID; let reason: String }
+        let _: Ignored = try await send("POST", "/flags",
+                                        body: .json(try JSONEncoder().encode(Flag(targetID: fontID, fontID: fontID, reason: reason))),
+                                        timeout: writeTimeout)
+    }
+
     /// `nil` when the game is switched off (204).
     func gamification() async throws -> GamificationSummary? { try await get("/gamification/me") }
     func guardedFonts() async throws -> [GuardedFont] { try await get("/gamification/guarded") }

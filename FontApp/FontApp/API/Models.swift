@@ -96,6 +96,16 @@ nonisolated struct FontDetail: Codable, Identifiable, Sendable {
     let statusConflict: Bool?
 }
 
+/// `GET /fonts/:id/nearest-water`.
+nonisolated struct NearestWater: Codable, Identifiable, Sendable {
+    let id: UUID
+    let name: String?
+    let source: WaterSource?
+    let latitude: Double
+    let longitude: Double
+    let distanceKm: Double
+}
+
 extension FontSummary {
     /// A page as a summary, for opening it from lists that only carry an id.
     nonisolated init(_ d: FontDetail) {

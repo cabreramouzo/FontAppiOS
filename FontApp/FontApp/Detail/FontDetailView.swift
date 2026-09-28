@@ -11,6 +11,11 @@ struct FontDetailView: View {
     @State private var showsSignIn = false
     @State private var showsCamera = false
     @State private var editor: FontEditModel?
+    @State private var nearWater: NearestWater?
+    @State private var flagging = false
+    @State private var notice: String?
+    @State private var copied = false
+    @Environment(\.showOnMap) private var showOnMap
     @Environment(LocationService.self) private var location
     /// What the caller already knows, shown while the rest loads.
     private let preview: FontSummary?
@@ -46,6 +51,9 @@ struct FontDetailView: View {
                 if let font = loadedFont { star(font) }
             }
             ToolbarItem(placement: .topBarTrailing) {
+                if let font = loadedFont { moreMenu(font) }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 if case .loaded(let font) = model.state, let userID = session.userID {
                     Button {
                         editor = FontEditModel(font: font, userID: userID)
@@ -59,6 +67,27 @@ struct FontDetailView: View {
             }
         }
         .task { await model.load() }
+        // Dry, broken or gone: where the nearest water is, as the web says it. Only then:
+        // a fountain that flows needs no alternative.
+        .task(id: loadedFont.map { model.evidence(for: $0).lastWaterStatus }) {
+            guard let font = loadedFont,
+                  ["dry", "broken", "gone"].contains(model.evidence(for: font).lastWaterStatus ?? "") else {
+                nearWater = nil
+                return
+            }
+            nearWater = try? await APIClient.shared.nearestWater(font.id)
+        }
+        .confirmationDialog(L10n.t("flag.fontTitle"), isPresented: $flagging, titleVisibility: .visible) {
+            ForEach(["fake", "duplicate", "nonexistent", "spam", "abuse"], id: \.self) { reason in
+                Button(L10n.t("flag.reason.\(reason)"), role: .destructive) { flag(reason) }
+            }
+            Button(L10n.t("form.cancel"), role: .cancel) {}
+        } message: {
+            Text(L10n.t("flag.fontHelp"))
+        }
+        .alert(notice ?? "", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
+            Button("OK", role: .cancel) {}
+        }
         .alert(favoriteError ?? "", isPresented: Binding(get: { favoriteError != nil }, set: { if !$0 { favoriteError = nil } })) {
             Button("OK", role: .cancel) {}
         }
@@ -99,6 +128,74 @@ struct FontDetailView: View {
 
     private var loadedFont: FontDetail? { model.font }
 
+    /// Share, copy the coordinates and report: what the web has as a row of buttons, here
+    /// in the "more" menu, where iOS keeps the actions nobody needs on every visit.
+    private func moreMenu(_ font: FontDetail) -> some View {
+        Menu {
+            ShareLink(item: shareText(font)) {
+                Label(L10n.t("detail.share"), systemImage: "square.and.arrow.up")
+            }
+            Button {
+                UIPasteboard.general.string = String(format: "%.6f, %.6f", font.latitude, font.longitude)
+                copied.toggle()
+                notice = L10n.t("toast.coordsCopied")
+            } label: {
+                Label(String(format: "%.6f, %.6f", font.latitude, font.longitude), systemImage: "doc.on.doc")
+            }
+            // Not on your own fountain, and only with a session, as on the web.
+            if let userID = session.userID, font.creator?.id != userID {
+                Divider()
+                Button(role: .destructive) { flagging = true } label: {
+                    Label(L10n.t("flag.font"), systemImage: "flag")
+                }
+            }
+        } label: {
+            Label(L10n.t("detail.share"), systemImage: "ellipsis")
+        }
+        .sensoryFeedback(.success, trigger: copied)
+        .accessibilityIdentifier("fontDetail.more")
+    }
+
+    /// Says what it is without anyone opening it: it lands in a chat among other things.
+    private func shareText(_ font: FontDetail) -> String {
+        let lang = Bundle.main.preferredLocalizations.first?.split(separator: "-").first.map(String.init) ?? "ca"
+        let link = "https://fontapp.net/fonts/\(font.id.uuidString.lowercased())?lang=\(lang)"
+        return L10n.t("detail.shareText", ["name": L10n.fontName(font.name)]) + " " + link
+    }
+
+    private func flag(_ reason: String) {
+        guard let font = loadedFont else { return }
+        Task {
+            do {
+                try await APIClient.shared.flagFont(font.id, reason: reason)
+                notice = L10n.t("flag.done")
+            } catch {
+                notice = ErrorText.describe(error)
+            }
+        }
+    }
+
+    private func nearWaterSection(_ water: NearestWater) -> some View {
+        let distance = water.distanceKm < 1
+            ? "\(Int((water.distanceKm * 1000).rounded())) m"
+            : Measurement(value: water.distanceKm, unit: UnitLength.kilometers)
+                .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(0...1))))
+        return Section {
+            NavigationLink {
+                FontDetailView(fontID: water.id)
+            } label: {
+                HStack(spacing: 12) {
+                    Text("💧").font(.title2).accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L10n.t("detail.nearWaterTitle", ["dist": distance])).font(.subheadline.bold())
+                        Text(L10n.fontName(water.name)).font(.footnote).foregroundStyle(.secondary)
+                    }
+                }
+                .frame(minHeight: 44)
+            }
+        }
+    }
+
     private func content(_ font: FontDetail, offlineNote: String?) -> some View {
         List {
             if let offlineNote {
@@ -123,7 +220,20 @@ struct FontDetailView: View {
                 QuickReviewSection(model: quick, onChange: { await model.load() },
                                    onSignIn: { showsSignIn = true })
             }
-            Section { directionsButton(font) }
+            if let nearWater { nearWaterSection(nearWater) }
+            Section {
+                directionsButton(font)
+                if let showOnMap {
+                    Button {
+                        showOnMap(FontSummary(font))
+                    } label: {
+                        WideButtonLabel(L10n.t("detail.viewOnMap"), systemImage: "map")
+                    }
+                    .buttonStyle(.bordered)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 12, trailing: 16))
+                    .listRowSeparator(.hidden)
+                }
+            }
             statusSection(font)
             if font.image == nil, let upload = model.photoUpload {
                 PhotoSection(model: upload, onUploaded: { await model.load() },
@@ -268,6 +378,12 @@ struct FontDetailView: View {
 /// Icon and title centred together in a full-width button. A `Label` inside a list row
 /// takes the list's label style: the icon goes missing and the title keeps its column,
 /// so it sits off centre.
+extension EnvironmentValues {
+    /// Goes to the map and shows a fountain there. `nil` where the page is already over
+    /// the map, so "view on map" is not offered.
+    @Entry var showOnMap: ((FontSummary) -> Void)? = nil
+}
+
 struct WideButtonLabel: View {
     let title: String
     let systemImage: String

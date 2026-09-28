@@ -159,6 +159,8 @@ struct MapScreen: View {
         .sheet(item: $selected) { font in
             NavigationStack {
                 FontDetailView(fontID: font.id, preview: font)
+                    // Already over the map.
+                    .environment(\.showOnMap, nil)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button(role: .close) { selected = nil }

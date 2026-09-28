@@ -42,6 +42,14 @@ struct ContentView: View {
         }
         // A tab bar on a phone, a sidebar where the screen is wide enough.
         .tabViewStyle(.sidebarAdaptable)
+        // "View on map" from a fountain opened in Favourites, the profile or the bell.
+        .environment(\.showOnMap) { font in
+            tab = .map
+            Task {
+                try? await Task.sleep(for: .milliseconds(350))
+                focus = MapFocus(target: .fountain(font))
+            }
+        }
         // A GPX opened from another app is a route to show on the map.
         .onOpenURL { url in if url.isFileURL { tab = .map } }
     }
