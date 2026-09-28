@@ -163,20 +163,10 @@ struct MapScreen: View {
         .onChange(of: location.isAuthorized) { locateOnce() }
         .onReceive(NotificationCenter.default.publisher(for: .fontChanged)) { _ in model.refresh() }
         .sheet(item: $selected) { font in
-            NavigationStack {
-                FontDetailView(fontID: font.id, preview: font, onClose: { selected = nil })
-                    // Over the map it brings the fountain into view, close, and lowers the
-                    // sheet to the short card so the map shows around it.
-                    .environment(\.showOnMap) { font in
-                        detent = .shortCard
-                        controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
-                                        meters: 250, aboveSheet: true)
-                    }
+            FountainSheet(font: font, detent: $detent, onClose: { selected = nil }) { font in
+                controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                meters: 250, aboveSheet: true)
             }
-            // Opens as the short card: status, the three chips and the way there, with the
-            // map still in view. Up for the whole page.
-            .presentationDetents([.shortCard, .large], selection: $detent)
-            .presentationBackgroundInteraction(.enabled(upThrough: .shortCard))
         }
         .onChange(of: selected?.id) { detent = .shortCard }
     }
@@ -349,4 +339,72 @@ extension PresentationDetent {
 
 extension UTType {
     static let gpx = UTType(importedAs: "com.topografix.gpx", conformingTo: .xml)
+}
+
+/// The fountain's page over the map. Its own view, with the height as a binding.
+private struct FountainSheet: View {
+    let font: FontSummary
+    @Binding var detent: PresentationDetent
+    let onClose: () -> Void
+    let reveal: (FontSummary) -> Void
+
+    @State private var sheet = SheetHandle()
+
+    var body: some View {
+        NavigationStack {
+            FontDetailView(fontID: font.id, preview: font, onClose: onClose)
+                // Over the map it brings the fountain into view, close, and lowers the
+                // sheet to the short card so the map shows around it.
+                .environment(\.showOnMap) { font in
+                    detent = .shortCard
+                    // Once the sheet was dragged up, SwiftUI changes the selection and
+                    // leaves the sheet where it is (seen on iOS 26): UIKit's sheet is told.
+                    sheet.lowerToSmallest()
+                    reveal(font)
+                }
+                .background(SheetFinder(handle: sheet))
+        }
+        // Opens as the short card: status, the three chips and the way there, with the
+        // map still in view. Up for the whole page.
+        .presentationDetents([.shortCard, .large], selection: $detent)
+        .presentationBackgroundInteraction(.enabled(upThrough: .shortCard))
+    }
+}
+
+/// UIKit's sheet behind a SwiftUI sheet, found from inside it.
+@MainActor final class SheetHandle {
+    weak var controller: UISheetPresentationController?
+
+    /// The smallest height that is not the full page: the short card.
+    func lowerToSmallest() {
+        guard let sheet = controller,
+              let short = sheet.detents.first(where: { $0.identifier != .large }) else { return }
+        sheet.animateChanges { sheet.selectedDetentIdentifier = short.identifier }
+    }
+}
+
+private struct SheetFinder: UIViewControllerRepresentable {
+    let handle: SheetHandle
+
+    func makeUIViewController(context: Context) -> UIViewController { Probe(handle: handle) }
+    func updateUIViewController(_ controller: UIViewController, context: Context) {}
+
+    final class Probe: UIViewController {
+        let handle: SheetHandle
+        init(handle: SheetHandle) { self.handle = handle; super.init(nibName: nil, bundle: nil) }
+        required init?(coder: NSCoder) { fatalError() }
+
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            // Up the parents to the one presented as a sheet.
+            var current: UIViewController? = self
+            while let c = current {
+                if let sheet = c.sheetPresentationController, c.presentingViewController != nil {
+                    handle.controller = sheet
+                    return
+                }
+                current = c.parent
+            }
+        }
+    }
 }
