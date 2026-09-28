@@ -59,7 +59,7 @@ struct FontBadgesSection: View {
                             .foregroundStyle(row.earned ? .primary : .secondary)
                         Group {
                             if let by = row.by {
-                                Text(verbatim: "\(L10n.t("detail.badges.by")) @\(by)")
+                                HStack(spacing: 4) { Text(L10n.t("detail.badges.by")); UserLink(username: by) }
                             } else if let hint = row.hint {
                                 Text(hint)
                             }

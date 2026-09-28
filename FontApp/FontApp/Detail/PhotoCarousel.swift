@@ -102,7 +102,7 @@ struct PhotoCarousel: View {
             // what is below it.
             HStack(spacing: 8) {
                 if let review = photo.review {
-                    if let user = review.username { Text("@\(user)").font(.footnote) }
+                    if let user = review.username { UserLink(username: user).font(.footnote) }
                     if let status = WaterStatus(review.waterStatus) {
                         Text("\(L10n.t("carousel.reportedStatus")): \(status.emoji) \(L10n.t(status.labelKey))")
                             .font(.caption).foregroundStyle(.secondary)

@@ -24,6 +24,8 @@ struct FontDetailView: View {
     @State private var creatorName: String?
     @State private var creatorTier: String?
     @State private var photoAuthor: String?
+    /// Someone whose @name was tapped: their profile goes on this page's stack.
+    @State private var profile: String?
     @State private var capabilities: Set<String> = []
     @State private var editingReview: CommentResponse?
     @State private var editingReport: ReportResponse?
@@ -82,6 +84,8 @@ struct FontDetailView: View {
         .toolbar { ToolbarItem(placement: .principal) { Color.clear.frame(width: 1, height: 1) } }
         .toolbarVisibility(onClose == nil ? .automatic : .hidden, for: .navigationBar)
         .task { await model.load() }
+        .navigationDestination(item: $profile) { UserProfileScreen(handle: $0) }
+        .environment(\.openProfile) { profile = $0 }
         .onAppear { approach.start() }
         .onDisappear { approach.stop() }
         // Dry, broken or gone: where the nearest water is, as the web says it. Only then:
@@ -384,15 +388,15 @@ struct FontDetailView: View {
         if creatorName != nil || showsPioneer || font.mayor != nil {
             Section {
                 if let creatorName {
-                    LabeledContent(L10n.t("detail.createdBy"), value: "@\(creatorName)")
+                    LabeledContent(L10n.t("detail.createdBy")) { UserLink(username: creatorName) }
                 }
                 if showsPioneer, let pioneer {
-                    LabeledContent(L10n.t("detail.pioneerBy"), value: "@\(pioneer)")
+                    LabeledContent(L10n.t("detail.pioneerBy")) { UserLink(username: pioneer) }
                 }
                 if let mayor = font.mayor {
                     LabeledContent {
                         VStack(alignment: .trailing, spacing: 2) {
-                            Text(verbatim: "@\(mayor.username)")
+                            UserLink(username: mayor.username)
                             Text(L10n.t("detail.mayorReviews", ["n": mayor.reviews])).font(.caption)
                         }
                     } label: {
@@ -963,7 +967,7 @@ private struct ReviewRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             HStack(spacing: 8) {
-                Text(review.username ?? L10n.t("review.anon"))
+                if let user = review.username { UserLink(username: user) } else { Text(L10n.t("review.anon")) }
                 if let n = review.confirmations, n > 0 {
                     Text(n == 1 ? L10n.t("detail.confirmedByOne") : L10n.t("detail.confirmedByMany", ["n": n]))
                 }
@@ -997,10 +1001,12 @@ private struct ReportRow: View {
                     .foregroundStyle(.secondary)
             }
             Text(report.message)
-            Text([report.username ?? L10n.t("review.anon"),
-                  report.editedAt != nil ? L10n.t("report.edited") : nil].compactMap { $0 }.joined(separator: " · "))
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+            HStack(spacing: 4) {
+                if let user = report.username { UserLink(username: user) } else { Text(L10n.t("review.anon")) }
+                if report.editedAt != nil { Text("· " + L10n.t("report.edited")) }
+            }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
         }
         .padding(.leading, report.parentID == nil ? 0 : 16)
         .padding(.vertical, 4)

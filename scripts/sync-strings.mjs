@@ -19,7 +19,7 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
 const PREFIXES = ['country.', 'layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
-  'login.', 'notif.', 'popup.', 'profile.', 'guard.', 'game.', 'privacy.', 'settings.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.', 'gpx.', 'gpxIn.', 'newFont.', 'draft.', 'mission.', 'flag.', 'update.', 'comment.', 'report.', 'gallery.', 'dup.', 'image.', 'maint.', 'hidden.', 'badges.', 'celebrate.', 'waterHelp.', 'drinkHelp.', 'sourceLimit.', 'carousel.', 'approach.', 'detail.badges.', 'exif.']
+  'login.', 'notif.', 'popup.', 'profile.', 'guard.', 'game.', 'privacy.', 'settings.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.', 'gpx.', 'gpxIn.', 'newFont.', 'draft.', 'mission.', 'flag.', 'update.', 'comment.', 'report.', 'gallery.', 'dup.', 'image.', 'maint.', 'hidden.', 'badges.', 'celebrate.', 'waterHelp.', 'drinkHelp.', 'sourceLimit.', 'carousel.', 'approach.', 'detail.badges.', 'exif.', 'user.']
 const KEYS = [
   'map.geoDenied', 'map.geoUnavailable',
   'detail.edit', 'detail.editInfoHint', 'detail.editInfoNote', 'detail.editingTitle', 'detail.replacePhoto',
@@ -206,6 +206,9 @@ const IOS_ONLY = {
   },
   'ios.close': {
     ca: 'Tanca', es: 'Cerrar', gl: 'Pechar', eu: 'Itxi', en: 'Close', fr: 'Fermer', pt: 'Fechar', it: 'Chiudi',
+  },
+  'ios.showAll': {
+    ca: 'Mostra-les totes ({n})', es: 'Mostrar todas ({n})', gl: 'Amosalas todas ({n})', eu: 'Erakutsi guztiak ({n})', en: 'Show all ({n})', fr: 'Tout afficher ({n})', pt: 'Mostrar todas ({n})', it: 'Mostra tutte ({n})',
   },
   'ios.more': {
     ca: 'Més', es: 'Más', gl: 'Máis', eu: 'Gehiago', en: 'More', fr: 'Plus', pt: 'Mais', it: 'Altro',

@@ -541,3 +541,20 @@ nonisolated struct PhotoExif: Decodable, Sendable {
         return UUID(uuidString: stem) == nil ? nil : stem.lowercased()
     }
 }
+
+/// Someone else's profile as anyone can see it (`GET /users/:idOrUsername`).
+nonisolated struct PublicUser: Decodable, Sendable {
+    let id: UUID
+    let name: String
+    let username: String
+    var anonymized: Bool? = nil
+    var createdAt: Date? = nil
+    /// Only when they chose to make it public.
+    var email: String? = nil
+}
+
+/// What someone has earned, and nothing of what is missing. Empty with the game off.
+nonisolated struct PublicGamification: Decodable, Sendable {
+    var badges: [BadgesPreview.Badge] = []
+    var level: String? = nil
+}

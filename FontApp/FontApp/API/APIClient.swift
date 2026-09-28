@@ -316,6 +316,17 @@ nonisolated struct APIClient: Sendable {
         return user.username
     }
 
+    /// Someone's public profile, by id or username (the server resolves both).
+    func publicUser(_ handle: String) async throws -> PublicUser { try await get("/users/\(Self.segment(handle))") }
+    func userFonts(_ handle: String) async throws -> [FontSummary] { try await get("/users/\(Self.segment(handle))/fonts") }
+    func userComments(_ handle: String) async throws -> [MyComment] { try await get("/users/\(Self.segment(handle))/comments") }
+    func userGamification(_ handle: String) async throws -> PublicGamification {
+        try await get("/users/\(Self.segment(handle))/badges")
+    }
+    private static func segment(_ s: String) -> String {
+        s.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed.subtracting(CharacterSet(charactersIn: "/"))) ?? s
+    }
+
     /// Someone's public badges; the fountain page only needs the creator's discoverer tier.
     func badges(of id: UUID) async throws -> [BadgesPreview.Badge] {
         struct Public: Decodable { let badges: [BadgesPreview.Badge] }
