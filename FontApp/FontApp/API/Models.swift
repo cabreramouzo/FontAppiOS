@@ -192,6 +192,9 @@ nonisolated struct ReportResponse: Codable, Identifiable, Sendable {
     let parentID: UUID?
     let resolvedAt: Date?
     let resolvedBy: String?
+    var editedAt: Date? = nil
+    var likes: Int? = nil
+    var likedByMe: Bool? = nil
 }
 
 /// One entry of `GET /activity`.
@@ -380,6 +383,9 @@ nonisolated struct GamificationSummary: Decodable, Sendable {
     /// Fountains you are the guardian of (who checks them most in 60 days).
     let mayorCount: Int?
     let provisional: Bool
+    /// What your level opens (phase 6): `markDuplicate`, `resolveIncident`…
+    struct Grant: Decodable, Sendable { let capabilities: [String] }
+    var grant: Grant? = nil
 }
 
 /// A fountain whose latest review is yours (`GET /gamification/guarded`), the most

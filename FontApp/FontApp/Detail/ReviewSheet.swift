@@ -6,6 +6,9 @@ import SwiftUI
 /// when there is more to say.
 struct ReviewSheet: View {
     let fontID: UUID
+    var fontName: String?
+    /// Correcting your own review (or any, as an admin) instead of writing a new one.
+    var editing: CommentResponse?
     let onPosted: () async -> Void
 
     @Environment(SessionStore.self) private var session
@@ -58,7 +61,7 @@ struct ReviewSheet: View {
                     }
                 }
             }
-            .navigationTitle(L10n.t("detail.newUpdate"))
+            .navigationTitle(L10n.t(editing == nil ? "detail.newUpdate" : "detail.edit"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -68,14 +71,22 @@ struct ReviewSheet: View {
                     if isSending {
                         ProgressView()
                     } else {
-                        Button(L10n.t("update.publish"), action: send)
+                        Button(L10n.t(editing == nil ? "update.publish" : "form.save"), action: send)
                             .disabled(draft.isEmpty && photo == nil)
                     }
                 }
             }
-            .onAppear { draft = FormDraft.load(Draft.self, key: draftKey) ?? Draft() }
-            // Closing keeps the draft; only sending removes it.
-            .onChange(of: draft) { FormDraft.save(draft.isEmpty ? nil : draft, key: draftKey) }
+            .onAppear {
+                if let editing {
+                    draft = Draft(status: editing.waterStatus, rating: editing.rating ?? 0, body: editing.body)
+                } else {
+                    draft = FormDraft.load(Draft.self, key: draftKey) ?? Draft()
+                }
+            }
+            // Closing keeps the draft; only sending removes it. A correction has no draft.
+            .onChange(of: draft) {
+                if editing == nil { FormDraft.save(draft.isEmpty ? nil : draft, key: draftKey) }
+            }
             .onChange(of: pickerItem) { _, item in
                 guard let item else { return }
                 Task { photo = try? await item.loadTransferable(type: Data.self) }
@@ -88,26 +99,48 @@ struct ReviewSheet: View {
         error = nil
         Task {
             defer { isSending = false }
+            var review = ComposedReview(waterStatus: draft.status,
+                                        rating: draft.rating > 0 ? draft.rating : nil,
+                                        body: draft.body.trimmingCharacters(in: .whitespacesAndNewlines),
+                                        image: editing?.image)
+            var prepared: PhotoPreparer.Prepared?
             do {
-                var review = ComposedReview(waterStatus: draft.status,
-                                            rating: draft.rating > 0 ? draft.rating : nil,
-                                            body: draft.body.trimmingCharacters(in: .whitespacesAndNewlines))
                 if let photo {
                     // The original file, so its EXIF date and place travel as separate fields.
-                    let prepared = try await Task.detached(priority: .userInitiated) {
+                    prepared = try await Task.detached(priority: .userInitiated) {
                         try PhotoPreparer.prepare(photo)
                     }.value
-                    review.image = try await APIClient.shared.uploadImage(prepared.jpeg, meta: prepared.meta)
+                    review.image = try await APIClient.shared.uploadImage(prepared!.jpeg, meta: prepared!.meta)
                 }
-                _ = try await APIClient.shared.postComment(on: fontID, review)
-                FormDraft.save(Draft?.none, key: draftKey)
-                NotificationCenter.default.post(name: .fontChanged, object: fontID)
-                await onPosted()
-                dismiss()
+                if let editing {
+                    _ = try await APIClient.shared.updateComment(editing.id, on: fontID, review)
+                } else {
+                    _ = try await APIClient.shared.postComment(on: fontID, review)
+                }
+                done()
+            } catch let failure as APIError where failure.status == 0 && editing == nil {
+                // No signal, in front of the fountain: the web queues it, so does the app.
+                review.image = nil
+                do {
+                    try Outbox.shared.enqueueComment(review, jpeg: prepared?.jpeg, meta: prepared?.meta,
+                                                     fontID: fontID, fontName: fontName)
+                    done()
+                } catch {
+                    self.error = ErrorText.describe(failure)
+                }
             } catch {
                 self.error = ErrorText.describe(error)
             }
         }
+    }
+}
+
+extension ReviewSheet {
+    fileprivate func done() {
+        FormDraft.save(Draft?.none, key: draftKey)
+        NotificationCenter.default.post(name: .fontChanged, object: fontID)
+        Task { await onPosted() }
+        dismiss()
     }
 }
 

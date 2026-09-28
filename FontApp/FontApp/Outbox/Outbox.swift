@@ -13,6 +13,8 @@ nonisolated struct OutboxItem: Codable, Identifiable, Equatable, Sendable {
         /// with it, not as its own item: a review of a fountain that does not exist yet
         /// could not be sent.
         case font
+        /// A full review from the page (status, stars, text, photo), as the web queues it.
+        case comment
     }
 
     let id: UUID
@@ -37,6 +39,8 @@ nonisolated struct OutboxItem: Codable, Identifiable, Equatable, Sendable {
     /// For `font`.
     var newFont: NewFont? = nil
     var firstStatus: String? = nil
+    /// For `comment`; its photo, if any, is `photoFile`.
+    var comment: ComposedReview? = nil
 }
 
 /// The outbox: contributions saved on the phone and sent when there is signal.
@@ -117,6 +121,20 @@ final class Outbox {
         return append(OutboxItem(id: id, kind: .font, fontID: id, fontName: font.name, userID: currentUserID,
                                  queuedAt: .now, attempts: 0, needsAuth: false, review: nil,
                                  photoFile: file, photoMeta: meta, newFont: font, firstStatus: firstStatus))
+    }
+
+    @discardableResult
+    func enqueueComment(_ comment: ComposedReview, jpeg: Data?, meta: PhotoMeta?, fontID: UUID,
+                        fontName: String?) throws -> OutboxItem {
+        let id = UUID()
+        var file: String?
+        if let jpeg {
+            file = "\(id.uuidString).jpg"
+            try jpeg.write(to: directory.appending(path: file!), options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        }
+        return append(OutboxItem(id: id, kind: .comment, fontID: fontID, fontName: fontName, userID: currentUserID,
+                                 queuedAt: .now, attempts: 0, needsAuth: false, review: nil,
+                                 photoFile: file, photoMeta: meta, comment: comment))
     }
 
     private func append(_ item: OutboxItem) -> OutboxItem {
@@ -207,6 +225,12 @@ final class Outbox {
             // If someone put a photo meanwhile, the server says 403: dropped after a few
             // tries, which is right — replacing is not for anyone.
             try await api.setFontPhoto(item.fontID, image: url, queuedOffline: true)
+        case .comment:
+            guard var comment = item.comment else { return }
+            if let jpeg = photoData(of: item) {
+                comment.image = try await api.uploadImage(jpeg, meta: item.photoMeta ?? PhotoMeta())
+            }
+            _ = try await api.postComment(on: item.fontID, comment, queuedOffline: true)
         case .font:
             guard var font = item.newFont else { return }
             if let jpeg = photoData(of: item) {

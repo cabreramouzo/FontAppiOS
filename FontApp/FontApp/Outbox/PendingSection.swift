@@ -53,7 +53,7 @@ private struct PendingRow: View {
 
     private var kindKey: String {
         switch item.kind {
-        case .review: "offline.itemReview"
+        case .review, .comment: "offline.itemReview"
         case .photo: "offline.itemPhoto"
         case .font: "offline.itemFont"
         }

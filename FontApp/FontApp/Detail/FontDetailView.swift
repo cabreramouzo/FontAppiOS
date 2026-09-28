@@ -22,6 +22,13 @@ struct FontDetailView: View {
     @State private var suggestsDuplicate = false
     @State private var confirmsDelete = false
     @State private var creatorName: String?
+    @State private var capabilities: Set<String> = []
+    @State private var editingReview: CommentResponse?
+    @State private var editingReport: ReportResponse?
+    @State private var deleting: Deletion?
+
+    /// A review or a note waiting for "delete?" to be confirmed.
+    private enum Deletion { case review(CommentResponse), report(ReportResponse) }
 
     /// A new comment, or a reply to one.
     private struct ReportTarget: Identifiable {
@@ -94,10 +101,27 @@ struct FontDetailView: View {
             guard let creator = loadedFont?.creator?.id else { return }
             creatorName = try? await APIClient.shared.username(of: creator)
         }
+        .task(id: session.userID) { capabilities = await Capabilities.of(session.userID) }
         .sheet(isPresented: $writesReview) {
             if let font = loadedFont {
-                ReviewSheet(fontID: font.id) { await model.load() }
+                ReviewSheet(fontID: font.id, fontName: font.name) { await model.load() }
             }
+        }
+        .sheet(item: $editingReview) { review in
+            if let font = loadedFont {
+                ReviewSheet(fontID: font.id, fontName: font.name, editing: review) { await model.load() }
+            }
+        }
+        .sheet(item: $editingReport) { report in
+            if let font = loadedFont {
+                ReportSheet(fontID: font.id, editing: report) { await model.load() }
+            }
+        }
+        .confirmationDialog(deleting.map { if case .review = $0 { L10n.t("review.confirmDelete") } else { L10n.t("detail.confirmDeleteIncident") } } ?? "",
+                            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
+                            titleVisibility: .visible) {
+            Button(L10n.t("detail.delete"), role: .destructive) { if let deleting { delete(deleting) } }
+            Button(L10n.t("form.cancel"), role: .cancel) {}
         }
         .sheet(item: $reportTarget) { target in
             if let font = loadedFont {
@@ -178,7 +202,9 @@ struct FontDetailView: View {
             } label: {
                 Label(String(format: "%.6f, %.6f", font.latitude, font.longitude), systemImage: "doc.on.doc")
             }
-            if session.isSignedIn {
+            // Whose level already lets them mark it has the real button on the web; two
+            // similar buttons doing different things is worse than one.
+            if session.isSignedIn, !capabilities.contains("markDuplicate") {
                 Button { suggestsDuplicate = true } label: {
                     Label(L10n.t("dup.suggest"), systemImage: "square.on.square")
                 }
@@ -255,6 +281,88 @@ struct FontDetailView: View {
     private func canResolve(_ report: ReportResponse) -> Bool {
         guard let userID = session.userID else { return false }
         return report.userID == userID || (session.user?.canManageFonts ?? false)
+            || capabilities.contains("resolveIncident")
+    }
+
+    private var isAdmin: Bool { session.user?.canManageFonts ?? false }
+
+    /// Your own note, within the hour: the server says when it is over.
+    private func canEdit(_ report: ReportResponse) -> Bool {
+        guard let userID = session.userID, report.userID == userID else { return false }
+        let elapsed = Date.now.timeIntervalSince(report.createdAt)
+        return elapsed >= 0 && elapsed <= 3600
+    }
+
+    private func like(_ report: ReportResponse) {
+        guard let font = loadedFont else { return }
+        Task {
+            do {
+                _ = try await APIClient.shared.likeReport(report.id, on: font.id, !(report.likedByMe ?? false))
+                await model.load()
+            } catch {
+                notice = ErrorText.describe(error)
+            }
+        }
+    }
+
+    private func delete(_ deletion: Deletion) {
+        guard let font = loadedFont else { return }
+        Task {
+            do {
+                switch deletion {
+                case .review(let review): try await APIClient.shared.deleteComment(review.id, on: font.id)
+                case .report(let report): try await APIClient.shared.deleteReport(report.id, on: font.id)
+                }
+                NotificationCenter.default.post(name: .fontChanged, object: font.id)
+                await model.load()
+            } catch {
+                notice = ErrorText.describe(error)
+            }
+        }
+    }
+
+    private func reviewAction(_ font: FontDetail, _ action: @escaping () async throws -> Void, done: String? = nil) {
+        Task {
+            do {
+                try await action()
+                if let done { notice = done }
+                await model.load()
+            } catch {
+                notice = ErrorText.describe(error)
+            }
+        }
+    }
+
+    /// What can be done with a review: correct or delete yours, report someone else's,
+    /// and make its photo the fountain's cover (its creator, an admin, or anyone while
+    /// the fountain has none).
+    @ViewBuilder private func reviewMenu(_ review: CommentResponse, _ font: FontDetail) -> some View {
+        let mine = review.userID != nil && review.userID == session.userID
+        if mine || isAdmin {
+            Button { editingReview = review } label: { Label(L10n.t("detail.edit"), systemImage: "pencil") }
+        }
+        if review.image != nil, review.image != font.image,
+           session.isSignedIn, font.image == nil || isAdmin || font.creator?.id == session.userID {
+            Button {
+                reviewAction(font, { try await APIClient.shared.setCoverFromComment(review.id, on: font.id) },
+                             done: L10n.t("detail.photoSetAsMain"))
+            } label: {
+                Label(L10n.t("detail.useAsMainPhoto"), systemImage: "photo")
+            }
+        }
+        if session.isSignedIn, !mine {
+            Button(role: .destructive) {
+                reviewAction(font, { try await APIClient.shared.flagComment(review.id, on: font.id) },
+                             done: L10n.t("flag.done"))
+            } label: {
+                Label(L10n.t("flag.report"), systemImage: "flag")
+            }
+        }
+        if mine || isAdmin {
+            Button(role: .destructive) { deleting = .review(review) } label: {
+                Label(L10n.t("detail.delete"), systemImage: "trash")
+            }
+        }
     }
 
     private func resolve(_ report: ReportResponse) {
@@ -372,6 +480,7 @@ struct FontDetailView: View {
                     .frame(minHeight: 44)
                     ForEach(model.reviews) { review in
                         ReviewRow(review: review)
+                            .contextMenu { reviewMenu(review, font) }
                         if review.id == confirmable?.id {
                             stillTheSameButton(review)
                         }
@@ -387,8 +496,24 @@ struct FontDetailView: View {
                 }
                 ForEach(model.reports) { report in
                     ReportRow(report: report)
+                        .swipeActions {
+                            if report.userID != nil && report.userID == session.userID || isAdmin {
+                                Button(role: .destructive) { deleting = .report(report) } label: {
+                                    Label(L10n.t("detail.delete"), systemImage: "trash")
+                                }
+                            }
+                        }
                     if session.isSignedIn {
                         HStack(spacing: 16) {
+                            Button {
+                                like(report)
+                            } label: {
+                                Label("\(report.likes ?? 0)", systemImage: report.likedByMe == true ? "heart.fill" : "heart")
+                            }
+                            .accessibilityLabel(L10n.t(report.likedByMe == true ? "report.unlike" : "report.like"))
+                            if canEdit(report) {
+                                Button(L10n.t("detail.edit")) { editingReport = report }
+                            }
                             // Replies hang from the first message: one level, as on the web.
                             if report.parentID == nil {
                                 Button(L10n.t("report.reply")) { reportTarget = ReportTarget(replyTo: report) }
@@ -651,7 +776,8 @@ private struct ReportRow: View {
                     .foregroundStyle(.secondary)
             }
             Text(report.message)
-            Text(report.username ?? L10n.t("review.anon"))
+            Text([report.username ?? L10n.t("review.anon"),
+                  report.editedAt != nil ? L10n.t("report.edited") : nil].compactMap { $0 }.joined(separator: " · "))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }

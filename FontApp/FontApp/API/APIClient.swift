@@ -211,9 +211,49 @@ nonisolated struct APIClient: Sendable {
     }
 
     /// A review written on the page, with any of status, rating, text and photo.
-    func postComment(on fontID: UUID, _ review: ComposedReview) async throws -> CommentResponse {
+    func postComment(on fontID: UUID, _ review: ComposedReview, queuedOffline: Bool = false) async throws -> CommentResponse {
         try await send("POST", "/fonts/\(fontID.uuidString)/comments",
+                       body: .json(try JSONEncoder().encode(review)), queuedOffline: queuedOffline, timeout: writeTimeout)
+    }
+
+    /// Your own review, or any as an admin.
+    func updateComment(_ id: UUID, on fontID: UUID, _ review: ComposedReview) async throws -> CommentResponse {
+        try await send("PUT", "/fonts/\(fontID.uuidString)/comments/\(id.uuidString)",
                        body: .json(try JSONEncoder().encode(review)), timeout: writeTimeout)
+    }
+
+    func deleteComment(_ id: UUID, on fontID: UUID) async throws {
+        let _: Ignored = try await send("DELETE", "/fonts/\(fontID.uuidString)/comments/\(id.uuidString)", timeout: writeTimeout)
+    }
+
+    /// Anyone's review but your own; private to the moderators.
+    func flagComment(_ id: UUID, on fontID: UUID) async throws {
+        struct Flag: Encodable { let targetType = "comment"; let targetID: UUID; let fontID: UUID }
+        let _: Ignored = try await send("POST", "/flags", body: .json(try JSONEncoder().encode(Flag(targetID: id, fontID: fontID))),
+                                        timeout: writeTimeout)
+    }
+
+    /// The review's photo becomes the fountain's cover.
+    func setCoverFromComment(_ id: UUID, on fontID: UUID) async throws {
+        let _: Ignored = try await send("POST", "/fonts/\(fontID.uuidString)/photo/from-comment/\(id.uuidString)",
+                                        timeout: writeTimeout)
+    }
+
+    /// A note's text only, within the hour after posting it; the server says when it is over.
+    func updateReport(_ id: UUID, on fontID: UUID, message: String) async throws -> ReportResponse {
+        struct Body: Encodable { let message: String }
+        return try await send("PUT", "/fonts/\(fontID.uuidString)/report/\(id.uuidString)",
+                              body: .json(try JSONEncoder().encode(Body(message: message))), timeout: writeTimeout)
+    }
+
+    func deleteReport(_ id: UUID, on fontID: UUID) async throws {
+        let _: Ignored = try await send("DELETE", "/fonts/\(fontID.uuidString)/report/\(id.uuidString)", timeout: writeTimeout)
+    }
+
+    /// Idempotent: repeating it does not stack.
+    func likeReport(_ id: UUID, on fontID: UUID, _ on: Bool) async throws -> ReportResponse {
+        try await send(on ? "POST" : "DELETE", "/fonts/\(fontID.uuidString)/report/\(id.uuidString)/like",
+                       timeout: writeTimeout)
     }
 
     /// A comment or an incident, or a reply. The server never stores a reply as an incident.

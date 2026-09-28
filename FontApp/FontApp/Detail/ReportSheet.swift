@@ -7,6 +7,8 @@ struct ReportSheet: View {
     let fontID: UUID
     /// Replying to this comment, or a new one.
     var replyTo: ReportResponse?
+    /// Correcting your own note's text, within the hour.
+    var editing: ReportResponse?
     let onPosted: () async -> Void
 
     @Environment(SessionStore.self) private var session
@@ -43,7 +45,7 @@ struct ReportSheet: View {
                               text: $draft.message, axis: .vertical)
                         .lineLimit(3...10)
                 }
-                if replyTo == nil {
+                if replyTo == nil, editing == nil {
                     Section {
                         Toggle(L10n.t("comment.isIncident"), isOn: $draft.isIncident)
                         if draft.isIncident {
@@ -56,7 +58,7 @@ struct ReportSheet: View {
                     }
                 }
             }
-            .navigationTitle(L10n.t(replyTo == nil ? "report.add" : "report.reply"))
+            .navigationTitle(L10n.t(editing != nil ? "detail.edit" : replyTo == nil ? "report.add" : "report.reply"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -66,14 +68,20 @@ struct ReportSheet: View {
                     if isSending {
                         ProgressView()
                     } else {
-                        Button(L10n.t(replyTo == nil ? "comment.submit" : "report.send"), action: send)
+                        Button(L10n.t(editing != nil ? "form.save" : replyTo == nil ? "comment.submit" : "report.send"), action: send)
                             .disabled(draft.message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }
                 }
             }
-            .onAppear { draft = FormDraft.load(Draft.self, key: draftKey) ?? Draft() }
+            .onAppear {
+                if let editing {
+                    draft = Draft(message: editing.message)
+                } else {
+                    draft = FormDraft.load(Draft.self, key: draftKey) ?? Draft()
+                }
+            }
             .onChange(of: draft) {
-                FormDraft.save(draft.message.isEmpty ? nil : draft, key: draftKey)
+                if editing == nil { FormDraft.save(draft.message.isEmpty ? nil : draft, key: draftKey) }
             }
         }
     }
@@ -88,7 +96,11 @@ struct ReportSheet: View {
         Task {
             defer { isSending = false }
             do {
-                _ = try await APIClient.shared.postReport(on: fontID, report)
+                if let editing {
+                    _ = try await APIClient.shared.updateReport(editing.id, on: fontID, message: report.message)
+                } else {
+                    _ = try await APIClient.shared.postReport(on: fontID, report)
+                }
                 FormDraft.save(Draft?.none, key: draftKey)
                 await onPosted()
                 dismiss()
