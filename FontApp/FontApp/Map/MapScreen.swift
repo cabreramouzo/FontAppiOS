@@ -10,6 +10,7 @@ struct MapScreen: View {
     @State private var controller = MapController()
     @State private var filters = MapFilters()
     @State private var sheet: MapSheet?
+    @State private var searching = false
     @State private var route: RouteModel?
     @State private var importsGPX = false
     @State private var exported: SharedFile?
@@ -21,7 +22,7 @@ struct MapScreen: View {
     @State private var toast: String?
 
     private enum MapSheet: Identifiable {
-        case layers, filters, search, offline, missions
+        case layers, filters, offline, missions
         case route(RouteModel)
         /// The model travels with the case: a separate optional state is still nil in the
         /// first render of the sheet, which then shows empty.
@@ -31,7 +32,6 @@ struct MapScreen: View {
             switch self {
             case .layers: "layers"
             case .filters: "filters"
-            case .search: "search"
             case .offline: "offline"
             case .missions: "missions"
             case .route: "route"
@@ -73,7 +73,7 @@ struct MapScreen: View {
                 .padding(.top, 8)
         }
         .overlay(alignment: .topLeading) {
-            MapSearchCapsule { sheet = .search }
+            MapSearchCapsule { withAnimation(.snappy) { searching = true } }
                 .padding(.leading, 12)
                 .padding(.trailing, 76)
                 .padding(.top, 8)
@@ -93,6 +93,20 @@ struct MapScreen: View {
                     .padding(.vertical, 10)
                     .glassEffect(.regular, in: Capsule())
                     .padding(.bottom, 130)
+                    .transition(.opacity)
+            }
+        }
+        // Search in place: over everything on the map, under the status bar, where the
+        // capsule was. The selected fountain's sheet opens after it closes.
+        .overlay {
+            if searching {
+                MapSearch(isActive: $searching,
+                          onFountain: { font in
+                              controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                              meters: 400, aboveSheet: true)
+                              selected = font
+                          },
+                          onPlace: { controller.show($0) })
                     .transition(.opacity)
             }
         }
@@ -140,15 +154,6 @@ struct MapScreen: View {
                     .presentationDetents([.medium, .large])
             case .offline:
                 OfflineZonesSheet(controller: controller).presentationDetents([.medium, .large])
-            case .search:
-                SearchScreen(
-                    onFountain: { font in
-                        controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
-                                        meters: 400, aboveSheet: true)
-                        selected = font
-                    },
-                    onPlace: { controller.show($0) }
-                )
             }
         }
         .fileImporter(isPresented: $importsGPX,

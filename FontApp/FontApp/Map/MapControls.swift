@@ -123,7 +123,7 @@ private struct SystemMapButtons: View {
     }
 }
 
-/// "Search a fountain or a place", which opens the full-screen search.
+/// "Search a fountain or a place": tapping it turns it into the search field, in place.
 struct MapSearchCapsule: View {
     let action: () -> Void
 

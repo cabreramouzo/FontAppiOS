@@ -153,6 +153,13 @@ const IOS_ONLY = {
     en: 'Search fountain or place', fr: 'Chercher une fontaine ou un lieu', pt: 'Procurar fonte ou local',
     it: 'Cerca fontana o luogo',
   },
+  'ios.search.cancel': {
+    ca: 'Cancel·la', es: 'Cancelar', gl: 'Cancelar', eu: 'Utzi', en: 'Cancel', fr: 'Annuler', pt: 'Cancelar', it: 'Annulla',
+  },
+  'ios.search.clear': {
+    ca: 'Esborra la cerca', es: 'Borrar la búsqueda', gl: 'Borrar a busca', eu: 'Garbitu bilaketa', en: 'Clear search',
+    fr: 'Effacer la recherche', pt: 'Limpar a pesquisa', it: 'Cancella la ricerca',
+  },
   'ios.search.fountains': {
     ca: 'Fonts', es: 'Fuentes', gl: 'Fontes', eu: 'Iturriak', en: 'Fountains', fr: 'Fontaines', pt: 'Fontes', it: 'Fontane',
   },

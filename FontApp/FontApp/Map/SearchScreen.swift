@@ -2,54 +2,94 @@ import CoreLocation
 import MapKit
 import SwiftUI
 
-/// Full-screen search, as the web does on phones: the keyboard covers what is left over
-/// instead of half of the results. Fountains by name from the API, places from MapKit.
-struct SearchScreen: View {
+/// Search in place, as Komoot and AllTrails do over their maps: the capsule on the map
+/// becomes the field where it is, the keyboard comes up and the results take the screen
+/// below it. "Cancel" goes back to the map. No sheet on top, no second search bar.
+/// Fountains by name from the API, places from MapKit; before typing, what is near.
+struct MapSearch: View {
+    @Binding var isActive: Bool
     let onFountain: (FontSummary) -> Void
     let onPlace: (MKMapRect) -> Void
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(LocationService.self) private var location
     @State private var model = SearchModel()
+    @FocusState private var focused: Bool
 
     var body: some View {
-        NavigationStack {
-            List {
-                // Before typing, what is near, as Apple Maps does. The web's "near me"
-                // list lived in the filters sheet; here it is where one looks first.
-                if model.query.trimmingCharacters(in: .whitespaces).count < 2 {
-                    nearbySection
-                }
-                // A place that is exactly what was typed (a town) goes first; otherwise
-                // fountains, which is what the app is for.
-                if model.placesFirst {
-                    placesSection
-                    fountainsSection
-                } else {
-                    fountainsSection
-                    placesSection
-                }
-                if let error = model.error {
-                    Text(error).foregroundStyle(.secondary)
-                }
+        VStack(spacing: 0) {
+            HStack(spacing: 10) {
+                field
+                Button(L10n.t("ios.search.cancel"), action: close)
+                    .frame(minHeight: 44)
             }
-            .overlay {
-                if model.isEmptyResult {
-                    ContentUnavailableView.search(text: model.query)
+            .padding(.horizontal, 12)
+            .padding(.top, 8)
+            .padding(.bottom, 8)
+            results
+        }
+        .background(Color(.systemGroupedBackground))
+        .onAppear { focused = true }
+        .onChange(of: model.query) { model.queryChanged(near: location.location) }
+        .task { await model.loadNearby(from: location.location) }
+    }
+
+    private var field: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+            TextField(L10n.t("ios.search.prompt"), text: $model.query)
+                .focused($focused)
+                .submitLabel(.search)
+                .autocorrectionDisabled()
+                .accessibilityIdentifier("map.search.field")
+            if !model.query.isEmpty {
+                Button {
+                    model.query = ""
+                    focused = true
+                } label: {
+                    Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L10n.t("ios.search.clear"))
             }
-            .navigationTitle(L10n.t("ios.search.prompt"))
-            .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $model.query, isPresented: .constant(true),
-                        placement: .navigationBarDrawer(displayMode: .always),
-                        prompt: L10n.t("ios.search.prompt"))
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) { Button(role: .close) { dismiss() } }
+        }
+        .padding(.horizontal, 16)
+        .frame(height: 48)
+        .glassEffect(.regular, in: Capsule())
+    }
+
+    private var results: some View {
+        List {
+            // Before typing, what is near, as Apple Maps does.
+            if model.query.trimmingCharacters(in: .whitespaces).count < 2 {
+                nearbySection
             }
-            .onChange(of: model.query) { model.queryChanged(near: location.location) }
-            .task { await model.loadNearby(from: location.location) }
+            // A place that is exactly what was typed (a town) goes first; otherwise
+            // fountains, which is what the app is for.
+            if model.placesFirst {
+                placesSection
+                fountainsSection
+            } else {
+                fountainsSection
+                placesSection
+            }
+            if let error = model.error {
+                Text(error).foregroundStyle(.secondary)
+            }
+        }
+        .scrollDismissesKeyboard(.immediately)
+        .overlay {
+            if model.isEmptyResult {
+                ContentUnavailableView.search(text: model.query)
+            }
         }
     }
+
+    private func close() {
+        focused = false
+        withAnimation(.snappy) { isActive = false }
+    }
+
+    private func dismiss() { close() }
 
     @ViewBuilder private var nearbySection: some View {
         if location.location == nil {
