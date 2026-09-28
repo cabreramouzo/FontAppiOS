@@ -48,6 +48,8 @@ struct ProfileHeader: View {
 struct CappedSection<Item: Identifiable, Row: View>: View {
     let title: String
     let systemImage: String
+    /// Read before the list: what matters is often a count, not the rows.
+    var intro: String?
     var hint: String?
     let empty: String
     let items: [Item]?
@@ -58,6 +60,9 @@ struct CappedSection<Item: Identifiable, Row: View>: View {
 
     var body: some View {
         Section {
+            if let intro {
+                Text(intro).font(.footnote).foregroundStyle(.secondary)
+            }
             if let items {
                 if items.isEmpty {
                     Text(empty).foregroundStyle(.secondary)

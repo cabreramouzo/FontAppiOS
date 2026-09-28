@@ -311,3 +311,60 @@ nonisolated struct MyComment: Codable, Identifiable, Sendable {
     let waterStatus: String?
     let createdAt: Date?
 }
+
+/// Your score (`GET /gamification/me`), only the part the profile shows. `nil` (a 204)
+/// when you switched the game off. Level keys (`river`) are translated here, never shown.
+nonisolated struct GamificationSummary: Decodable, Sendable {
+    struct Impact: Decodable, Sendable {
+        let fontsWithPhotoThanksToYou: Int
+        let fontsYouKeepFresh: Int
+        let fontsYouPutOnTheMap: Int
+    }
+
+    let gotes: Int
+    /// Contributed but still inside the 72 h window.
+    let pending: Int
+    let level: String
+    let nextLevel: String?
+    let gotesToNextLevel: Int?
+    /// The level you reach once the pending drops settle, when it is higher.
+    let pendingLevel: String?
+    let impact: Impact
+    /// Fountains you are the guardian of (who checks them most in 60 days).
+    let mayorCount: Int?
+    let provisional: Bool
+}
+
+/// A fountain whose latest review is yours (`GET /gamification/guarded`), the most
+/// forgotten first.
+nonisolated struct GuardedFont: Decodable, Identifiable, Sendable {
+    let fontID: UUID
+    let name: String?
+    let days: Int
+    /// Past the 90-day cut.
+    let stale: Bool
+    let source: WaterSource?
+    /// What you said last time: that is what goes stale.
+    let waterStatus: String?
+
+    var id: UUID { fontID }
+}
+
+/// The collection (`GET /gamification/collection`): distinct fountains you reviewed and
+/// the kinds you have. `local` only when coordinates were sent and there are fountains around.
+nonisolated struct VisitedCollection: Decodable, Sendable {
+    struct Kind: Decodable, Sendable {
+        let source: String
+        let count: Int
+    }
+
+    struct Local: Decodable, Sendable {
+        let nearby: Int
+        let visited: Int
+        let radiusKm: Double
+    }
+
+    let visited: Int
+    let types: [Kind]
+    let local: Local?
+}

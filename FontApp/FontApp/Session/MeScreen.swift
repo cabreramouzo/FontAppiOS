@@ -1,10 +1,13 @@
+import CoreLocation
 import SwiftUI
 
-/// The "Me" tab: what is yours — who you are, your fountains, favourites and reviews —
-/// with the bell, signing out and deleting the account.
+/// The "Me" tab: what is yours — who you are, your score and collection, the fountains
+/// that depend on you, your fountains, favourites and reviews — with the bell, signing
+/// out and deleting the account.
 struct MeScreen: View {
     @Environment(SessionStore.self) private var session
     @Environment(Outbox.self) private var outbox
+    @Environment(LocationService.self) private var location
     @State private var showsSignIn = false
     @State private var isSigningOut = false
     @State private var confirmsDeletion = false
@@ -59,6 +62,9 @@ struct MeScreen: View {
                 }
             }
             PendingSection()
+            if let game = profile.game { GameSection(game: game) }
+            if let collection = profile.collection { CollectionSection(collection: collection) }
+            if let guarded = profile.guarded { GuardedSection(fonts: guarded) }
             if let failed = profile.failed {
                 Section { Text(failed).foregroundStyle(.secondary) }
             }
@@ -98,7 +104,9 @@ struct MeScreen: View {
 
     private func reload() async {
         async let account: Void = session.refresh()
-        async let lists: Void = profile.load()
+        // Only a position the app already has: the profile never asks for permission.
+        let near = location.location.map { (latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude) }
+        async let lists: Void = profile.load(near: near)
         _ = await (account, lists)
     }
 

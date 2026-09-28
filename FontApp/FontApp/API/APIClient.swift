@@ -193,6 +193,18 @@ nonisolated struct APIClient: Sendable {
     func myFavorites() async throws -> [FontSummary] { try await get("/auth/me/favorites") }
     func myComments() async throws -> [MyComment] { try await get("/auth/me/comments") }
 
+    /// `nil` when the game is switched off (204).
+    func gamification() async throws -> GamificationSummary? { try await get("/gamification/me") }
+    func guardedFonts() async throws -> [GuardedFont] { try await get("/gamification/guarded") }
+
+    /// With a position, adds the local goal ("N of the ones around you"). Only pass one
+    /// the app already has permission for. `nil` when the game is off.
+    func visitedCollection(near: (latitude: Double, longitude: Double)?) async throws -> VisitedCollection? {
+        let query = near.map { [URLQueryItem(name: "lat", value: String($0.latitude)),
+                                URLQueryItem(name: "long", value: String($0.longitude))] } ?? []
+        return try await get("/gamification/collection", query: query)
+    }
+
     // MARK: Bell
 
     /// The in-app notifications. Reading them does **not** mark them read: that happens
