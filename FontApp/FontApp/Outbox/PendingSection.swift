@@ -8,6 +8,7 @@ import SwiftUI
 struct PendingSection: View {
     @Environment(Outbox.self) private var outbox
     @State private var confirmsDiscard = false
+    @State private var showsDetails = false
 
     var body: some View {
         if !outbox.items.isEmpty {
@@ -23,6 +24,9 @@ struct PendingSection: View {
                     .frame(minHeight: 44)
                 }
                 .disabled(outbox.isFlushing || outbox.mine.isEmpty)
+                Button(L10n.t("offline.seeDetails")) { showsDetails = true }
+                    .frame(minHeight: 44)
+                    .sheet(isPresented: $showsDetails) { PendingDetailsSheet() }
                 Button(L10n.t("offline.discard"), role: .destructive) { confirmsDiscard = true }
                     .frame(minHeight: 44)
                     .confirmationDialog(L10n.t("offline.discardConfirm", ["n": outbox.items.count]),

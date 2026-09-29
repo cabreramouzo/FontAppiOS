@@ -19,6 +19,7 @@ struct ConnectivityNoticeView: View {
     /// Changes when the chip is tapped, to start the timer again.
     @State private var expandedAt = 0
     @State private var justSynced = false
+    @State private var showsDetails = false
 
     private var input: ConnectivityNotice.Input {
         ConnectivityNotice.Input(online: sync.isOnline, pending: outbox.items.count, others: outbox.othersCount,
@@ -48,6 +49,8 @@ struct ConnectivityNoticeView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.top, 8)
+        // Outside the card and the chip: it opens from either, and neither owns it.
+        .sheet(isPresented: $showsDetails) { PendingDetailsSheet() }
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: shrunk)
         .onChange(of: outbox.isFlushing) { was, now in
             if was, !now, outbox.lastSent > 0 { justSynced = true }
@@ -94,6 +97,12 @@ struct ConnectivityNoticeView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(notice.title).font(.subheadline.weight(.semibold))
                 Text(notice.detail).font(.caption).foregroundStyle(.secondary)
+                // See, copy or keep what is stuck: so it is never trapped where nobody can read it.
+                if input.pending > 0 {
+                    Button(L10n.t("offline.seeDetails")) { showsDetails = true }
+                        .font(.caption.weight(.semibold))
+                        .frame(minHeight: 44, alignment: .leading)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             action(input)
