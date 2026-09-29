@@ -101,6 +101,8 @@ These are decisions, not accidents. Each has its reasoning in `FontAppBE/CLAUDE.
   pointing when accuracy makes it a lie, "you are there" only within 5 m real distance.
 - **Staff accounts** (moderator and above) see the map buttons in staff purple
   (`#7c3aed`) so they do not contribute as admin by mistake.
+- **Permissions:** every iOS permission, when it is asked and what works without it, is in
+  `docs/permissions.md`. Update it when a permission is added or moves.
 - Touch targets ≥ 44 pt; the web uses 48 px for thumb controls.
 - Data licence: OpenStreetMap (ODbL) and ICGC/ACA (CC BY 4.0) must be attributed on the
   map; community data is ODbL, photos CC BY-SA 4.0.
