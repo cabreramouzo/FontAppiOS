@@ -11,6 +11,7 @@ struct MeScreen: View {
     @State private var showsSignIn = false
     @State private var isSigningOut = false
     @State private var confirmsDeletion = false
+    @State private var showsDangerZone = false
     @State private var isDeleting = false
     @State private var deletionError: String?
     @State private var profile = ProfileModel()
@@ -132,24 +133,30 @@ struct MeScreen: View {
 
     /// Apple requires deleting the account from inside the app (App Store rule 5.1.1(v)).
     /// The server anonymises it: personal data goes, contributions stay without a name.
+    /// Folded by default: deleting cannot be undone, so it takes a deliberate tap to
+    /// even see the button, and one more to confirm.
     private var deletion: some View {
         Section {
-            Button(role: .destructive) { confirmsDeletion = true } label: {
-                HStack {
-                    Label(L10n.t("profile.deleteAccount"), systemImage: "trash")
-                        .foregroundStyle(.red)
-                    if isDeleting { Spacer(); ProgressView() }
+            DisclosureGroup(isExpanded: $showsDangerZone) {
+                Text(L10n.t("profile.dangerZoneHint"))
+                    .font(.footnote).foregroundStyle(.secondary)
+                Button(role: .destructive) { confirmsDeletion = true } label: {
+                    HStack {
+                        Label(L10n.t("profile.deleteAccount"), systemImage: "trash")
+                            .foregroundStyle(.red)
+                        if isDeleting { Spacer(); ProgressView() }
+                    }
+                    .frame(minHeight: 44)
                 }
-                .frame(minHeight: 44)
+                .disabled(isDeleting || isSigningOut)
+                if let deletionError {
+                    Text(deletionError).foregroundStyle(.red)
+                }
+            } label: {
+                Label(L10n.t("profile.dangerZone"), systemImage: "exclamationmark.triangle")
+                    .foregroundStyle(.secondary)
+                    .frame(minHeight: 44)
             }
-            .disabled(isDeleting || isSigningOut)
-            if let deletionError {
-                Text(deletionError).foregroundStyle(.red)
-            }
-        } header: {
-            Text(L10n.t("profile.dangerZone"))
-        } footer: {
-            Text(L10n.t("profile.dangerZoneHint"))
         }
         .confirmationDialog(L10n.t("profile.deleteAccount"), isPresented: $confirmsDeletion, titleVisibility: .visible) {
             Button(L10n.t("profile.deleteAccount"), role: .destructive, action: deleteAccount)
