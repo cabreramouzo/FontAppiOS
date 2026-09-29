@@ -1,3 +1,4 @@
+import UIKit
 import Foundation
 import Testing
 @testable import FontApp
@@ -63,5 +64,18 @@ struct OfflineZoneCoverageTests {
         #expect(zone().coversHalf(of: half))
         #expect(!zone().coversHalf(of: world))
         #expect(!zone().coversHalf(of: elsewhere))
+    }
+}
+
+struct PhotoPreparerFallbackTests {
+    @Test func aPngIsPreparedAsAJpeg() throws {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 64, height: 48))
+        let png = renderer.pngData { $0.cgContext.setFillColor(UIColor.blue.cgColor); $0.cgContext.fill(CGRect(x: 0, y: 0, width: 64, height: 48)) }
+        let prepared = try PhotoPreparer.prepare(png)
+        #expect(prepared.jpeg.prefix(2) == Data([0xFF, 0xD8]))
+    }
+
+    @Test func nonsenseIsRefused() {
+        #expect(throws: (any Error).self) { try PhotoPreparer.prepare(Data("not an image".utf8)) }
     }
 }

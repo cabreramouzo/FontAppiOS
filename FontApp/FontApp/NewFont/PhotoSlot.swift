@@ -1,3 +1,4 @@
+import OSLog
 import PhotosUI
 import SwiftUI
 import UniformTypeIdentifiers
@@ -18,12 +19,14 @@ struct PhotoSlot: View {
     /// The bytes chosen from the library. `false` when they could not be used.
     let onChosen: (Data) async -> Bool
     let onRemove: () -> Void
+    var onReadingChanged: (Bool) -> Void = { _ in }
 
     @State private var asks = false
     @State private var showsLibrary = false
     @State private var item: PhotosPickerItem?
     @State private var isReading = false
     @State private var unreadable = false
+    @State private var unreadableReason = ""
 
     private static let thumbnail: CGFloat = 140
 
@@ -43,6 +46,9 @@ struct PhotoSlot: View {
             }
             if unreadable {
                 Text(L10n.t("ios.photo.unreadable")).font(.footnote).foregroundStyle(.red)
+                #if DEBUG
+                Text(unreadableReason).font(.caption2).foregroundStyle(.secondary)
+                #endif
             }
         }
         .confirmationDialog(L10n.plain("image.add"), isPresented: $asks, titleVisibility: .hidden) {
@@ -106,15 +112,31 @@ struct PhotoSlot: View {
     private func read(_ chosen: PhotosPickerItem) async {
         unreadable = false
         isReading = true
-        defer { isReading = false }
-        // As an image first (what the library really holds: HEIC, JPEG, a Live Photo's still),
-        // and as plain data if that fails.
-        var data = (try? await chosen.loadTransferable(type: PickedImage.self))?.data
-        if data == nil { data = try? await chosen.loadTransferable(type: Data.self) }
-        guard let data, await onChosen(data) else {
-            unreadable = true
-            return
+        onReadingChanged(true)
+        defer {
+            isReading = false
+            onReadingChanged(false)
         }
+        // Three ways to get the original bytes, from the most to the least specific: the
+        // library holds HEIC, JPEG, Live Photo stills and iCloud originals, and any one of
+        // them may refuse what another gives.
+        var reasons: [String] = []
+        var data: Data?
+        do { data = try await chosen.loadTransferable(type: PickedImage.self)?.data } catch { reasons.append("image: \(error)") }
+        if data == nil {
+            do { data = try await chosen.loadTransferable(type: Data.self) } catch { reasons.append("data: \(error)") }
+        }
+        if data == nil {
+            do { data = try await chosen.loadTransferable(type: PickedFile.self)?.data } catch { reasons.append("file: \(error)") }
+        }
+        guard let data else { return fail("could not load the photo (\(reasons.joined(separator: "; ")))") }
+        guard await onChosen(data) else { return fail("could not prepare \(data.count) bytes") }
+    }
+
+    private func fail(_ reason: String) {
+        Logger(subsystem: "net.fontapp.FontApp", category: "photo").error("choosing a photo failed: \(reason, privacy: .public)")
+        unreadableReason = reason
+        unreadable = true
     }
 }
 
@@ -124,5 +146,16 @@ private struct PickedImage: Transferable {
 
     static var transferRepresentation: some TransferRepresentation {
         DataRepresentation(importedContentType: .image) { PickedImage(data: $0) }
+    }
+}
+
+/// The same, received as a file (an iCloud original is downloaded first) and read at once.
+private struct PickedFile: Transferable {
+    let data: Data
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(importedContentType: .image) { received in
+            PickedFile(data: try Data(contentsOf: received.file))
+        }
     }
 }

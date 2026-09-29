@@ -1,5 +1,6 @@
 import Foundation
 import ImageIO
+import UIKit
 import UniformTypeIdentifiers
 
 /// Turns a picked photo into what `POST /images` takes: a JPEG no larger than it needs to
@@ -22,6 +23,19 @@ nonisolated enum PhotoPreparer {
     enum Failure: Error { case unreadable }
 
     static func prepare(_ original: Data) throws -> Prepared {
+        do {
+            return try prepareFromSource(original)
+        } catch {
+            // ImageIO refused it: let UIKit decode it (formats and colour spaces it knows), and
+            // prepare the JPEG it hands back. The EXIF is read from the original first.
+            guard let image = UIImage(data: original), let jpeg = image.jpegData(compressionQuality: 1) else { throw error }
+            let meta = CGImageSourceCreateWithData(original as CFData, nil).map(metadata(of:)) ?? PhotoMeta()
+            let prepared = try prepareFromSource(jpeg)
+            return Prepared(jpeg: prepared.jpeg, meta: meta)
+        }
+    }
+
+    private static func prepareFromSource(_ original: Data) throws -> Prepared {
         guard let source = CGImageSourceCreateWithData(original as CFData, nil) else { throw Failure.unreadable }
         let meta = metadata(of: source)
         let options: [CFString: Any] = [
