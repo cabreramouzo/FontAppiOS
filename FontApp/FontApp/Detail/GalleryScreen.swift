@@ -139,6 +139,10 @@ private struct AddGalleryPhotoSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var pickerItem: PhotosPickerItem?
     @State private var photo: Data?
+    /// The camera hands over pixels without EXIF: the date and position are the facts.
+    @State private var fromCamera = false
+    @State private var showsCamera = false
+    @Environment(LocationService.self) private var location
     @State private var kind: FontPhoto.Kind = .fountain
     @State private var caption = ""
     @State private var isSending = false
@@ -151,8 +155,16 @@ private struct AddGalleryPhotoSheet: View {
                     Section { Text(error).foregroundStyle(.red) }
                 }
                 Section {
+                    // Standing in front of it is when there is something to photograph.
+                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        Button { showsCamera = true } label: {
+                            Label(L10n.t("ios.takePhoto"), systemImage: "camera")
+                                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        }
+                    }
                     PhotosPicker(selection: $pickerItem, matching: .images) {
                         Label(L10n.t("gallery.choose"), systemImage: "photo.on.rectangle")
+                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                     }
                     if let photo, let image = UIImage(data: photo) {
                         Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 200)
@@ -187,7 +199,19 @@ private struct AddGalleryPhotoSheet: View {
             }
             .onChange(of: pickerItem) { _, item in
                 guard let item else { return }
-                Task { photo = try? await item.loadTransferable(type: Data.self) }
+                Task {
+                    photo = try? await item.loadTransferable(type: Data.self)
+                    fromCamera = false
+                }
+            }
+            .fullScreenCover(isPresented: $showsCamera) {
+                CameraPicker { jpeg in
+                    showsCamera = false
+                    guard let jpeg else { return }
+                    photo = jpeg
+                    fromCamera = true
+                }
+                .ignoresSafeArea()
             }
         }
     }
@@ -199,9 +223,17 @@ private struct AddGalleryPhotoSheet: View {
         Task {
             defer { isSending = false }
             do {
-                let prepared = try await Task.detached(priority: .userInitiated) {
+                var prepared = try await Task.detached(priority: .userInitiated) {
                     try PhotoPreparer.prepare(photo)
                 }.value
+                if fromCamera {
+                    var meta = PhotoMeta(takenAt: .now)
+                    if location.isAuthorized, let fix = location.location, fix.horizontalAccuracy <= RemoteReview.maxAccuracy {
+                        meta.latitude = fix.coordinate.latitude
+                        meta.longitude = fix.coordinate.longitude
+                    }
+                    prepared = PhotoPreparer.Prepared(jpeg: prepared.jpeg, meta: meta)
+                }
                 let url = try await APIClient.shared.uploadImage(prepared.jpeg, meta: prepared.meta)
                 let text = caption.trimmingCharacters(in: .whitespacesAndNewlines)
                 _ = try await APIClient.shared.addFontPhoto(fontID, url: url, kind: kind, caption: text.isEmpty ? nil : text)
