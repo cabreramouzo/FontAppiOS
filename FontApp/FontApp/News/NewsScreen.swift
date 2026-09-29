@@ -23,8 +23,14 @@ struct NewsScreen: View {
                 ToolbarItem(placement: .topBarTrailing) { filterMenu }
                 if session.isSignedIn { ToolbarItem(placement: .topBarTrailing) { BellButton() } }
             }
-            .refreshable { await model.reload(location: location.location) }
+            .refreshable {
+                async let pulse: Void = model.reloadPulse()
+                await model.reload(location: location.location)
+                await pulse
+            }
         }
+        // Global, like on the web: it does not follow the feed filter, so it loads once.
+        .task { await model.reloadPulse() }
         .task(id: ReloadKey(scope: model.effectiveScope(location: location.location), km: model.km, country: model.country)) {
             await model.reload(location: location.location)
         }
@@ -67,6 +73,9 @@ struct NewsScreen: View {
                 Text(L10n.t("news.intro"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                if let pulse = model.pulse, !pulse.isEmpty {
+                    PulseStrip(pulse: pulse, me: session.user?.username)
+                }
                 if case .failed(let message) = model.state {
                     Label(message, systemImage: "wifi.exclamationmark")
                         .font(.callout)
@@ -172,6 +181,113 @@ struct NewsScreen: View {
             }
         } label: {
             Label(L10n.t("map.filters"), systemImage: "line.3.horizontal.decrease")
+        }
+    }
+}
+
+/// Who went up a level and who is about to, above the feed, as on the web
+/// (`PulseStrip.tsx`). Starts folded, like the web on a phone: the feed is what people
+/// come for. Not drawn at all when there is nothing to tell.
+private struct PulseStrip: View {
+    let pulse: PulseSnapshot
+    let me: String?
+    @State private var open = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.snappy) { open.toggle() }
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "chart.line.uptrend.xyaxis").foregroundStyle(Color.accentColor)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L10n.t("pulse.title")).font(.subheadline.weight(.heavy))
+                        Text(L10n.t("pulse.summary", ["promoted": pulse.promotions.count,
+                                                      "climbers": pulse.climbers.count]))
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.down")
+                        .rotationEffect(.degrees(open ? 180 : 0))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(minHeight: 52)
+                .padding(.horizontal, 14)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(L10n.t("pulse.hint"))
+
+            if open {
+                VStack(alignment: .leading, spacing: 18) {
+                    Text(L10n.t("pulse.hint")).font(.caption).foregroundStyle(.secondary)
+                    if !pulse.promotions.isEmpty {
+                        PulseColumn(title: L10n.t("pulse.promoted"), rows: pulse.promotions) { p in
+                            HStack(spacing: 8) {
+                                LevelImage(key: p.level, size: 34)
+                                who(p.username, then: L10n.t("pulse.reached", ["level": L10n.t("game.level.\(p.level)")]))
+                            }
+                        }
+                    }
+                    if !pulse.climbers.isEmpty {
+                        PulseColumn(title: L10n.t("pulse.climbers"), rows: pulse.climbers) { c in
+                            VStack(alignment: .leading, spacing: 4) {
+                                who(c.username, then: L10n.t("pulse.needs", ["n": c.remaining,
+                                                                             "level": L10n.t("game.level.\(c.nextLevel)")]))
+                                ProgressView(value: min(max(c.pct, 0), 100), total: 100)
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 14)
+                .padding(.bottom, 14)
+                .transition(.opacity)
+            }
+        }
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 14))
+        .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(Color(.separator), lineWidth: 0.5) }
+    }
+
+    /// The name, linked to the profile; "(you)" when it is you, as on the web.
+    private func who(_ username: String, then text: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 4) {
+                UserLink(username: username).fontWeight(.bold)
+                if username == me {
+                    Text(verbatim: "(\(L10n.t("pulse.mine")))").fontWeight(.bold).foregroundStyle(Color.accentColor)
+                }
+            }
+            Text(text).foregroundStyle(.primary)
+        }
+        .font(.subheadline)
+    }
+}
+
+/// One of the two lists, cut at five rows with its own "see N more" (web: `VISIBLES`).
+private struct PulseColumn<Row: Hashable, Content: View>: View {
+    let title: String
+    let rows: [Row]
+    @ViewBuilder let content: (Row) -> Content
+    @State private var expanded = false
+    private let visible = 5
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title.uppercased())
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.secondary)
+            ForEach(expanded ? rows : Array(rows.prefix(visible)), id: \.self) { content($0) }
+            if rows.count > visible {
+                Button {
+                    withAnimation(.snappy) { expanded.toggle() }
+                } label: {
+                    Label(expanded ? L10n.t("pulse.less") : L10n.t("pulse.more", ["n": rows.count - visible]),
+                          systemImage: expanded ? "chevron.up" : "chevron.down")
+                        .font(.subheadline)
+                        .frame(minHeight: 44)
+                }
+                .buttonStyle(.borderless)
+            }
         }
     }
 }

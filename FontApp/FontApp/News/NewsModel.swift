@@ -37,6 +37,9 @@ final class NewsModel {
         didSet { defaults.set(country, forKey: Self.countryKey) }
     }
     private(set) var items: [ActivityItem] = []
+    /// The level race above the feed. `nil` until loaded, and kept on failure: it is an
+    /// extra over the feed, so an error never shows.
+    private(set) var pulse: PulseSnapshot?
     private(set) var state: State = .idle
     private(set) var canLoadMore = false
     private(set) var isLoadingMore = false
@@ -105,6 +108,10 @@ final class NewsModel {
             guard requestGeneration == generation else { return }
             canLoadMore = false
         }
+    }
+
+    func reloadPulse() async {
+        if let fresh = try? await api.pulse() { pulse = fresh }
     }
 
     private func fetch(before: Double?) async throws -> [ActivityItem] {

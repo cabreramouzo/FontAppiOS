@@ -129,6 +129,11 @@ nonisolated struct APIClient: Sendable {
         return try await get("/activity", query: query)
     }
 
+    /// Who went up a level this week and who is close to it. Global, not filtered by zone.
+    func pulse() async throws -> PulseSnapshot {
+        try await get("/activity/pulse")
+    }
+
     /// Every fountain in a box, as summaries (at most 3,000; the map's legacy endpoint).
     /// For offline zones, where clusters would be of no use.
     func fontsInBounds(_ box: MapBox) async throws -> [FontSummary] {

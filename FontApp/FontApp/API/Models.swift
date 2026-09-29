@@ -565,3 +565,26 @@ nonisolated struct PublicGamification: Decodable, Sendable {
     var badges: [BadgesPreview.Badge] = []
     var level: String? = nil
 }
+
+/// `GET /activity/pulse`: the level race shown above the news feed.
+nonisolated struct PulseSnapshot: Codable, Hashable, Sendable {
+    struct Promotion: Codable, Hashable, Sendable {
+        let username: String
+        /// Level key; the label comes from `game.level.<key>`.
+        let level: String
+        let gotes: Int
+    }
+
+    struct Climber: Codable, Hashable, Sendable {
+        let username: String
+        let nextLevel: String
+        let gotes: Int
+        let remaining: Int
+        let pct: Double
+    }
+
+    let promotions: [Promotion]
+    let climbers: [Climber]
+
+    var isEmpty: Bool { promotions.isEmpty && climbers.isEmpty }
+}
