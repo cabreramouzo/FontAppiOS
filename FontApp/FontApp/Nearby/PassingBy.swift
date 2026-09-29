@@ -3,6 +3,7 @@ import CoreMotion
 import Foundation
 import Observation
 import OSLog
+import UIKit
 import UserNotifications
 
 /// "You are passing by a fountain: is it flowing?", answered from the notice itself.
@@ -207,10 +208,53 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
         refresh.notifyOnExit = true
         manager.startMonitoring(for: refresh)
         log.info("watching \(chosen.count) fountains")
+        await saveCovers(for: chosen)
+    }
+
+    // MARK: Covers
+
+    /// The cover of each watched fountain, saved small on the phone while there is
+    /// signal: the notice carries it, and on the Watch a photo says which fountain it is
+    /// faster than a name (most have none). Near a fountain there is often no signal.
+    private static var coversDirectory: URL {
+        URL.cachesDirectory.appending(path: "passingBy", directoryHint: .isDirectory)
+    }
+
+    private static func coverFile(_ id: UUID) -> URL {
+        coversDirectory.appending(path: "\(id.uuidString).jpg")
+    }
+
+    private func saveCovers(for chosen: [FontSummary]) async {
+        let fm = FileManager.default
+        try? fm.createDirectory(at: Self.coversDirectory, withIntermediateDirectories: true)
+        let keep = Set(chosen.filter { $0.image != nil }.map { "\($0.id.uuidString).jpg" })
+        for name in (try? fm.contentsOfDirectory(atPath: Self.coversDirectory.path())) ?? [] where !keep.contains(name) {
+            try? fm.removeItem(at: Self.coversDirectory.appending(path: name))
+        }
+        for font in chosen {
+            let file = Self.coverFile(font.id)
+            guard !fm.fileExists(atPath: file.path()), let url = APIClient.shared.imageURL(font.image) else { continue }
+            guard let (data, response) = try? await URLSession.shared.data(from: url),
+                  (response as? HTTPURLResponse)?.statusCode == 200,
+                  let small = await UIImage(data: data)?.byPreparingThumbnail(ofSize: CGSize(width: 480, height: 480)),
+                  let jpeg = small.jpegData(compressionQuality: 0.7) else { continue }
+            try? jpeg.write(to: file, options: .atomic)
+        }
+    }
+
+    /// iOS moves an attachment's file into its own store: a copy goes, the cover stays
+    /// for the next time.
+    private static func coverAttachment(_ id: UUID) -> UNNotificationAttachment? {
+        let file = coverFile(id)
+        guard FileManager.default.fileExists(atPath: file.path()) else { return nil }
+        let copy = URL.temporaryDirectory.appending(path: "passingBy-\(UUID().uuidString).jpg")
+        guard (try? FileManager.default.copyItem(at: file, to: copy)) != nil else { return nil }
+        return try? UNNotificationAttachment(identifier: "cover", url: copy, options: nil)
     }
 
     private func stop() {
         for region in manager.monitoredRegions { manager.stopMonitoring(for: region) }
+        try? FileManager.default.removeItem(at: Self.coversDirectory)
         watched = [:]
         defaults.removeObject(forKey: Self.watchedKey)
     }
@@ -289,6 +333,7 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
         content.body = L10n.t("ios.passingBy.noticeBody")
         content.sound = .default
         content.categoryIdentifier = Self.category
+        if let cover = Self.coverAttachment(font.id) { content.attachments = [cover] }
         content.threadIdentifier = Self.category
         content.userInfo = ["url": "/fonts/\(font.id.uuidString)", "fontID": font.id.uuidString,
                             "fontName": font.name ?? ""]
