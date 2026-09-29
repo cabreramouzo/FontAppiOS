@@ -33,6 +33,8 @@ struct FontDetailView: View {
     @State private var deleting: Deletion?
     @State private var photoRemoval: PhotoRemovalStatus?
     @State private var coverAction: CoverAction?
+    @State private var viewingReviewPhoto: PhotoToView?
+    @Namespace private var reviewPhotoZoom
 
     /// Taking the cover down, or asking for it: both confirmed first.
     private enum CoverAction { case remove, request }
@@ -139,6 +141,9 @@ struct FontDetailView: View {
                 if let action = coverAction { cover(action) }
             }
             Button(L10n.t("form.cancel"), role: .cancel) {}
+        }
+        .fullScreenCover(item: $viewingReviewPhoto) { photo in
+            photo.viewer(name: L10n.fontName(loadedFont?.name ?? preview?.name), zoom: reviewPhotoZoom)
         }
         .sheet(isPresented: $writesReview) {
             if let font = loadedFont {
@@ -667,13 +672,10 @@ struct FontDetailView: View {
             // one line, the three chips where the thumb is, and the way there. The rest is
             // one swipe up.
             header(font)
-            // First, when it shows at all: then you are there, and nothing on the page
-            // matters more. The rest of the time it takes no room.
-            FinalApproachSection(coordinate: CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
-                                 hasPhoto: font.image != nil, tracker: approach)
             HiddenNotice(font: font)
             if let quick = model.quickReview {
-                QuickReviewSection(model: quick, onChange: { await model.load() },
+                QuickReviewSection(model: quick, ownRecent: model.ownRecentReport(by: session.user?.id),
+                                   onChange: { await model.load() },
                                    onSignIn: { showsSignIn = true })
             }
             if let followUp {
@@ -687,6 +689,11 @@ struct FontDetailView: View {
                     }
                 }
             }
+            // Right under the chips, when it shows at all: the chips are what the short
+            // card opens for, and a big arrow above them pushed them out of it. The rest of
+            // the time it takes no room.
+            FinalApproachSection(coordinate: CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                 hasPhoto: font.image != nil, tracker: approach)
             if let nearWater { nearWaterSection(nearWater) }
             statusSection(font)
             let photos = FountainPhoto.all(cover: font.image, reviews: model.reviews)
@@ -736,25 +743,44 @@ struct FontDetailView: View {
                 daysSinceCheck: model.evidence(for: font).lastUpdate.map {
                     Int(Date.now.timeIntervalSince($0) / 86_400)
                 })
-            do {
-                let confirmable = session.isSignedIn ? model.confirmable(by: session.user?.id) : nil
-                Section(L10n.t("detail.statusReviews")) {
+            // As on the web: the current report on its own, what to do about it right
+            // under it, and the history one tap away.
+            Section(L10n.t("detail.statusReviews")) {
+                if let latest = model.latestReview {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ReviewRow(review: latest, zoom: reviewPhotoZoom,
+                                  onPhoto: { viewingReviewPhoto = PhotoToView(review: latest) })
+                        if latest.waterStatus != nil, let confirmed = latest.lastConfirmedAt {
+                            Text(L10n.t("confirm.lastConfirmed", ["when": RelativeTime.string(since: confirmed)]))
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
+                    }
+                    .contextMenu { reviewMenu(latest, font) }
+                    reviewActions(latest)
+                } else {
+                    Text(L10n.t("detail.beFirst")).foregroundStyle(.secondary)
                     Button {
                         if session.isSignedIn { writesReview = true } else { showsSignIn = true }
                     } label: {
-                        Label(L10n.t("detail.newUpdate"), systemImage: "square.and.pencil")
+                        Label(L10n.t("detail.reportStatus"), systemImage: "square.and.pencil")
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(session.isStaff ? Color.staff : .accentColor)
+                }
+                if let error = model.actionError {
+                    Text(error).font(.subheadline).foregroundStyle(.red)
+                }
+                let previous = model.previousReviews
+                if !previous.isEmpty {
+                    NavigationLink {
+                        PreviousReviewsScreen(model: model, fontName: L10n.fontName(font.name)) { review in
+                            reviewMenu(review, font)
+                        }
+                    } label: {
+                        Text(L10n.t("detail.viewPreviousReviews", ["n": previous.count]))
                     }
                     .frame(minHeight: 44)
-                    ForEach(model.reviews) { review in
-                        ReviewRow(review: review)
-                            .contextMenu { reviewMenu(review, font) }
-                        if review.id == confirmable?.id {
-                            stillTheSameButton(review)
-                        }
-                    }
-                    if let error = model.actionError {
-                        Text(error).font(.subheadline).foregroundStyle(.red)
-                    }
                 }
             }
             Section(L10n.t("detail.incidents", ["n": model.reports.count])) {
@@ -797,7 +823,7 @@ struct FontDetailView: View {
                 Button {
                     if session.isSignedIn { reportTarget = ReportTarget(replyTo: nil) } else { showsSignIn = true }
                 } label: {
-                    Label(L10n.t("report.add"), systemImage: "exclamationmark.bubble")
+                    Label(L10n.t("ios.report.add"), systemImage: "exclamationmark.bubble")
                 }
                 .frame(minHeight: 44)
             }
@@ -808,17 +834,61 @@ struct FontDetailView: View {
         .listStyle(.insetGrouped)
     }
 
-    /// "Still the same": backs someone else's latest report instead of repeating it.
+    /// Under the current report: "still the same +N" (green, filled once you said it)
+    /// and "it changed", which opens the full review. Without a session both ask to sign in.
+    private func reviewActions(_ latest: CommentResponse) -> some View {
+        let canConfirm = session.isSignedIn
+            ? model.confirmable(by: session.user?.id)?.id == latest.id
+            : latest.waterStatus != nil
+        return HStack(spacing: 8) {
+            if canConfirm { stillTheSameButton(latest) }
+            Button {
+                if session.isSignedIn { writesReview = true } else { showsSignIn = true }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "pencil")
+                    Text(L10n.t("detail.changed")).lineLimit(1).minimumScaleFactor(0.8)
+                }
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .tint(session.isStaff ? Color.staff : .accentColor)
+        }
+        .listRowInsets(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
+    }
+
+    /// "Still the same": backs the latest report instead of repeating it. The count is
+    /// the people who already did; saying it fills the button and adds you.
     private func stillTheSameButton(_ review: CommentResponse) -> some View {
         let active = review.confirmedByMe ?? false
-        return Button {
-            Task { await model.setStillTheSame(review, !active) }
-        } label: {
-            Label(L10n.t("confirm.keepSame"), systemImage: active ? "hand.thumbsup.fill" : "hand.thumbsup")
-                .frame(maxWidth: .infinity, minHeight: 44)
+        let count = review.confirmations ?? 0
+        let tint = session.isStaff ? Color.staff : Color.green
+        let label = HStack(spacing: 6) {
+            Image(systemName: active ? "hand.thumbsup.fill" : "hand.thumbsup")
+            Text(L10n.t(active ? "confirm.confirmed" : "confirm.keepSame"))
+                .lineLimit(1).minimumScaleFactor(0.8)
+            if count > 0 {
+                Text("+\(count)")
+                    .font(.footnote.weight(.bold)).monospacedDigit()
+                    .padding(.horizontal, 6).padding(.vertical, 1)
+                    .background(active ? Color.white.opacity(0.25) : tint.opacity(0.15), in: Capsule())
+            }
         }
-        .buttonStyle(.bordered)
-        .tint(session.isStaff ? Color.staff : .accentColor)
+        .font(.body.weight(.semibold))
+        .frame(maxWidth: .infinity, minHeight: 44)
+        let action = {
+            guard session.isSignedIn else { showsSignIn = true; return }
+            Task { await model.setStillTheSame(review, !active) }
+        }
+        return Group {
+            if active {
+                Button(action: action) { label }.buttonStyle(.borderedProminent)
+            } else {
+                Button(action: action) { label }.buttonStyle(.bordered)
+            }
+        }
+        .tint(tint)
         .accessibilityHint(L10n.t(active ? "confirm.titleActive" : "confirm.titleInactive"))
     }
 
@@ -1003,8 +1073,13 @@ private struct PhotoView: View {
     }
 }
 
-private struct ReviewRow: View {
+struct ReviewRow: View {
     let review: CommentResponse
+    /// Opens the photo full screen; presented by whoever holds the row, not from inside
+    /// the list (a cover hung on a lazy list row dismissed the fountain sheet).
+    /// Where the full-screen photo shrinks back to when closed.
+    var zoom: Namespace.ID? = nil
+    var onPhoto: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -1016,14 +1091,21 @@ private struct ReviewRow: View {
                     .foregroundStyle(.secondary)
             }
             if !review.body.isEmpty { MentionText(review.body) }
-            if let url = APIClient.shared.imageURL(review.image) {
-                AsyncImage(url: url) { image in
-                    image.resizable().scaledToFill()
-                } placeholder: {
-                    Color(.secondarySystemFill)
+            if let image = review.image, let url = PhotoToView.url(image) {
+                Button { onPhoto?() } label: {
+                    AsyncImage(url: url) { image in
+                        image.resizable().scaledToFill()
+                    } placeholder: {
+                        Color(.secondarySystemFill)
+                    }
+                    .frame(width: 120, height: 90)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .contentShape(RoundedRectangle(cornerRadius: 8))
+                    .transitionSource(id: review.id, in: zoom)
                 }
-                .frame(width: 120, height: 90)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .buttonStyle(.borderless)
+                .disabled(onPhoto == nil)
+                .accessibilityLabel(L10n.t("carousel.review"))
             }
             HStack(spacing: 8) {
                 if let user = review.username { UserLink(username: user) } else { Text(L10n.t("review.anon")) }
@@ -1069,5 +1151,51 @@ private struct ReportRow: View {
         }
         .padding(.leading, report.parentID == nil ? 0 : 16)
         .padding(.vertical, 4)
+    }
+}
+
+/// A review's photo, opened full screen in the zoomable viewer.
+struct PhotoToView: Identifiable {
+    let review: CommentResponse
+    var id: UUID { review.id }
+
+    /// A photo saved with an offline zone is read from the phone.
+    static func url(_ image: String) -> URL? {
+        OfflineZones.shared.photoFile(for: image) ?? APIClient.shared.imageURL(image)
+    }
+
+    /// Opens from the thumbnail and shrinks back into it, as the carousel's photos.
+    func viewer(name: String, zoom: Namespace.ID) -> some View {
+        PhotoViewer(name: name,
+                    photos: [FountainPhoto(id: review.id.uuidString, image: review.image ?? "", review: review)],
+                    url: Self.url, index: 0)
+            .navigationTransition(.zoom(sourceID: review.id, in: zoom))
+    }
+}
+
+private extension View {
+    @ViewBuilder func transitionSource(id: UUID, in namespace: Namespace.ID?) -> some View {
+        if let namespace { matchedTransitionSource(id: id, in: namespace) } else { self }
+    }
+}
+
+/// Every review but the newest, newest first, pushed from the fountain's page.
+struct PreviousReviewsScreen<Menu: View>: View {
+    let model: FontDetailModel
+    let fontName: String
+    @ViewBuilder let menu: (CommentResponse) -> Menu
+
+    @State private var viewing: PhotoToView?
+    @Namespace private var zoom
+
+    var body: some View {
+        List(model.previousReviews) { review in
+            ReviewRow(review: review, zoom: zoom, onPhoto: { viewing = PhotoToView(review: review) })
+                .contextMenu { menu(review) }
+        }
+        .listStyle(.insetGrouped)
+        .navigationTitle(L10n.t("detail.statusReviews"))
+        .navigationBarTitleDisplayMode(.inline)
+        .fullScreenCover(item: $viewing) { $0.viewer(name: fontName, zoom: zoom) }
     }
 }

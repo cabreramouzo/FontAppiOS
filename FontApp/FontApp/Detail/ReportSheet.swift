@@ -57,7 +57,7 @@ struct ReportSheet: View {
                     }
                 }
             }
-            .navigationTitle(L10n.t(editing != nil ? "detail.edit" : replyTo == nil ? "report.add" : "report.reply"))
+            .navigationTitle(L10n.t(editing != nil ? "detail.edit" : replyTo == nil ? "ios.report.add" : "report.reply"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

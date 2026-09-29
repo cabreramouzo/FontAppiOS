@@ -70,6 +70,12 @@
             ReferencedContainer = "container:FontApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-FontAppAPI https://fontapp.fly.dev"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <LocationScenarioReference
          identifier = "Simulator/Moia.gpx"
          referenceType = "0">

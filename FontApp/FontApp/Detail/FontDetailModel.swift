@@ -89,10 +89,36 @@ final class FontDetailModel {
 
     /// The review "still the same" is offered on: the latest one with a water status, if
     /// someone else wrote it (confirming your own report is refused for a day).
-    func confirmable(by userID: UUID?) -> CommentResponse? {
-        guard let userID, let latest = reviews.filter({ $0.waterStatus != nil })
-            .max(by: { $0.createdAt < $1.createdAt }), latest.userID != userID else { return nil }
+    func confirmable(by userID: UUID?, now: Date = .now) -> CommentResponse? {
+        guard let userID, let latest = latestReview, latest.waterStatus != nil else { return nil }
+        if latest.userID == userID {
+            // Your own report: the server lets you say it again a day after the report and
+            // after your last confirmation (`web/src/lib/selfConfirm.ts`); before, a 403.
+            let last = [latest.createdAt, latest.lastConfirmedAt].compactMap { $0 }.max() ?? latest.createdAt
+            guard now.timeIntervalSince(last) >= 86_400 else { return nil }
+        }
         return latest
+    }
+
+    /// Your own status report, while it is too recent to say it again: the server refuses
+    /// confirming your own report for a day (`confirm.tooSoon`, `web/src/lib/selfConfirm.ts`),
+    /// so the chips would only publish a twin — the fountain's creation status included,
+    /// which is its first review.
+    func ownRecentReport(by userID: UUID?, now: Date = .now) -> CommentResponse? {
+        guard let userID, let latest = latestReview, latest.waterStatus != nil,
+              latest.userID == userID else { return nil }
+        return confirmable(by: userID, now: now) == nil ? latest : nil
+    }
+
+    /// The newest review: the current status card. The rest are the history.
+    var latestReview: CommentResponse? {
+        reviews.max { $0.createdAt != $1.createdAt ? $0.createdAt < $1.createdAt : $0.id.uuidString > $1.id.uuidString }
+    }
+
+    /// Everything but the newest, newest first.
+    var previousReviews: [CommentResponse] {
+        let latestID = latestReview?.id
+        return reviews.filter { $0.id != latestID }.sorted { $0.createdAt > $1.createdAt }
     }
 
     func setStillTheSame(_ review: CommentResponse, _ on: Bool) async {

@@ -9,7 +9,10 @@ the source of truth for the API and for every product decision. **Read it; don't
 here** — copies go stale. Give this session access to that folder (in the desktop app,
 add it as an extra directory; in the terminal, `/add-dir /Users/mac/src/FontAppBE`).
 
-- Product rules and the reasoning behind them: `FontAppBE/CLAUDE.md` (long; search it).
+- **Client rules: `FontAppBE/docs/client-rules.md`.** Every product rule a client must
+  keep, with who enforces it (server / client / both). Read the sections a screen touches
+  **before** building it. When a rule is learnt here (field test, bug), add it there.
+- Product rules and the full reasoning behind them: `FontAppBE/CLAUDE.md` (long; search it).
 - API contract: `FontAppBE/docs/api.md`. **Partly stale** — when it disagrees with the
   code, the code wins: routes in `Sources/App/routes.swift` and `Sources/App/Controllers/`,
   DTOs next to their controller. The web client's calls in `web/src/api/client.ts` are a

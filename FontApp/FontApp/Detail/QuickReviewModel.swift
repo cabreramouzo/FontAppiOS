@@ -59,9 +59,20 @@ final class QuickReviewModel {
     /// clock, so the button goes away on its own when the window closes.
     private(set) var canUndo = false
 
+    /// A review (or its "still the same") went out or waits in the outbox: the chips are
+    /// done until it is undone. Leaving the page and coming back, the server decides —
+    /// `confirmIfUnchanged` turns a repeat into a confirmation.
+    var hasSpoken: Bool {
+        switch state {
+        case .sent, .queued: true
+        case .idle, .sending, .undone, .failed: false
+        }
+    }
+
     /// The chip was tapped. `fix` is only passed when location permission is granted.
     func tap(_ status: WaterStatus, fix: CLLocation?) async -> Bool {
         if case .sending = state { return false }
+        guard !hasSpoken else { return false }
         let meters = RemoteReview.distance(from: fix, to: coordinate)
         if let meters, !Self.remoteConfirmed.contains(fontID) {
             remoteQuestion = RemoteQuestion(status: status, meters: meters)

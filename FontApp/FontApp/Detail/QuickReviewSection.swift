@@ -5,6 +5,8 @@ import SwiftUI
 /// them is how people find out that anyone can say how a fountain is.
 struct QuickReviewSection: View {
     @Bindable var model: QuickReviewModel
+    /// Your own report is the latest and less than a day old: nothing new to say yet.
+    let ownRecent: CommentResponse?
     /// Reloads the fountain after a review lands or is undone.
     let onChange: () async -> Void
     /// Presented by the page, not from inside the list: a sheet hung on a lazy list
@@ -16,7 +18,16 @@ struct QuickReviewSection: View {
 
     var body: some View {
         Section(L10n.t("popup.howIsIt")) {
-            chips
+            // Once said, the chips give way to the thanks, as in the web popup: one tap is
+            // one review, and a second tap cannot publish a twin. Undoing brings them back.
+            if model.hasSpoken {
+                EmptyView()
+            } else if let ownRecent, let status = ownRecent.waterStatus.flatMap(WaterStatus.init(rawValue:)) {
+                Text("\(status.emoji) \(L10n.t(status.labelKey))").font(.subheadline.weight(.semibold))
+                Text(L10n.t("err.confirm.tooSoon")).font(.footnote).foregroundStyle(.secondary)
+            } else {
+                chips
+            }
             if session.isSignedIn {
                 feedback
             } else {

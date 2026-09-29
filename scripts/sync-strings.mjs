@@ -45,9 +45,22 @@ const KEYS = [
   'profile.deleteAccount', 'profile.confirmDelete', 'profile.dangerZone', 'profile.dangerZoneHint',
   'maintenance.recovered', 'favorite.save', 'favorite.saved',
   'detail.noPhotoYet', 'detail.viewOnMap', 'detail.share', 'detail.shareText', 'detail.nearWaterTitle', 'detail.nearWaterGo', 'form.cancel', 'detail.createdBy', 'detail.pioneerBy', 'detail.mayorBy', 'detail.mayorReviews', 'detail.mayorHelp', 'detail.confirmDeleteFont', 'detail.delete', 'detail.newUpdate', 'detail.confirmDeleteIncident', 'review.confirmDelete', 'detail.useAsMainPhoto', 'detail.photoSetAsMain', 'form.undo', 'form.create', 'detail.municipality', 'footer.legal', 'nav.guide', 'detail.region', 'detail.country', 'detail.stale',
+  'detail.changed', 'detail.viewPreviousReviews', 'detail.reportStatus',
 ]
 
 const IOS_ONLY = {
+  // The web's `report.add` ("report an issue") read as if only breakdowns belonged
+  // there; the section is for notes too, as its title says.
+  'ios.report.add': {
+    ca: 'Informa d’un avís o incidència',
+    es: 'Reportar un aviso o incidencia',
+    gl: 'Informar dun aviso ou incidencia',
+    eu: 'Jakinarazi ohar edo gorabehera bat',
+    en: 'Report a note or issue',
+    fr: 'Signaler une remarque ou un problème',
+    pt: 'Reportar um aviso ou incidente',
+    it: 'Segnala un avviso o un problema',
+  },
   'ios.deleteAccount.pending': {
     ca: 'Abans s’enviarà el que tens pendent en aquest telèfon ({n}); el que no es pugui enviar es perdrà.',
     es: 'Antes se enviará lo que tienes pendiente en este teléfono ({n}); lo que no se pueda enviar se perderá.',

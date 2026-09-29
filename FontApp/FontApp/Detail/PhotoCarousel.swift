@@ -50,12 +50,15 @@ struct PhotoCarousel: View {
     @State private var index = 0
     @State private var viewing: Int?
     @State private var meta: [String: PhotoExif] = [:]
+    @Namespace private var zoom
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             TabView(selection: $index) {
                 ForEach(Array(photos.enumerated()), id: \.element.id) { i, photo in
-                    Button { viewing = i } label: { FilledPhoto(url: url(photo.image)) }
+                    Button { viewing = i } label: {
+                        FilledPhoto(url: url(photo.image)).matchedTransitionSource(id: photo.id, in: zoom)
+                    }
                         .buttonStyle(.plain)
                         .accessibilityLabel("\(name) — \(L10n.t(photo.review == nil ? "carousel.cover" : "carousel.review"))")
                         .tag(i)
@@ -75,7 +78,10 @@ struct PhotoCarousel: View {
             meta = Dictionary(rows.map { ($0.photoID.lowercased(), $0) }, uniquingKeysWith: { a, _ in a })
         }
         .fullScreenCover(item: Binding(get: { viewing.map(Viewing.init) }, set: { viewing = $0?.index })) { v in
-            PhotoViewer(name: name, photos: photos, url: url, index: v.index)
+            // Swiping in the viewer pages the carousel too, so closing shrinks the photo
+            // back into the page it came from.
+            PhotoViewer(name: name, photos: photos, url: url, index: v.index, onIndex: { index = $0 })
+                .navigationTransition(.zoom(sourceID: photos[min(index, photos.count - 1)].id, in: zoom))
         }
     }
 
@@ -185,23 +191,41 @@ private struct FilledPhoto: View {
 }
 
 /// The photos full screen, swiped as in the carousel; pinch or double tap to zoom.
-private struct PhotoViewer: View {
+/// Dragged up or down (unzoomed), the photo follows the finger and shrinks; let go far
+/// enough and the system's zoom transition takes it back into its thumbnail, as Photos.
+struct PhotoViewer: View {
     let name: String
     let photos: [FountainPhoto]
     let url: (String) -> URL?
     @State var index: Int
+    var onIndex: (Int) -> Void = { _ in }
+    /// Zoomed in, a drag pans the photo instead of closing the viewer.
+    @State private var zoomed = false
+    /// The drag to close, as it goes.
+    @State private var drag: CGSize = .zero
+
+    /// The web's distance to close (`CIERRE_V` in `ZoomableImage.tsx`).
+    private static let closeDistance: CGFloat = 90
+    private var progress: CGFloat { min(1, hypot(drag.width, drag.height) / 400) }
 
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         TabView(selection: $index) {
             ForEach(Array(photos.enumerated()), id: \.element.id) { i, photo in
-                ZoomablePhoto(url: url(photo.image)).tag(i)
+                ZoomablePhoto(url: url(photo.image), isCurrent: i == index, onZoom: { zoomed = $0 },
+                              onDrag: { drag = $0 }, onRelease: release).tag(i)
             }
         }
-        .tabViewStyle(.page(indexDisplayMode: photos.count > 1 ? .always : .never))
-        .background(.black)
+        .tabViewStyle(.page(indexDisplayMode: photos.count > 1 && drag == .zero ? .always : .never))
+        .scaleEffect(1 - progress * 0.45)
+        .offset(drag)
+        .background { Color.black.opacity(1 - progress).ignoresSafeArea() }
         .ignoresSafeArea()
+        // The page shows through while the photo is dragged away.
+        .presentationBackground(.clear)
+        .interactiveDismissDisabled(zoomed)
+        .onChange(of: index) { _, i in zoomed = false; onIndex(i) }
         .overlay(alignment: .topLeading) {
             Button { dismiss() } label: {
                 Image(systemName: "xmark").font(.body.weight(.semibold)).frame(width: 44, height: 44)
@@ -209,6 +233,7 @@ private struct PhotoViewer: View {
             .buttonStyle(.plain)
             .glassEffect(.regular.interactive(), in: Circle())
             .padding(.leading, 16)
+            .opacity(drag == .zero ? 1 : 0)
             .accessibilityLabel(L10n.t("ios.close"))
         }
         .overlay(alignment: .topTrailing) {
@@ -218,51 +243,196 @@ private struct PhotoViewer: View {
                     .padding(.horizontal, 12).frame(minHeight: 44)
                     .glassEffect(.regular, in: Capsule())
                     .padding(.trailing, 16)
+                    .opacity(drag == .zero ? 1 : 0)
             }
         }
         .environment(\.colorScheme, .dark)
         .accessibilityLabel(name)
     }
+
+    /// Far enough (or flicked): closed from where it is, shrinking into the thumbnail.
+    /// Not far enough: back to its place.
+    private func release(_ translation: CGSize, _ velocity: CGSize) {
+        if hypot(translation.width, translation.height) > Self.closeDistance || abs(velocity.height) > 900 {
+            dismiss()
+        } else {
+            withAnimation(.spring(duration: 0.3)) { drag = .zero }
+        }
+    }
 }
 
+/// One photo in the viewer, on a `UIScrollView`: the system's own pinch (around the
+/// fingers), pan with inertia and edge bounce, and double tap to zoom on the tapped
+/// point. Unzoomed, the scroll view has nothing to scroll, so the horizontal drag falls
+/// through to the pager and swipes to the next photo.
 private struct ZoomablePhoto: View {
     let url: URL?
+    var isCurrent = true
+    var onZoom: (Bool) -> Void = { _ in }
+    var onDrag: (CGSize) -> Void = { _ in }
+    var onRelease: (CGSize, CGSize) -> Void = { _, _ in }
 
-    @State private var scale: CGFloat = 1
-    @State private var base: CGFloat = 1
-    @State private var offset: CGSize = .zero
-    @State private var start: CGSize = .zero
+    @State private var image: UIImage?
+    @State private var failed = false
 
     var body: some View {
-        AsyncImage(url: url) { phase in
-            if case .success(let image) = phase {
-                image.resizable().scaledToFit()
-                    .scaleEffect(scale)
-                    .offset(offset)
-                    .gesture(MagnifyGesture()
-                        .onChanged { scale = max(1, min(5, base * $0.magnification)) }
-                        .onEnded { _ in
-                            base = scale
-                            if scale == 1 { withAnimation(.snappy) { offset = .zero; start = .zero } }
-                        })
-                    // Panning only while zoomed: otherwise the drag is the swipe to the next.
-                    .gesture(scale > 1 ? DragGesture()
-                        .onChanged { offset = CGSize(width: start.width + $0.translation.width,
-                                                     height: start.height + $0.translation.height) }
-                        .onEnded { _ in start = offset } : nil)
-                    .onTapGesture(count: 2) {
-                        withAnimation(.snappy) {
-                            scale = scale > 1 ? 1 : 2.5
-                            base = scale
-                            offset = .zero; start = .zero
-                        }
-                    }
-            } else if case .failure = phase {
+        ZStack {
+            if let image {
+                ZoomScrollView(image: image, isCurrent: isCurrent, onZoom: onZoom, onDrag: onDrag, onRelease: onRelease)
+            } else if failed {
                 Label(L10n.t("photo.failed"), systemImage: "photo.badge.exclamationmark").foregroundStyle(.secondary)
             } else {
                 ProgressView()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .task(id: url) {
+            image = nil; failed = false
+            guard let url else { failed = true; return }
+            if let (data, _) = try? await URLSession.shared.data(from: url), let loaded = UIImage(data: data) {
+                image = loaded
+            } else if !Task.isCancelled {
+                failed = true
+            }
+        }
+    }
+}
+
+/// Reports its layout so the image can be fitted once the page has its real size
+/// (`makeUIView` runs before that).
+private final class FittingScrollView: UIScrollView {
+    var onLayout: (() -> Void)?
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        onLayout?()
+    }
+}
+
+private struct ZoomScrollView: UIViewRepresentable {
+    let image: UIImage
+    let isCurrent: Bool
+    let onZoom: (Bool) -> Void
+    let onDrag: (CGSize) -> Void
+    let onRelease: (CGSize, CGSize) -> Void
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    func makeUIView(context: Context) -> UIScrollView {
+        let scroll = FittingScrollView()
+        scroll.delegate = context.coordinator
+        scroll.showsHorizontalScrollIndicator = false
+        scroll.showsVerticalScrollIndicator = false
+        scroll.contentInsetAdjustmentBehavior = .never
+        scroll.bouncesZoom = true
+        scroll.backgroundColor = .clear
+        scroll.maximumZoomScale = 5
+
+        let view = UIImageView(image: image)
+        view.contentMode = .scaleAspectFit
+        view.isUserInteractionEnabled = true
+        scroll.addSubview(view)
+        context.coordinator.imageView = view
+        context.coordinator.scroll = scroll
+        scroll.onLayout = { [weak c = context.coordinator] in c?.layoutIfNeeded() }
+
+        let double = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.doubleTapped(_:)))
+        double.numberOfTapsRequired = 2
+        view.addGestureRecognizer(double)
+
+        // The drag to close. The system's own (on the zoom transition) never starts here:
+        // the pager takes the touch first.
+        let pan = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.dragged(_:)))
+        pan.delegate = context.coordinator
+        scroll.addGestureRecognizer(pan)
+        return scroll
+    }
+
+    func updateUIView(_ scroll: UIScrollView, context: Context) {
+        let c = context.coordinator
+        if c.imageView?.image !== image { c.imageView?.image = image }
+        c.onZoom = onZoom
+        c.onDrag = onDrag
+        c.onRelease = onRelease
+        // Swiped away zoomed in: back to whole, so coming back finds the full photo.
+        if !isCurrent, scroll.zoomScale > 1 { scroll.setZoomScale(1, animated: false) }
+    }
+
+    final class Coordinator: NSObject, UIScrollViewDelegate, UIGestureRecognizerDelegate {
+        weak var scroll: UIScrollView?
+        weak var imageView: UIImageView?
+        var laidOutSize: CGSize = .zero
+        var onZoom: (Bool) -> Void = { _ in }
+        var onDrag: (CGSize) -> Void = { _ in }
+        var onRelease: (CGSize, CGSize) -> Void = { _, _ in }
+        private var wasZoomed = false
+
+        /// Only unzoomed and for a clearly vertical drag: zoomed, the drag pans the photo;
+        /// sideways, it is the pager's swipe to the next one.
+        func gestureRecognizerShouldBegin(_ gesture: UIGestureRecognizer) -> Bool {
+            guard let pan = gesture as? UIPanGestureRecognizer, pan !== scroll?.panGestureRecognizer,
+                  let scroll else { return true }
+            guard scroll.zoomScale <= 1.01 else { return false }
+            let v = pan.velocity(in: scroll)
+            return abs(v.y) > abs(v.x) * 1.5
+        }
+
+        @objc func dragged(_ pan: UIPanGestureRecognizer) {
+            let t = pan.translation(in: pan.view?.window)
+            switch pan.state {
+            case .changed:
+                onDrag(CGSize(width: t.x, height: t.y))
+            case .ended:
+                let v = pan.velocity(in: pan.view?.window)
+                onRelease(CGSize(width: t.x, height: t.y), CGSize(width: v.x, height: v.y))
+            case .cancelled, .failed:
+                onRelease(.zero, .zero)
+            default:
+                break
+            }
+        }
+
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? { imageView }
+
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            center()
+            let zoomed = scrollView.zoomScale > 1.01
+            // Unzoomed there is nothing to pan, and a pan that begins anyway takes the
+            // drag down from the system's close-by-zooming-back gesture.
+            scrollView.panGestureRecognizer.isEnabled = zoomed
+            if zoomed != wasZoomed { wasZoomed = zoomed; onZoom(zoomed) }
+        }
+
+        /// The image is fitted to the page at scale 1 (zoom scales are relative to that),
+        /// and re-fitted when the page changes size (rotation).
+        func layoutIfNeeded() {
+            guard let scroll, let imageView, scroll.bounds.size != .zero, scroll.bounds.size != laidOutSize else { return }
+            laidOutSize = scroll.bounds.size
+            scroll.zoomScale = 1
+            imageView.frame = CGRect(origin: .zero, size: scroll.bounds.size)
+            scroll.contentSize = scroll.bounds.size
+            scroll.panGestureRecognizer.isEnabled = false
+            center()
+        }
+
+        /// Smaller than the page (a zoom under 1 while pinching): keep it centred.
+        private func center() {
+            guard let scroll, let imageView else { return }
+            let x = max(0, (scroll.bounds.width - imageView.frame.width) / 2)
+            let y = max(0, (scroll.bounds.height - imageView.frame.height) / 2)
+            scroll.contentInset = UIEdgeInsets(top: y, left: x, bottom: y, right: x)
+        }
+
+        @objc func doubleTapped(_ gesture: UITapGestureRecognizer) {
+            guard let scroll, let imageView else { return }
+            if scroll.zoomScale > 1.01 {
+                scroll.setZoomScale(1, animated: true)
+            } else {
+                let target: CGFloat = 2.5
+                let point = gesture.location(in: imageView)
+                let size = CGSize(width: scroll.bounds.width / target, height: scroll.bounds.height / target)
+                scroll.zoom(to: CGRect(x: point.x - size.width / 2, y: point.y - size.height / 2,
+                                       width: size.width, height: size.height), animated: true)
+            }
+        }
     }
 }

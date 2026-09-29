@@ -13,9 +13,14 @@ struct ReviewSheet: View {
 
     @Environment(SessionStore.self) private var session
     @Environment(\.dismiss) private var dismiss
+    @Environment(LocationService.self) private var location
     @State private var draft = Draft()
     @State private var pickerItem: PhotosPickerItem?
     @State private var photo: Data?
+    /// A photo just taken: the camera's JPEG carries no EXIF, so when and where come from
+    /// the moment and the position (as the new-fountain form does).
+    @State private var cameraMeta: PhotoMeta?
+    @State private var showsCamera = false
     @State private var isSending = false
     @State private var error: String?
 
@@ -51,12 +56,24 @@ struct ReviewSheet: View {
                     MentionField(placeholder: L10n.t("update.howNowOpt"), text: $draft.body)
                 }
                 Section {
+                    if let photo, let image = UIImage(data: photo) {
+                        Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 180)
+                        Button(L10n.t("form.discard"), role: .destructive) {
+                            self.photo = nil; cameraMeta = nil
+                        }
+                        .frame(minHeight: 44)
+                    }
+                    // Taken on the spot or chosen from the library; Files is left out, a
+                    // fountain's photo is almost never there.
+                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        Button { showsCamera = true } label: {
+                            Label(L10n.t("ios.takePhoto"), systemImage: "camera").frame(minHeight: 44)
+                        }
+                    }
                     PhotosPicker(selection: $pickerItem, matching: .images) {
                         Label(photo == nil ? L10n.t("ios.choosePhoto") : L10n.t("detail.replacePhoto"),
                               systemImage: "photo.on.rectangle")
-                    }
-                    if let photo, let image = UIImage(data: photo) {
-                        Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 180)
+                            .frame(minHeight: 44)
                     }
                 }
             }
@@ -66,11 +83,16 @@ struct ReviewSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(role: .close) { dismiss() }
                 }
+                // As Apple's own forms on iOS 26: an icon in a filled button, which leaves
+                // the title its room. The text stays as the accessibility label.
                 ToolbarItem(placement: .confirmationAction) {
                     if isSending {
                         ProgressView()
                     } else {
-                        Button(L10n.t(editing == nil ? "update.publish" : "form.save"), action: send)
+                        Button(L10n.t(editing == nil ? "update.publish" : "form.save"),
+                               systemImage: editing == nil ? "arrow.up" : "checkmark", action: send)
+                            .buttonStyle(.glassProminent)
+                            .tint(session.isStaff ? Color.staff : .accentColor)
                             .disabled(draft.isEmpty && photo == nil)
                     }
                 }
@@ -88,7 +110,26 @@ struct ReviewSheet: View {
             }
             .onChange(of: pickerItem) { _, item in
                 guard let item else { return }
-                Task { photo = try? await item.loadTransferable(type: Data.self) }
+                pickerItem = nil
+                Task {
+                    if let data = try? await item.loadTransferable(type: Data.self) { photo = data; cameraMeta = nil }
+                }
+            }
+            .fullScreenCover(isPresented: $showsCamera) {
+                CameraPicker { data in
+                    showsCamera = false
+                    guard let data else { return }
+                    var meta = PhotoMeta(takenAt: .now)
+                    if location.isAuthorized, let fix = location.location,
+                       fix.horizontalAccuracy >= 0, fix.horizontalAccuracy <= RemoteReview.maxAccuracy,
+                       abs(fix.timestamp.timeIntervalSinceNow) < 180 {
+                        meta.latitude = fix.coordinate.latitude
+                        meta.longitude = fix.coordinate.longitude
+                    }
+                    photo = data
+                    cameraMeta = meta
+                }
+                .ignoresSafeArea()
             }
         }
     }
@@ -109,6 +150,7 @@ struct ReviewSheet: View {
                     prepared = try await Task.detached(priority: .userInitiated) {
                         try PhotoPreparer.prepare(photo)
                     }.value
+                    if let cameraMeta { prepared = PhotoPreparer.Prepared(jpeg: prepared!.jpeg, meta: cameraMeta) }
                     review.image = try await APIClient.shared.uploadImage(prepared!.jpeg, meta: prepared!.meta)
                 }
                 if let editing {
@@ -143,24 +185,42 @@ extension ReviewSheet {
     }
 }
 
-/// One to five stars; tapping the current one clears it.
+/// One to five stars: tap one, or slide the finger along them (as the App Store's
+/// rating); tapping the current one clears it.
 struct StarPicker: View {
     @Binding var rating: Int
 
+    private static let size: CGFloat = 44
+    private static let spacing: CGFloat = 4
+    /// The rating when the finger came down, to tell "tap the current star" apart.
+    @State private var startRating: Int?
+
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: Self.spacing) {
             ForEach(1...5, id: \.self) { n in
-                Button {
-                    rating = rating == n ? 0 : n
-                } label: {
-                    Image(systemName: n <= rating ? "star.fill" : "star")
-                        .font(.title2)
-                        .foregroundStyle(n <= rating ? .yellow : .secondary)
-                        .frame(width: 44, height: 44)
-                }
-                .buttonStyle(.plain)
+                Image(systemName: n <= rating ? "star.fill" : "star")
+                    .font(.title2)
+                    .foregroundStyle(n <= rating ? .yellow : .secondary)
+                    .frame(width: Self.size, height: Self.size)
             }
         }
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                    if startRating == nil { startRating = rating }
+                    let moved = abs(value.translation.width) > 8
+                    let star = Self.star(at: value.location.x)
+                    // A tap on the current star waits for the finger to lift (it clears);
+                    // anything else follows the finger at once.
+                    if moved || star != startRating { set(star) }
+                }
+                .onEnded { value in
+                    let star = Self.star(at: value.location.x)
+                    if abs(value.translation.width) <= 8, star == startRating { set(0) }
+                    startRating = nil
+                }
+        )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(L10n.t("update.rating"))
         .accessibilityValue("\(rating)")
@@ -171,5 +231,17 @@ struct StarPicker: View {
             @unknown default: break
             }
         }
+    }
+
+    /// The star under the finger; past the left edge, none.
+    private static func star(at x: CGFloat) -> Int {
+        if x < 0 { return 0 }
+        return min(5, Int(x / (size + spacing)) + 1)
+    }
+
+    private func set(_ value: Int) {
+        guard value != rating else { return }
+        rating = value
+        UISelectionFeedbackGenerator().selectionChanged()
     }
 }
