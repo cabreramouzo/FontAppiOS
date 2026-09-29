@@ -357,6 +357,7 @@ private struct ActivityCard: View {
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .clipped()
+                .allowsHitTesting(false)
                 .overlay {
                     LinearGradient(colors: [.black.opacity(0.12), .black.opacity(0.65), .black.opacity(0.95)],
                                    startPoint: .top, endPoint: .bottom)
@@ -365,6 +366,9 @@ private struct ActivityCard: View {
             .accessibilityHidden(true)
         }
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        // `clipped` only clips the drawing: a scaled-to-fill photo still takes taps beyond
+        // the card, and the first card stole the ones meant for the strip above it.
+        .contentShape(RoundedRectangle(cornerRadius: 18))
         .overlay {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(item.kind == .report ? Color.orange.opacity(0.7) : Color.white.opacity(0.12),
