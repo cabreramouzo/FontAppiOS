@@ -39,8 +39,11 @@ struct MaintenanceSection: View {
     let isModerator: Bool
     let onChanged: () async -> Void
     let onNotice: (String) -> Void
+    /// Opens the choice of the fountain this one copies. The page presents it: a sheet
+    /// hung on a row of the list was raised by SwiftUI over the map instead, replacing
+    /// the fountain's own sheet, which closed both a second later.
+    let onMarkDuplicate: () -> Void
 
-    @State private var marksDuplicate = false
     @State private var confirmsRetire = false
     @State private var hidesForAbuse = false
     @State private var isBusy = false
@@ -65,7 +68,7 @@ struct MaintenanceSection: View {
                             try await APIClient.shared.markDuplicate(font.id, of: nil)
                         }
                     } else {
-                        Button { marksDuplicate = true } label: {
+                        Button(action: onMarkDuplicate) {
                             Label(L10n.t("maint.markDuplicate"), systemImage: "square.on.square")
                         }
                     }
@@ -109,15 +112,6 @@ struct MaintenanceSection: View {
                 Button(L10n.t("form.cancel"), role: .cancel) {}
             } message: {
                 Text(L10n.t("maint.abuseHelp"))
-            }
-            .sheet(isPresented: $marksDuplicate) {
-                DuplicateSheet(font: font, title: L10n.t("maint.markDuplicate"), help: L10n.t("maint.duplicateHelp"),
-                               pick: { other in
-                                   try await APIClient.shared.markDuplicate(font.id, of: other)
-                                   await onChanged()
-                                   return L10n.t("maint.markDuplicate")
-                               },
-                               onSent: { _ in })
             }
         }
     }

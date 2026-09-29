@@ -20,6 +20,7 @@ struct FontDetailView: View {
     @State private var writesReview = false
     @State private var reportTarget: ReportTarget?
     @State private var suggestsDuplicate = false
+    @State private var marksDuplicate = false
     @State private var confirmsDelete = false
     @State private var creatorName: String?
     @State private var creatorTier: String?
@@ -163,6 +164,17 @@ struct FontDetailView: View {
         .sheet(item: $reportTarget) { target in
             if let font = loadedFont {
                 ReportSheet(fontID: font.id, replyTo: target.replyTo) { await model.load() }
+            }
+        }
+        .sheet(isPresented: $marksDuplicate) {
+            if let font = loadedFont {
+                DuplicateSheet(font: font, title: L10n.t("maint.markDuplicate"), help: L10n.t("maint.duplicateHelp"),
+                               pick: { other in
+                                   try await APIClient.shared.markDuplicate(font.id, of: other)
+                                   await model.load()
+                                   return L10n.t("maint.markDuplicate")
+                               },
+                               onSent: { notice = $0 })
             }
         }
         .sheet(isPresented: $suggestsDuplicate) {
@@ -790,7 +802,8 @@ struct FontDetailView: View {
                 .frame(minHeight: 44)
             }
             MaintenanceSection(font: font, capabilities: capabilities, isModerator: session.isStaff,
-                               onChanged: { await model.load() }, onNotice: { notice = $0 })
+                               onChanged: { await model.load() }, onNotice: { notice = $0 },
+                               onMarkDuplicate: { marksDuplicate = true })
         }
         .listStyle(.insetGrouped)
     }
