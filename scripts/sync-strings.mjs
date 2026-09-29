@@ -412,30 +412,67 @@ for (const [key, texts] of Object.entries(IOS_ONLY)) {
 }
 
 const here = dirname(fileURLToPath(import.meta.url))
-const out = join(here, '../FontApp/FontApp/Localizable.xcstrings')
+writeCatalog(join(here, '../FontApp/FontApp/Localizable.xcstrings'), strings)
 
-// Keep what Xcode extracted by itself (format strings like "%lld km", with no
-// translations), and write the file the way Xcode does: same key order, " : " and
-// blank empty objects. Otherwise every run and every build rewrite the whole file.
-const previous = existsSync(out) ? JSON.parse(readFileSync(out, 'utf8')).strings : {}
-for (const [key, entry] of Object.entries(previous)) {
-  if (!(key in strings) && entry.extractionState !== 'manual') strings[key] = entry
+// The widget is its own bundle and cannot read the app's catalog: it gets the few web
+// strings it shows plus its own.
+const WIDGET_KEYS = ['status.flowing', 'status.trickle', 'status.dry', 'status.broken', 'status.gone',
+  'status.unknown', 'confidence.unverified', 'font.unnamed']
+const WIDGET_ONLY = {
+  'widget.name': {
+    ca: 'Fonts a prop', es: 'Fuentes cerca', gl: 'Fontes preto', eu: 'Iturriak gertu', en: 'Fountains nearby', fr: 'Fontaines à proximité', pt: 'Fontes perto', it: 'Fontane vicine',
+  },
+  'widget.description': {
+    ca: 'La font més propera i com està, sense obrir l’app.', es: 'La fuente más cercana y cómo está, sin abrir la app.', gl: 'A fonte máis próxima e como está, sen abrir a app.', eu: 'Iturririk hurbilena eta nola dagoen, aplikazioa ireki gabe.', en: 'The nearest fountain and how it is, without opening the app.', fr: 'La fontaine la plus proche et son état, sans ouvrir l’app.', pt: 'A fonte mais próxima e como está, sem abrir a app.', it: 'La fontana più vicina e com’è, senza aprire l’app.',
+  },
+  'widget.noLocation': {
+    ca: 'Obre FontApp i permet la ubicació per veure les fonts properes.', es: 'Abre FontApp y permite la ubicación para ver las fuentes cercanas.', gl: 'Abre FontApp e permite a localización para ver as fontes próximas.', eu: 'Ireki FontApp eta baimendu kokapena inguruko iturriak ikusteko.', en: 'Open FontApp and allow location to see nearby fountains.', fr: 'Ouvrez FontApp et autorisez la localisation pour voir les fontaines proches.', pt: 'Abra a FontApp e permita a localização para ver as fontes próximas.', it: 'Apri FontApp e consenti la posizione per vedere le fontane vicine.',
+  },
+  'widget.nothing': {
+    ca: 'No hi ha fonts conegudes a prop.', es: 'No hay fuentes conocidas cerca.', gl: 'Non hai fontes coñecidas preto.', eu: 'Ez dago iturri ezagunik gertu.', en: 'No known fountains nearby.', fr: 'Aucune fontaine connue à proximité.', pt: 'Não há fontes conhecidas perto.', it: 'Nessuna fontana conosciuta nelle vicinanze.',
+  },
+  'widget.offline': {
+    ca: 'Sense connexió. Ho tornarem a provar aviat.', es: 'Sin conexión. Lo volveremos a intentar pronto.', gl: 'Sen conexión. Tentarémolo de novo pronto.', eu: 'Konexiorik gabe. Laster saiatuko gara berriro.', en: 'No connection. We’ll try again soon.', fr: 'Pas de connexion. Nouvel essai bientôt.', pt: 'Sem ligação. Voltamos a tentar em breve.', it: 'Nessuna connessione. Riproveremo presto.',
+  },
 }
-// Xcode's order is its own (roughly case-insensitive): keep the keys it placed where they
-// are, and slot new ones in before the first key that sorts after them.
-const order = Object.keys(previous).filter((k) => k in strings)
-for (const key of Object.keys(strings).sort(xcodeOrder)) {
-  if (order.includes(key)) continue
-  const at = order.findIndex((k) => xcodeOrder(k, key) > 0)
-  order.splice(at === -1 ? order.length : at, 0, key)
+const widget = {}
+for (const key of WIDGET_KEYS) {
+  if (!strings[key]) throw new Error(`Widget key not in the app catalog: ${key}`)
+  widget[key] = strings[key]
 }
-const ordered = {}
-for (const key of order) ordered[key] = sortKeys(strings[key])
-const json = JSON.stringify({ sourceLanguage: 'ca', strings: ordered, version: '1.0' }, null, 2)
-  .replace(/^(\s*"(?:[^"\\]|\\.)*"): /gm, '$1 : ')
-  .replace(/^(\s*)(.*)\{\}(,?)$/gm, '$1$2{\n\n$1}$3')
-writeFileSync(out, json)
-console.log(`${Object.keys(ordered).length} keys → ${out}`)
+for (const [key, texts] of Object.entries(WIDGET_ONLY)) {
+  const localizations = {}
+  for (const [web, apple] of Object.entries(LANGS)) localizations[apple] = unit(texts[web])
+  widget[key] = { extractionState: 'manual', localizations }
+}
+writeCatalog(join(here, '../FontApp/FontAppWidget/Localizable.xcstrings'), widget)
+
+function writeCatalog(out, source) {
+  const strings = { ...source }
+
+  // Keep what Xcode extracted by itself (format strings like "%lld km", with no
+  // translations), and write the file the way Xcode does: same key order, " : " and
+  // blank empty objects. Otherwise every run and every build rewrite the whole file.
+  const previous = existsSync(out) ? JSON.parse(readFileSync(out, 'utf8')).strings : {}
+  for (const [key, entry] of Object.entries(previous)) {
+    if (!(key in strings) && entry.extractionState !== 'manual') strings[key] = entry
+  }
+  // Xcode's order is its own (roughly case-insensitive): keep the keys it placed where they
+  // are, and slot new ones in before the first key that sorts after them.
+  const order = Object.keys(previous).filter((k) => k in strings)
+  for (const key of Object.keys(strings).sort(xcodeOrder)) {
+    if (order.includes(key)) continue
+    const at = order.findIndex((k) => xcodeOrder(k, key) > 0)
+    order.splice(at === -1 ? order.length : at, 0, key)
+  }
+  const ordered = {}
+  for (const key of order) ordered[key] = sortKeys(strings[key])
+  const json = JSON.stringify({ sourceLanguage: 'ca', strings: ordered, version: '1.0' }, null, 2)
+    .replace(/^(\s*"(?:[^"\\]|\\.)*"): /gm, '$1 : ')
+    .replace(/^(\s*)(.*)\{\}(,?)$/gm, '$1$2{\n\n$1}$3')
+  writeFileSync(out, json)
+  console.log(`${Object.keys(ordered).length} keys → ${out}`)
+}
 
 // Inside an entry Xcode sorts plainly: languages, then "state" before "value".
 function sortKeys(value) {

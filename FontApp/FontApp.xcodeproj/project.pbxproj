@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		04A1B2C3D4E5F60718293A4D /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = 04A1B2C3D4E5F60718293A4C /* MapLibre */; };
+		0AB1C2D3E4F5061728394A0A /* FontAppWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0AB1C2D3E4F5061728394A01 /* FontAppWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,13 +26,35 @@
 			remoteGlobalIDString = 044F28763068858800D0EF7B;
 			remoteInfo = FontApp;
 		};
+		0AB1C2D3E4F5061728394A0C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 044F286F3068858800D0EF7B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0AB1C2D3E4F5061728394A06;
+			remoteInfo = FontAppWidget;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0AB1C2D3E4F5061728394A0B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0AB1C2D3E4F5061728394A0A /* FontAppWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		044F28773068858800D0EF7B /* FontApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FontApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		044F28863068858A00D0EF7B /* FontAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FontAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		044F28903068858A00D0EF7B /* FontAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FontAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		04A1B2C3D4E5F60718293A50 /* Moia.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = Moia.gpx; path = Simulator/Moia.gpx; sourceTree = "<group>"; };
+		0AB1C2D3E4F5061728394A01 /* FontAppWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FontAppWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -48,6 +71,11 @@
 		044F28933068858A00D0EF7B /* FontAppUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FontAppUITests;
+			sourceTree = "<group>";
+		};
+		0AB1C2D3E4F5061728394A02 /* FontAppWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FontAppWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +103,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0AB1C2D3E4F5061728394A03 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -84,6 +119,7 @@
 				044F28793068858800D0EF7B /* FontApp */,
 				044F28893068858A00D0EF7B /* FontAppTests */,
 				044F28933068858A00D0EF7B /* FontAppUITests */,
+				0AB1C2D3E4F5061728394A02 /* FontAppWidget */,
 				04A1B2C3D4E5F60718293A50 /* Moia.gpx */,
 				044F28783068858800D0EF7B /* Products */,
 			);
@@ -95,6 +131,7 @@
 				044F28773068858800D0EF7B /* FontApp.app */,
 				044F28863068858A00D0EF7B /* FontAppTests.xctest */,
 				044F28903068858A00D0EF7B /* FontAppUITests.xctest */,
+				0AB1C2D3E4F5061728394A01 /* FontAppWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -109,10 +146,12 @@
 				044F28733068858800D0EF7B /* Sources */,
 				044F28743068858800D0EF7B /* Frameworks */,
 				044F28753068858800D0EF7B /* Resources */,
+				0AB1C2D3E4F5061728394A0B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				0AB1C2D3E4F5061728394A0D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				044F28793068858800D0EF7B /* FontApp */,
@@ -171,6 +210,28 @@
 			productReference = 044F28903068858A00D0EF7B /* FontAppUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		0AB1C2D3E4F5061728394A06 /* FontAppWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0AB1C2D3E4F5061728394A07 /* Build configuration list for PBXNativeTarget "FontAppWidget" */;
+			buildPhases = (
+				0AB1C2D3E4F5061728394A05 /* Sources */,
+				0AB1C2D3E4F5061728394A03 /* Frameworks */,
+				0AB1C2D3E4F5061728394A04 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				0AB1C2D3E4F5061728394A02 /* FontAppWidget */,
+			);
+			name = FontAppWidget;
+			packageProductDependencies = (
+			);
+			productName = FontAppWidget;
+			productReference = 0AB1C2D3E4F5061728394A01 /* FontAppWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -191,6 +252,9 @@
 					044F288F3068858A00D0EF7B = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = 044F28763068858800D0EF7B;
+					};
+					0AB1C2D3E4F5061728394A06 = {
+						CreatedOnToolsVersion = 26.6;
 					};
 				};
 			};
@@ -221,6 +285,7 @@
 				044F28763068858800D0EF7B /* FontApp */,
 				044F28853068858A00D0EF7B /* FontAppTests */,
 				044F288F3068858A00D0EF7B /* FontAppUITests */,
+				0AB1C2D3E4F5061728394A06 /* FontAppWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -241,6 +306,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		044F288E3068858A00D0EF7B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0AB1C2D3E4F5061728394A04 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -271,6 +343,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0AB1C2D3E4F5061728394A05 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -283,6 +362,11 @@
 			isa = PBXTargetDependency;
 			target = 044F28763068858800D0EF7B /* FontApp */;
 			targetProxy = 044F28913068858A00D0EF7B /* PBXContainerItemProxy */;
+		};
+		0AB1C2D3E4F5061728394A0D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0AB1C2D3E4F5061728394A06 /* FontAppWidget */;
+			targetProxy = 0AB1C2D3E4F5061728394A0C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -556,6 +640,60 @@
 			};
 			name = Release;
 		};
+		0AB1C2D3E4F5061728394A08 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "FontAppWidget-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = FontApp;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.fontapp.FontApp.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		0AB1C2D3E4F5061728394A09 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "FontAppWidget-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = FontApp;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = net.fontapp.FontApp.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -591,6 +729,15 @@
 			buildConfigurations = (
 				044F28A13068858A00D0EF7B /* Debug */,
 				044F28A23068858A00D0EF7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0AB1C2D3E4F5061728394A07 /* Build configuration list for PBXNativeTarget "FontAppWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0AB1C2D3E4F5061728394A08 /* Debug */,
+				0AB1C2D3E4F5061728394A09 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
