@@ -8,6 +8,9 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     private(set) var location: CLLocation?
 
     @ObservationIgnored private let manager = CLLocationManager()
+    /// Screens that need the exact spot right now (placing a new fountain). The map and
+    /// the feed make do with 100 m, which spares the battery; a pin does not.
+    @ObservationIgnored private var preciseUsers = 0
 
     var isAuthorized: Bool {
         authorization == .authorizedWhenInUse || authorization == .authorizedAlways
@@ -28,6 +31,23 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     func requestIfNeeded() {
         if authorization == .notDetermined { manager.requestWhenInUseAuthorization() }
         if isAuthorized { manager.startUpdatingLocation() }
+    }
+
+    /// Best accuracy, every fix, until the matching `endPrecise()`.
+    func beginPrecise() {
+        preciseUsers += 1
+        guard preciseUsers == 1 else { return }
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.distanceFilter = kCLDistanceFilterNone
+        if isAuthorized { manager.startUpdatingLocation() }
+    }
+
+    func endPrecise() {
+        guard preciseUsers > 0 else { return }
+        preciseUsers -= 1
+        guard preciseUsers == 0 else { return }
+        manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        manager.distanceFilter = 50
     }
 
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

@@ -254,12 +254,15 @@ struct MapScreen: View {
         }
         // A half-filled form comes back as it was left, pin included. One with nothing
         // written is not a draft: its pin would pin every new fountain to the same spot.
-        let draft = NewFontDraft.load().flatMap { $0.isEmpty ? nil : $0 } ?? {
-            let center = controller.mapView?.centerCoordinate ?? CLLocationCoordinate2D(latitude: 41.8, longitude: 2.1)
-            let start = NewFontPlacement.start(mapCenter: center, me: location.isAuthorized ? location.location : nil)
-            return NewFontDraft(latitude: start.latitude, longitude: start.longitude)
-        }()
-        sheet = .newFont(NewFontModel(draft: draft))
+        if let draft = NewFontDraft.load(), !draft.isEmpty {
+            sheet = .newFont(NewFontModel(draft: draft))
+            return
+        }
+        let center = controller.mapView?.centerCoordinate ?? CLLocationCoordinate2D(latitude: 41.8, longitude: 2.1)
+        let start = NewFontPlacement.start(mapCenter: center, me: location.isAuthorized ? location.location : nil)
+        let model = NewFontModel(draft: NewFontDraft(latitude: start.latitude, longitude: start.longitude))
+        if location.isAuthorized { model.followUser(from: start) }
+        sheet = .newFont(model)
     }
 
     private func show(toast text: String) {

@@ -161,7 +161,24 @@ struct NewFontSheet: View {
                 }
             }
             .interactiveDismissDisabled(isBusy)
-            .sheet(item: $help) { LegendHelp(kind: $0) }
+            // The exact spot, not the map's 100 m: the pin starts on the person.
+            .onAppear {
+                location.beginPrecise()
+                if let fix = location.location { model.userMoved(to: fix) }
+            }
+            .onDisappear { location.endPrecise() }
+            .onChange(of: location.location) { _, fix in
+                if let fix { model.userMoved(to: fix) }
+            }
+            .sheet(item: $help) { kind in
+                // Reading what each one means is when people decide: tapping it chooses it.
+                switch kind {
+                case .source:
+                    LegendHelp(kind: kind, selectedSource: model.draft.source) { model.draft.source = $0 }
+                case .drinkable:
+                    LegendHelp(kind: kind, selectedDrinkable: model.draft.drinkable) { model.draft.drinkable = $0 }
+                }
+            }
             .fullScreenCover(isPresented: $placesFullScreen) {
                 PlacementScreen(pin: $model.pin, layer: layer)
             }
@@ -423,18 +440,52 @@ struct LegendHelp: View {
     static let drinkables: [Drinkable] = [.yes, .untreated, .conditional, .no]
 
     let kind: Kind
+    /// With a choice to make (the new fountain's form), each row chooses and closes; the
+    /// current one is ticked. Without, the sheet only explains.
+    private var selectedSource: WaterSource?
+    private var selectedDrinkable: Drinkable?
+    private var onSource: ((WaterSource) -> Void)?
+    private var onDrinkable: ((Drinkable?) -> Void)?
     @Environment(\.dismiss) private var dismiss
+
+    init(kind: Kind) { self.kind = kind }
+
+    init(kind: Kind, selectedSource: WaterSource?, onSelect: @escaping (WaterSource) -> Void) {
+        self.kind = kind
+        self.selectedSource = selectedSource
+        onSource = onSelect
+    }
+
+    init(kind: Kind, selectedDrinkable: Drinkable?, onSelect: @escaping (Drinkable?) -> Void) {
+        self.kind = kind
+        self.selectedDrinkable = selectedDrinkable
+        onDrinkable = onSelect
+    }
 
     var body: some View {
         NavigationStack {
             List {
                 switch kind {
                 case .source:
-                    ForEach(Self.sources, id: \.self) { row($0.emoji, L10n.t("source.\($0.rawValue)"), L10n.t("waterHelp.\($0.rawValue)")) }
+                    ForEach(Self.sources, id: \.self) { source in
+                        choice(selected: selectedSource == source,
+                               action: onSource.map { pick in { pick(source) } }) {
+                            row(source.emoji, L10n.t("source.\(source.rawValue)"), L10n.t("waterHelp.\(source.rawValue)"))
+                        }
+                    }
                 case .drinkable:
-                    ForEach(Self.drinkables, id: \.self) { row($0.emoji, L10n.t("drink.\($0.rawValue)"), L10n.t("drinkHelp.\($0.rawValue)")) }
-                    // Not a value, but the one most confused with "untreated".
-                    row("❔", L10n.t("detail.unknownDrink"), L10n.t("drinkHelp.unknown"))
+                    ForEach(Self.drinkables, id: \.self) { drink in
+                        choice(selected: selectedDrinkable == drink,
+                               action: onDrinkable.map { pick in { pick(drink) } }) {
+                            row(drink.emoji, L10n.t("drink.\(drink.rawValue)"), L10n.t("drinkHelp.\(drink.rawValue)"))
+                        }
+                    }
+                    // Not a value, but the one most confused with "untreated"; chosen, it
+                    // leaves the field unset — which is what "unknown" is.
+                    choice(selected: onDrinkable != nil && selectedDrinkable == nil,
+                           action: onDrinkable.map { pick in { pick(nil) } }) {
+                        row("❔", L10n.t("detail.unknownDrink"), L10n.t("drinkHelp.unknown"))
+                    }
                     Text(L10n.t("drinkHelp.note")).font(.footnote).italic().foregroundStyle(.secondary)
                 }
             }
@@ -443,6 +494,29 @@ struct LegendHelp: View {
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button(role: .close) { dismiss() } } }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    @ViewBuilder
+    private func choice(selected: Bool, action: (() -> Void)?, @ViewBuilder label: () -> some View) -> some View {
+        if let action {
+            Button {
+                action()
+                dismiss()
+            } label: {
+                HStack {
+                    label()
+                    Spacer(minLength: 8)
+                    if selected {
+                        Image(systemName: "checkmark").font(.body.weight(.semibold)).foregroundStyle(.tint)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(selected ? .isSelected : [])
+        } else {
+            label()
+        }
     }
 
     private func row(_ emoji: String, _ label: String, _ about: String) -> some View {

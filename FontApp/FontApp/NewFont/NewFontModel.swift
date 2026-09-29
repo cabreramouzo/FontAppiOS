@@ -105,6 +105,31 @@ final class NewFontModel {
         return CLLocationCoordinate2D(latitude: lat, longitude: lon)
     }
 
+    /// Where a fresh draft started, while the pin has not been moved by hand. The fix
+    /// that placed it came from the map's coarse location (100 m, every 50 m), which in the
+    /// field put the pin well off the person: until they touch it, the pin keeps moving
+    /// to each better fix that is still "here" (within `nearbyMeters` of that start).
+    @ObservationIgnored private var following: (start: CLLocation, placed: CLLocationCoordinate2D)?
+
+    /// Called for a new draft, not one restored: a restored pin was placed on purpose.
+    func followUser(from start: CLLocationCoordinate2D) {
+        following = (CLLocation(latitude: start.latitude, longitude: start.longitude), start)
+    }
+
+    /// A new fix while the form is open.
+    func userMoved(to fix: CLLocation) {
+        guard let f = following else { return }
+        // Moved by hand (map pan, big map, photo GPS): the pin is theirs now.
+        let placed = CLLocation(latitude: f.placed.latitude, longitude: f.placed.longitude)
+        if placed.distance(from: CLLocation(latitude: draft.latitude, longitude: draft.longitude)) > 0.5 {
+            following = nil
+            return
+        }
+        guard fix.horizontalAccuracy >= 0, fix.distance(from: f.start) <= NewFontPlacement.nearbyMeters else { return }
+        following = (f.start, fix.coordinate)
+        pin = fix.coordinate
+    }
+
     func submit() async {
         state = .checking
         if let nearest = await nearestExisting() {
