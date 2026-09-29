@@ -52,6 +52,10 @@
 	     export compliance question. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Only for the opt-in "tell me when I pass a fountain" (PassingBy): region
+	     monitoring, which needs "Always" and no background location mode. -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Only if you turn on “Tell me when I pass a fountain”: FontApp uses your location in the background to ask how a fountain is when you pass near it. It is not stored anywhere.</string>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
 	<key>UIBackgroundModes</key>

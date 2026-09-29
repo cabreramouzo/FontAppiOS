@@ -100,6 +100,17 @@ final class PushNotifications: NSObject, UNUserNotificationCenterDelegate {
     }
 
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        // A chip pressed on a "passing by" notice: saved without opening the app.
+        let action = response.actionIdentifier
+        if action != UNNotificationDefaultActionIdentifier {
+            let info = response.notification.request.content.userInfo
+            let data = (try? JSONSerialization.data(withJSONObject: info)) ?? Data()
+            await MainActor.run {
+                let userInfo = (try? JSONSerialization.jsonObject(with: data) as? [AnyHashable: Any]) ?? [:]
+                PassingBy.answer(action: action, userInfo: userInfo)
+            }
+            return
+        }
         let path = response.notification.request.content.userInfo["url"] as? String
         await MainActor.run {
             self.opened = path.flatMap { URL(string: $0, relativeTo: URL(string: "https://fontapp.net")) }?.absoluteURL
@@ -112,6 +123,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         _ = PushNotifications.shared   // the delegate must be set before a tapped notice arrives
+        _ = PassingBy.shared           // and the location one before a region event does
         return true
     }
 

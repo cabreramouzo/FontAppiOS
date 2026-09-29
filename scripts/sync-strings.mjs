@@ -259,6 +259,34 @@ const IOS_ONLY = {
   'err.auth.appleNoEmail': {
     ca: 'Apple no ha compartit cap correu. Torna-ho a provar i deixa que en comparteixi un (pot ser l’ocult).', es: 'Apple no ha compartido ningún correo. Vuelve a probar y deja que comparta uno (puede ser el oculto).', gl: 'Apple non compartiu ningún correo. Téntao de novo e deixa que comparta un (pode ser o oculto).', eu: 'Applek ez du posta elektronikorik partekatu. Saiatu berriro eta utzi bat partekatzen (ezkutukoa izan daiteke).', en: 'Apple did not share an email. Try again and let it share one (the hidden one is fine).', fr: 'Apple n’a partagé aucun e-mail. Réessayez en le laissant en partager un (l’adresse masquée convient).', pt: 'A Apple não partilhou nenhum e-mail. Tente de novo e deixe partilhar um (pode ser o oculto).', it: 'Apple non ha condiviso alcuna email. Riprova e lascia che ne condivida una (va bene quella nascosta).',
   },
+  'ios.passingBy.title': {
+    ca: 'Avisa’m quan passi per una font', es: 'Avísame cuando pase por una fuente', gl: 'Avísame cando pase por unha fonte', eu: 'Abisatu iturri baten ondotik pasatzean', en: 'Tell me when I pass a fountain', fr: 'Me prévenir quand je passe près d’une fontaine', pt: 'Avisar-me quando passar por uma fonte', it: 'Avvisami quando passo vicino a una fontana',
+  },
+  'ios.passingBy.hint': {
+    ca: 'Quan passis a prop d’una font de la qual se sap poc, et preguntarem si raja i podràs respondre des del mateix avís. Com a molt tres al dia, mai de nit ni dues vegades la mateixa font en un mes. Cal el permís d’ubicació «Sempre»; la teva ubicació no es desa enlloc.',
+    es: 'Cuando pases cerca de una fuente de la que se sabe poco, te preguntaremos si mana y podrás responder desde el mismo aviso. Como mucho tres al día, nunca de noche ni dos veces la misma fuente en un mes. Necesita el permiso de ubicación «Siempre»; tu ubicación no se guarda en ningún sitio.',
+    gl: 'Cando pases preto dunha fonte da que se sabe pouco, preguntarémosche se bota auga e poderás responder desde o mesmo aviso. Como moito tres ao día, nunca de noite nin dúas veces a mesma fonte nun mes. Precisa o permiso de localización «Sempre»; a túa localización non se garda en ningún sitio.',
+    eu: 'Gutxi dakigun iturri baten ondotik pasatzean, ura ateratzen den galdetuko dizugu eta abisutik bertatik erantzun ahal izango duzu. Egunean hiru gehienez, inoiz ez gauez ezta iturri bera bi aldiz hilabetean ere. «Beti» kokapen-baimena behar du; zure kokapena ez da inon gordetzen.',
+    en: 'When you pass near a fountain little is known about, we’ll ask whether it’s flowing and you can answer from the notice itself. At most three a day, never at night, and never the same fountain twice in a month. Needs the “Always” location permission; your location is not stored anywhere.',
+    fr: 'Quand vous passez près d’une fontaine dont on sait peu de chose, nous vous demanderons si elle coule et vous pourrez répondre depuis la notification. Trois par jour au plus, jamais la nuit ni deux fois la même fontaine dans le mois. Nécessite l’autorisation de localisation « Toujours » ; votre position n’est enregistrée nulle part.',
+    pt: 'Quando passar perto de uma fonte de que se sabe pouco, perguntamos se está a correr e pode responder no próprio aviso. No máximo três por dia, nunca à noite nem duas vezes a mesma fonte num mês. Precisa da permissão de localização «Sempre»; a sua localização não é guardada em lado nenhum.',
+    it: 'Quando passi vicino a una fontana di cui si sa poco, ti chiederemo se scorre e potrai rispondere dalla notifica stessa. Al massimo tre al giorno, mai di notte né due volte la stessa fontana in un mese. Richiede il permesso di posizione «Sempre»; la tua posizione non viene salvata da nessuna parte.',
+  },
+  'ios.passingBy.needsAlways': {
+    ca: 'Perquè funcioni, a Ajustes > FontApp > Ubicació tria «Sempre».', es: 'Para que funcione, en Ajustes > FontApp > Ubicación elige «Siempre».', gl: 'Para que funcione, en Axustes > FontApp > Localización escolle «Sempre».', eu: 'Funtziona dezan, Ezarpenak > FontApp > Kokapena atalean aukeratu «Beti».', en: 'For this to work, choose “Always” in Settings > FontApp > Location.', fr: 'Pour que cela fonctionne, choisissez « Toujours » dans Réglages > FontApp > Position.', pt: 'Para funcionar, em Definições > FontApp > Localização escolha «Sempre».', it: 'Perché funzioni, in Impostazioni > FontApp > Posizione scegli «Sempre».',
+  },
+  'ios.passingBy.noticeTitle': {
+    ca: 'Passes a prop de: {name}', es: 'Pasas cerca de: {name}', gl: 'Pasas preto de: {name}', eu: 'Hemendik gertu zaude: {name}', en: 'You’re passing near {name}', fr: 'Vous passez près de : {name}', pt: 'Está a passar perto de: {name}', it: 'Stai passando vicino a: {name}',
+  },
+  'ios.passingBy.noticeTitleUnnamed': {
+    ca: 'Passes a prop d’una font', es: 'Pasas cerca de una fuente', gl: 'Pasas preto dunha fonte', eu: 'Iturri baten ondotik pasatzen ari zara', en: 'You’re passing near a fountain', fr: 'Vous passez près d’une fontaine', pt: 'Está a passar perto de uma fonte', it: 'Stai passando vicino a una fontana',
+  },
+  'ios.passingBy.noticeBody': {
+    ca: 'Hi raja aigua? Mantén premut per respondre sense obrir l’app.', es: '¿Sale agua? Mantén pulsado para responder sin abrir la app.', gl: 'Bota auga? Mantén premido para responder sen abrir a app.', eu: 'Ura ateratzen da? Luze sakatu aplikazioa ireki gabe erantzuteko.', en: 'Is water flowing? Press and hold to answer without opening the app.', fr: 'Est-ce que l’eau coule ? Appui long pour répondre sans ouvrir l’app.', pt: 'Está a sair água? Mantenha premido para responder sem abrir a app.', it: 'Esce acqua? Tieni premuto per rispondere senza aprire l’app.',
+  },
+  'ios.passingBy.notSeen': {
+    ca: 'No l’he vista', es: 'No la he visto', gl: 'Non a vin', eu: 'Ez dut ikusi', en: 'I didn’t see it', fr: 'Je ne l’ai pas vue', pt: 'Não a vi', it: 'Non l’ho vista',
+  },
   'ios.showAll': {
     ca: 'Mostra-les totes ({n})', es: 'Mostrar todas ({n})', gl: 'Amosalas todas ({n})', eu: 'Erakutsi guztiak ({n})', en: 'Show all ({n})', fr: 'Tout afficher ({n})', pt: 'Mostrar todas ({n})', it: 'Mostra tutte ({n})',
   },

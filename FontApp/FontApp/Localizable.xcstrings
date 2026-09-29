@@ -2869,6 +2869,377 @@
         }
       }
     },
+    "ios.passingBy.hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quan passis a prop d’una font de la qual se sap poc, et preguntarem si raja i podràs respondre des del mateix avís. Com a molt tres al dia, mai de nit ni dues vegades la mateixa font en un mes. Cal el permís d’ubicació «Sempre»; la teva ubicació no es desa enlloc."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you pass near a fountain little is known about, we’ll ask whether it’s flowing and you can answer from the notice itself. At most three a day, never at night, and never the same fountain twice in a month. Needs the “Always” location permission; your location is not stored anywhere."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando pases cerca de una fuente de la que se sabe poco, te preguntaremos si mana y podrás responder desde el mismo aviso. Como mucho tres al día, nunca de noche ni dos veces la misma fuente en un mes. Necesita el permiso de ubicación «Siempre»; tu ubicación no se guarda en ningún sitio."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gutxi dakigun iturri baten ondotik pasatzean, ura ateratzen den galdetuko dizugu eta abisutik bertatik erantzun ahal izango duzu. Egunean hiru gehienez, inoiz ez gauez ezta iturri bera bi aldiz hilabetean ere. «Beti» kokapen-baimena behar du; zure kokapena ez da inon gordetzen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand vous passez près d’une fontaine dont on sait peu de chose, nous vous demanderons si elle coule et vous pourrez répondre depuis la notification. Trois par jour au plus, jamais la nuit ni deux fois la même fontaine dans le mois. Nécessite l’autorisation de localisation « Toujours » ; votre position n’est enregistrée nulle part."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cando pases preto dunha fonte da que se sabe pouco, preguntarémosche se bota auga e poderás responder desde o mesmo aviso. Como moito tres ao día, nunca de noite nin dúas veces a mesma fonte nun mes. Precisa o permiso de localización «Sempre»; a túa localización non se garda en ningún sitio."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando passi vicino a una fontana di cui si sa poco, ti chiederemo se scorre e potrai rispondere dalla notifica stessa. Al massimo tre al giorno, mai di notte né due volte la stessa fontana in un mese. Richiede il permesso di posizione «Sempre»; la tua posizione non viene salvata da nessuna parte."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando passar perto de uma fonte de que se sabe pouco, perguntamos se está a correr e pode responder no próprio aviso. No máximo três por dia, nunca à noite nem duas vezes a mesma fonte num mês. Precisa da permissão de localização «Sempre»; a sua localização não é guardada em lado nenhum."
+          }
+        }
+      }
+    },
+    "ios.passingBy.needsAlways" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perquè funcioni, a Ajustes > FontApp > Ubicació tria «Sempre»."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For this to work, choose “Always” in Settings > FontApp > Location."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para que funcione, en Ajustes > FontApp > Ubicación elige «Siempre»."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funtziona dezan, Ezarpenak > FontApp > Kokapena atalean aukeratu «Beti»."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour que cela fonctionne, choisissez « Toujours » dans Réglages > FontApp > Position."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para que funcione, en Axustes > FontApp > Localización escolle «Sempre»."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perché funzioni, in Impostazioni > FontApp > Posizione scegli «Sempre»."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para funcionar, em Definições > FontApp > Localização escolha «Sempre»."
+          }
+        }
+      }
+    },
+    "ios.passingBy.noticeBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hi raja aigua? Mantén premut per respondre sense obrir l’app."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Is water flowing? Press and hold to answer without opening the app."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Sale agua? Mantén pulsado para responder sin abrir la app."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ura ateratzen da? Luze sakatu aplikazioa ireki gabe erantzuteko."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Est-ce que l’eau coule ? Appui long pour répondre sans ouvrir l’app."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bota auga? Mantén premido para responder sen abrir a app."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esce acqua? Tieni premuto per rispondere senza aprire l’app."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está a sair água? Mantenha premido para responder sem abrir a app."
+          }
+        }
+      }
+    },
+    "ios.passingBy.noticeTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passes a prop de: {name}"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You’re passing near {name}"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasas cerca de: {name}"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hemendik gertu zaude: {name}"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous passez près de : {name}"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasas preto de: {name}"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stai passando vicino a: {name}"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está a passar perto de: {name}"
+          }
+        }
+      }
+    },
+    "ios.passingBy.noticeTitleUnnamed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passes a prop d’una font"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You’re passing near a fountain"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasas cerca de una fuente"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iturri baten ondotik pasatzen ari zara"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous passez près d’une fontaine"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasas preto dunha fonte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stai passando vicino a una fontana"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está a passar perto de uma fonte"
+          }
+        }
+      }
+    },
+    "ios.passingBy.notSeen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No l’he vista"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I didn’t see it"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No la he visto"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ez dut ikusi"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je ne l’ai pas vue"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non a vin"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non l’ho vista"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não a vi"
+          }
+        }
+      }
+    },
+    "ios.passingBy.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avisa’m quan passi per una font"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tell me when I pass a fountain"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avísame cuando pase por una fuente"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abisatu iturri baten ondotik pasatzean"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me prévenir quand je passe près d’une fontaine"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avísame cando pase por unha fonte"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvisami quando passo vicino a una fontana"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avisar-me quando passar por uma fonte"
+          }
+        }
+      }
+    },
     "ios.push.denied" : {
       "extractionState" : "manual",
       "localizations" : {

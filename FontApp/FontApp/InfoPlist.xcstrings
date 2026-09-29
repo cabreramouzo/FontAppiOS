@@ -69,6 +69,59 @@
         }
       }
     },
+    "NSLocationAlwaysAndWhenInUseUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Només si actives «Avisa’m quan passi per una font»: FontApp fa servir la teva ubicació en segon pla per preguntar-te com està una font quan hi passes a prop. No es desa enlloc."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only if you turn on “Tell me when I pass a fountain”: FontApp uses your location in the background to ask how a fountain is when you pass near it. It is not stored anywhere."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo si activas «Avísame cuando pase por una fuente»: FontApp usa tu ubicación en segundo plano para preguntarte cómo está una fuente cuando pasas cerca. No se guarda en ningún sitio."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Abisatu iturri baten ondotik pasatzean» aktibatzen baduzu bakarrik: FontApp-ek zure kokapena atzeko planoan erabiltzen du iturri baten ondotik pasatzean nola dagoen galdetzeko. Ez da inon gordetzen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seulement si vous activez « Me prévenir quand je passe près d’une fontaine » : FontApp utilise votre position en arrière-plan pour vous demander l’état d’une fontaine quand vous passez à côté. Elle n’est enregistrée nulle part."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Só se activas «Avísame cando pase por unha fonte»: FontApp usa a túa localización en segundo plano para preguntarche como está unha fonte cando pasas preto. Non se garda en ningún sitio."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo se attivi «Avvisami quando passo vicino a una fontana»: FontApp usa la tua posizione in background per chiederti com’è una fontana quando ci passi vicino. Non viene salvata da nessuna parte."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Só se ativar «Avisar-me quando passar por uma fonte»: a FontApp usa a sua localização em segundo plano para lhe perguntar como está uma fonte quando passa perto. Não é guardada em lado nenhum."
+          }
+        }
+      }
+    },
     "NSLocationWhenInUseUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {

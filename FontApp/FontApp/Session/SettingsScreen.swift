@@ -164,6 +164,7 @@ struct SettingsScreen: View {
                     value: user.mentionEmails ?? true) { $0.mentionEmails = $1 }
         }
         pushSection(user)
+        passingBySection
         Section {
             let shared = !(user.gamificationOptOut ?? false)
             setting(L10n.t("game.share"), hint: nil, value: shared) { $0.gamificationOptOut = !$1 }
@@ -213,6 +214,26 @@ struct SettingsScreen: View {
             Text(L10n.t("ios.push.hint"))
         }
         .task { await push.refresh() }
+    }
+
+    /// "Tell me when I pass by a fountain": local notices, only with "Always" location.
+    /// The permission is asked when this is turned on, never before.
+    @ViewBuilder private var passingBySection: some View {
+        let passing = PassingBy.shared
+        Section {
+            Toggle(isOn: Binding(get: { passing.isEnabled }, set: { on in Task { await passing.setEnabled(on) } })) {
+                Text(L10n.t("ios.passingBy.title"))
+            }
+            .frame(minHeight: 44)
+            if passing.isBlocked {
+                Text(L10n.t("ios.passingBy.needsAlways")).font(.subheadline).foregroundStyle(.secondary)
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    Link(L10n.t("ios.push.openSettings"), destination: url).frame(minHeight: 44)
+                }
+            }
+        } footer: {
+            Text(L10n.t("ios.passingBy.hint"))
+        }
     }
 
     /// A switch that saves on change. The account's value is the truth: while saving, and

@@ -58,6 +58,7 @@ struct FontAppApp: App {
                 }
                 .onChange(of: session.userID) { _, userID in
                     PushNotifications.shared.sessionChanged(to: userID)
+                    if userID == nil { PassingBy.shared.signedOut() }
                     outbox.sessionChanged(to: userID)
                     sync.flush(reason: "session")
                     bell.clear()
@@ -71,6 +72,8 @@ struct FontAppApp: App {
             case .active:
                 sync.flush(reason: "foreground")
                 Task { await PushNotifications.shared.refresh() }
+                // Opening the app somewhere new: watch the fountains around here.
+                Task { await PassingBy.shared.refresh() }
                 celebrations.checkAtLaunch(session.userID)
                 if session.isSignedIn { Task { await bell.reload() } }
             case .background: sync.scheduleBackgroundFlush()
