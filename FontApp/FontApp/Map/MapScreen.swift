@@ -51,7 +51,7 @@ struct MapScreen: View {
 
     var body: some View {
         FontMapView(
-            fonts: filters.apply(model.fonts),
+            fonts: filters.apply(model.fonts, keep: model.isJustCreated),
             clusters: model.clusters,
             initialRegion: { size in
                 DefaultMapView.forTimeZone(TimeZone.current.identifier).region(for: size)
@@ -130,7 +130,8 @@ struct MapScreen: View {
                 FiltersSheet(filters: $filters).presentationDetents([.medium, .large])
             case .newFont(let model):
                 NewFontSheet(model: model, layer: controller.layer) { created in
-                    show(toast: L10n.t(created ? "toast.fontCreated" : "offline.savedFont"))
+                    show(toast: L10n.t(created != nil ? "toast.fontCreated" : "offline.savedFont"))
+                    if let created { showCreated(created) }
                 }
             case .route(let route):
                 RouteSheet(route: route,
@@ -199,7 +200,7 @@ struct MapScreen: View {
 
     /// The nearest fountain on each side of the current one, among those on the map.
     private func neighbours(of font: FontSummary) -> Neighbours {
-        let fonts = filters.apply(model.fonts)
+        let fonts = filters.apply(model.fonts, keep: model.isJustCreated)
         let band = controller.visibleLatitudes(covered: PresentationDetent.shortCardHeight)
         return Neighbours(west: NearbyBrowse.neighbour(of: font, on: .west, among: fonts, latitudes: band),
                           east: NearbyBrowse.neighbour(of: font, on: .east, among: fonts, latitudes: band),
@@ -210,7 +211,7 @@ struct MapScreen: View {
     /// rises as when tapped. The line then goes through the new one.
     private func step(_ side: NearbyBrowse.Side) {
         guard let current = selected,
-              let font = NearbyBrowse.neighbour(of: current, on: side, among: filters.apply(model.fonts),
+              let font = NearbyBrowse.neighbour(of: current, on: side, among: filters.apply(model.fonts, keep: model.isJustCreated),
                                                 latitudes: controller.visibleLatitudes(covered: PresentationDetent.shortCardHeight))
         else { return }
         selected = font
@@ -263,6 +264,19 @@ struct MapScreen: View {
         let model = NewFontModel(draft: NewFontDraft(latitude: start.latitude, longitude: start.longitude))
         if location.isAuthorized { model.followUser(from: start) }
         sheet = .newFont(model)
+    }
+
+    /// The new fountain, on the map at once and selected: its raised pin stands above
+    /// the blue dot, which otherwise covers it — it was created where the person stands.
+    private func showCreated(_ font: FontSummary) {
+        model.add(created: font)
+        Task {
+            // After the form's sheet has gone: one sheet at a time.
+            try? await Task.sleep(for: .milliseconds(450))
+            selected = font
+            controller.center(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                              covered: PresentationDetent.shortCardHeight)
+        }
     }
 
     private func show(toast text: String) {

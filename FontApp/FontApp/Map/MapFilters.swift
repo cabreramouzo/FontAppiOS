@@ -18,9 +18,12 @@ nonisolated struct MapFilters: Equatable, Sendable {
         [onlyWithWater, onlyReliable, hideNonPotable, source != nil].filter { $0 }.count
     }
 
-    func apply(_ fonts: [FontSummary], now: Date = .now) -> [FontSummary] {
+    /// `keep`: fountains shown whatever the filters say (one just created is always
+    /// unconfirmed, so "only confirmed" would hide it in front of its author).
+    func apply(_ fonts: [FontSummary], now: Date = .now, keep: (UUID) -> Bool = { _ in false }) -> [FontSummary] {
         guard activeCount > 0 else { return fonts }
         return fonts.filter { font in
+            if keep(font.id) { return true }
             if hideNonPotable, font.drinkable == .no { return false }
             if onlyWithWater, font.lastWaterStatus != "flowing", font.lastWaterStatus != "trickle" { return false }
             if onlyReliable, Confidence.level(of: font.evidence, now: now) != .verified { return false }

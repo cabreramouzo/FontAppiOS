@@ -24,6 +24,11 @@ final class MapModel {
     @ObservationIgnored private var lastLoaded: (box: MapBox, width: Int, height: Int)?
     @ObservationIgnored private var lastSpan: MKCoordinateSpan?
     @ObservationIgnored private var lastRequested: (box: MapBox, width: Int, height: Int)?
+    /// Fountains this person just created. They are on the map at once and stay there
+    /// even if an answer for the area does not bring them yet, or a filter would hide
+    /// them: a fountain that is not there after "created" gets added a second time.
+    private(set) var justCreated: [UUID: (font: FontSummary, at: Date)] = [:]
+    static let justCreatedFor: TimeInterval = 30 * 60
 
     init(api: APIClient = .shared, zones: OfflineZones = .shared, pins: PinCache = .shared) {
         self.api = api
@@ -71,6 +76,29 @@ final class MapModel {
         load(box: last.box, width: last.width, height: last.height)
     }
 
+    /// A fountain created on this phone: drawn now, not after the next load.
+    func add(created font: FontSummary) {
+        justCreated[font.id] = (font, .now)
+        fonts = withJustCreated(fonts, in: nil)
+    }
+
+    func isJustCreated(_ id: UUID) -> Bool {
+        justCreated[id].map { Date.now.timeIntervalSince($0.at) < Self.justCreatedFor } ?? false
+    }
+
+    /// Adds what was just created and is missing from an answer (the server's copy wins).
+    private func withJustCreated(_ list: [FontSummary], in box: MapBox?) -> [FontSummary] {
+        justCreated = justCreated.filter { Date.now.timeIntervalSince($0.value.at) < Self.justCreatedFor }
+        let present = Set(list.map(\.id))
+        let missing = justCreated.values.map(\.font).filter { font in
+            guard !present.contains(font.id) else { return false }
+            guard let box else { return true }
+            return font.latitude >= box.minLat && font.latitude <= box.maxLat
+                && font.longitude >= box.minLong && font.longitude <= box.maxLong
+        }
+        return missing.isEmpty ? list : list + missing
+    }
+
     /// Shows the pins already on the phone for a view. True when they are all there is
     /// to show (the area was loaded lately), so no request is needed.
     private func showKnown(in box: MapBox) -> Bool {
@@ -81,6 +109,7 @@ final class MapModel {
         // Unknown areas keep what is on screen until the answer comes, rather than
         // showing a partial set as if it were everything.
         if fresh || !known.isEmpty && fonts.isEmpty {
+            let known = withJustCreated(known, in: box)
             if fonts != known { fonts = known }
             if !clusters.isEmpty { clusters = [] }
         }
@@ -112,7 +141,8 @@ final class MapModel {
                 guard !Task.isCancelled, let self else { return }
                 self.lastLoaded = (box, width, height)
                 self.pins.store(response, for: box)
-                if self.fonts != response.fonts { self.fonts = response.fonts }
+                let fonts = self.withJustCreated(response.fonts, in: box)
+                if self.fonts != fonts { self.fonts = fonts }
                 if self.clusters != response.clusters { self.clusters = response.clusters }
                 self.errorMessage = nil
                 self.rateLimitedUntil = nil

@@ -65,7 +65,7 @@ final class NewFontModel {
         /// answered — the case that led to this was 3 m away and under another name.
         case confirmDuplicate(name: String, meters: Int)
         case sending
-        case created
+        case created(FontSummary)
         case queued
         case failed(String)
     }
@@ -176,7 +176,7 @@ final class NewFontModel {
             // anyway; it can be reviewed afterwards.
             if let status = draft.status { try? await api.postStatus(on: created.id, status) }
             NewFontDraft.clear(defaults)
-            state = .created
+            state = .created(FontSummary(created))
             NotificationCenter.default.post(name: .fontChanged, object: created.id)
         } catch let error as APIError where error.status == 0 {
             // No signal: the fountain is not lost. It waits on the phone with its photo.

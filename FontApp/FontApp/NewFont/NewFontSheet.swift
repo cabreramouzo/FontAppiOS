@@ -8,7 +8,8 @@ import SwiftUI
 struct NewFontSheet: View {
     @State var model: NewFontModel
     let layer: MapLayer
-    let onDone: (_ created: Bool) -> Void
+    /// The fountain as created, or nil when it waits in the outbox.
+    let onDone: (_ created: FontSummary?) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @Environment(LocationService.self) private var location
@@ -155,9 +156,10 @@ struct NewFontSheet: View {
                 .ignoresSafeArea()
             }
             .onChange(of: model.state) { _, state in
-                if state == .created || state == .queued {
-                    onDone(state == .created)
-                    dismiss()
+                switch state {
+                case .created(let font): onDone(font); dismiss()
+                case .queued: onDone(nil); dismiss()
+                default: break
                 }
             }
             .interactiveDismissDisabled(isBusy)
