@@ -27,6 +27,17 @@ nonisolated struct OfflineZone: Codable, Identifiable, Equatable, Sendable {
         latitude >= minLat && latitude <= maxLat && longitude >= minLong && longitude <= maxLong
     }
 
+    /// Whether this zone can stand in for a view: it covers at least half of it. Zoomed out
+    /// over a continent, a failed request must not swap the map for the dozen fountains of one
+    /// saved valley, drawn as if those were all there are (the web's `zonaCubreLaVista`).
+    func coversHalf(of box: MapBox) -> Bool {
+        let width = min(maxLong, box.maxLong) - max(minLong, box.minLong)
+        let height = min(maxLat, box.maxLat) - max(minLat, box.minLat)
+        guard width > 0, height > 0 else { return false }
+        let area = (box.maxLong - box.minLong) * (box.maxLat - box.minLat)
+        return area > 0 && (width * height) / area >= 0.5
+    }
+
     /// Its fountains inside a box, or none if the zone does not overlap it.
     func fonts(in box: MapBox) -> [FontSummary] {
         guard box.maxLat >= minLat, box.minLat <= maxLat, box.maxLong >= minLong, box.minLong <= maxLong else { return [] }
@@ -108,7 +119,7 @@ final class OfflineZones {
     /// Saved fountains inside a box, from every zone that overlaps it.
     func fonts(in box: MapBox) -> [FontSummary] {
         var seen = Set<UUID>()
-        return zones.flatMap { $0.fonts(in: box) }.filter { seen.insert($0.id).inserted }
+        return zones.filter { $0.coversHalf(of: box) }.flatMap { $0.fonts(in: box) }.filter { seen.insert($0.id).inserted }
     }
 
     func font(_ id: UUID) -> FontSummary? {

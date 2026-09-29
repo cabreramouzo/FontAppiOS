@@ -47,3 +47,21 @@ struct OfflineCacheTests {
         #expect(cache.data(for: mine) == nil)
     }
 }
+
+struct OfflineZoneCoverageTests {
+    private func zone() -> OfflineZone {
+        OfflineZone(id: UUID(), name: "Moià", savedAt: .now, minLat: 41.7, maxLat: 41.9, minLong: 2.0, maxLong: 2.2,
+                    fonts: [], tileLayer: nil, tiles: [], tileBytes: 0, photos: [], photoBytes: 0)
+    }
+
+    @Test func aZoneStandsInOnlyForAViewItMostlyCovers() {
+        let inside = MapBox(minLat: 41.75, maxLat: 41.85, minLong: 2.05, maxLong: 2.15)!
+        let half = MapBox(minLat: 41.7, maxLat: 41.9, minLong: 2.1, maxLong: 2.3)! // exactly half inside
+        let world = MapBox(minLat: -60, maxLat: 70, minLong: -170, maxLong: 170)!
+        let elsewhere = MapBox(minLat: 36, maxLat: 37, minLong: -6, maxLong: -5)!
+        #expect(zone().coversHalf(of: inside))
+        #expect(zone().coversHalf(of: half))
+        #expect(!zone().coversHalf(of: world))
+        #expect(!zone().coversHalf(of: elsewhere))
+    }
+}
