@@ -56,3 +56,40 @@ struct PendingExportTests {
         #expect(PendingExport.inQueueOrder([new, old]).map(\.id) == [old.id, new.id])
     }
 }
+
+struct OutboxDiscardTests {
+    private func outbox() -> Outbox {
+        Outbox(directory: FileManager.default.temporaryDirectory.appending(path: UUID().uuidString))
+    }
+
+    private func review(_ outbox: Outbox, as user: UUID?) {
+        outbox.currentUserID = user
+        outbox.enqueueReview(NewReview(waterStatus: "flowing", confirmIfUnchanged: true, remoteDistanceM: nil),
+                             fontID: UUID(), fontName: nil)
+    }
+
+    @Test func nothingPendingOffersNothing() {
+        #expect(outbox().discardPlan == nil)
+    }
+
+    @Test func aMixedQueueDiscardsOnlyTheOtherAccountsAndKeepsMine() {
+        let box = outbox()
+        let a = UUID(), b = UUID()
+        review(box, as: a)
+        review(box, as: b)
+        review(box, as: b)
+        #expect(box.discardPlan == Outbox.DiscardPlan(onlyOthers: true, count: 1))
+        box.discard(onlyOthers: true)
+        #expect(box.items.count == 2)
+        #expect(box.items.allSatisfy { $0.userID == b })
+    }
+
+    @Test func aQueueOfOneKindDiscardsAll() {
+        let box = outbox()
+        review(box, as: UUID())
+        review(box, as: box.currentUserID)
+        #expect(box.discardPlan == Outbox.DiscardPlan(onlyOthers: false, count: 2))
+        box.discard()
+        #expect(box.items.isEmpty)
+    }
+}

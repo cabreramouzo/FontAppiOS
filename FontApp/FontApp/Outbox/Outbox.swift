@@ -156,6 +156,22 @@ final class Outbox {
         save()
     }
 
+    /// What "discard" would throw away, for the confirmation to say how many.
+    struct DiscardPlan: Equatable {
+        /// The queue is mixed: only what another account saved goes, and what is this
+        /// account's stays and is sent.
+        let onlyOthers: Bool
+        let count: Int
+    }
+
+    /// `nil` when discarding should not be offered: nothing pending, or a flush running
+    /// with nothing that is another account's (it would drop what is being sent).
+    var discardPlan: DiscardPlan? {
+        guard !items.isEmpty, othersCount > 0 || !isFlushing else { return nil }
+        let onlyOthers = othersCount > 0 && othersCount < items.count
+        return DiscardPlan(onlyOthers: onlyOthers, count: onlyOthers ? othersCount : items.count)
+    }
+
     /// Destructive: these exist only on this phone. The caller asks first.
     func discard(onlyOthers: Bool = false) {
         for item in items where !onlyOthers || !isMine(item) { remove(item.id) }

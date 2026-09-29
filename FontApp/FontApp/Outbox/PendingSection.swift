@@ -27,12 +27,14 @@ struct PendingSection: View {
                 Button(L10n.t("offline.seeDetails")) { showsDetails = true }
                     .frame(minHeight: 44)
                     .sheet(isPresented: $showsDetails) { PendingDetailsSheet() }
-                Button(L10n.t("offline.discard"), role: .destructive) { confirmsDiscard = true }
-                    .frame(minHeight: 44)
-                    .confirmationDialog(L10n.t("offline.discardConfirm", ["n": outbox.items.count]),
-                                        isPresented: $confirmsDiscard, titleVisibility: .visible) {
-                        Button(L10n.t("offline.discard"), role: .destructive) { outbox.discard() }
-                    }
+                if let plan = outbox.discardPlan {
+                    Button(L10n.t("offline.discard"), role: .destructive) { confirmsDiscard = true }
+                        .frame(minHeight: 44)
+                        .confirmationDialog(L10n.t("offline.discardConfirm", ["n": plan.count]),
+                                            isPresented: $confirmsDiscard, titleVisibility: .visible) {
+                            Button(L10n.t("offline.discard"), role: .destructive) { outbox.discard(onlyOthers: plan.onlyOthers) }
+                        }
+                }
             } header: {
                 Text(L10n.t("offline.pending", ["n": outbox.items.count]))
             } footer: {

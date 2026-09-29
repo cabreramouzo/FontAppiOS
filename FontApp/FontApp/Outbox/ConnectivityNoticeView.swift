@@ -20,6 +20,7 @@ struct ConnectivityNoticeView: View {
     @State private var expandedAt = 0
     @State private var justSynced = false
     @State private var showsDetails = false
+    @State private var confirmsDiscard = false
 
     private var input: ConnectivityNotice.Input {
         ConnectivityNotice.Input(online: sync.isOnline, pending: outbox.items.count, others: outbox.othersCount,
@@ -51,6 +52,13 @@ struct ConnectivityNoticeView: View {
         .padding(.top, 8)
         // Outside the card and the chip: it opens from either, and neither owns it.
         .sheet(isPresented: $showsDetails) { PendingDetailsSheet() }
+        // Destructive — the data exist only on this phone — so it asks first, and says how many.
+        .confirmationDialog(L10n.t("offline.discardConfirm", ["n": outbox.discardPlan?.count ?? 0]),
+                            isPresented: $confirmsDiscard, titleVisibility: .visible) {
+            Button(L10n.t("offline.discard"), role: .destructive) {
+                outbox.discard(onlyOthers: outbox.discardPlan?.onlyOthers ?? false)
+            }
+        }
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: shrunk)
         .onChange(of: outbox.isFlushing) { was, now in
             if was, !now, outbox.lastSent > 0 { justSynced = true }
@@ -101,6 +109,13 @@ struct ConnectivityNoticeView: View {
                 if input.pending > 0 {
                     Button(L10n.t("offline.seeDetails")) { showsDetails = true }
                         .font(.caption.weight(.semibold))
+                        .frame(minHeight: 44, alignment: .leading)
+                }
+                // The way out for what can never go (another account's, already published by
+                // hand): small text, not a button — the exit must exist, not invite.
+                if outbox.discardPlan != nil {
+                    Button(L10n.t("offline.discard"), role: .destructive) { confirmsDiscard = true }
+                        .font(.caption)
                         .frame(minHeight: 44, alignment: .leading)
                 }
             }
