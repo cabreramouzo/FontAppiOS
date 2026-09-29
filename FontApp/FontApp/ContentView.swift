@@ -44,6 +44,9 @@ struct ContentView: View {
         }
         // A tab bar on a phone, a sidebar where the screen is wide enough.
         .tabViewStyle(.sidebarAdaptable)
+        // Choosing the search tab opens its field with the keyboard: iOS 27 draws the tab
+        // inside the bar and, left automatic, showed the screen with the field hidden.
+        .tabViewSearchActivation(.searchTabSelection)
         // "View on map" from a fountain opened in Favourites, the profile or the bell.
         .environment(\.showOnMap) { font in
             tab = .map
