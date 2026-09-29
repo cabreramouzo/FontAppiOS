@@ -1,6 +1,26 @@
 {
   "sourceLanguage" : "ca",
   "strings" : {
+    "%@ %@" : {
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ %@ · %@" : {
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ · %3$@"
+          }
+        }
+      }
+    },
     "confidence.unverified" : {
       "extractionState" : "manual",
       "localizations" : {
