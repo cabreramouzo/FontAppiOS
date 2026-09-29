@@ -14,7 +14,6 @@ struct NewFontSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(LocationService.self) private var location
     @Environment(SessionStore.self) private var session
-    @State private var pickerItem: PhotosPickerItem?
     @State private var showsCamera = false
     @State private var confirmsDiscard = false
     @State private var placesFullScreen = false
@@ -186,47 +185,21 @@ struct NewFontSheet: View {
         }
     }
 
-    @ViewBuilder private var photoRow: some View {
-        if let photo = model.photo, let image = UIImage(data: photo.jpeg) {
-            HStack {
-                Image(uiImage: image).resizable().scaledToFill()
-                    .frame(width: 72, height: 72).clipShape(RoundedRectangle(cornerRadius: 10))
-                Spacer()
-                Button(L10n.t("draft.discard"), role: .destructive) { model.photo = nil }
-            }
-        } else {
-            HStack(spacing: 8) {
-                if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                    Button {
-                        showsCamera = true
-                    } label: {
-                        Label(L10n.t("ios.takePhoto"), systemImage: "camera").frame(maxWidth: .infinity, minHeight: 44)
-                    }
-                    .buttonStyle(.bordered)
-                }
-                PhotosPicker(selection: $pickerItem, matching: .images) {
-                    Label(L10n.t("ios.choosePhoto"), systemImage: "photo.on.rectangle").frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.bordered)
-                .onChange(of: pickerItem) { _, item in
-                    guard let item else { return }
-                    pickerItem = nil
-                    Task {
-                        if let data = try? await item.loadTransferable(type: Data.self) {
-                            await usePhoto(data, fromCamera: false)
-                        }
-                    }
-                }
-            }
+    private var photoRow: some View {
+        PhotoSlot(jpeg: model.photo?.jpeg,
+                  canTakePhoto: UIImagePickerController.isSourceTypeAvailable(.camera),
+                  onTakePhoto: { showsCamera = true },
+                  onChosen: { await usePhoto($0, fromCamera: false) },
+                  onRemove: { model.photo = nil })
             .listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
-        }
     }
 
     /// Compressed now, with its EXIF read first, so it is ready both to upload and to queue.
-    private func usePhoto(_ data: Data, fromCamera: Bool) async {
+    @discardableResult
+    private func usePhoto(_ data: Data, fromCamera: Bool) async -> Bool {
         guard var prepared = try? await Task.detached(priority: .userInitiated, operation: {
             try PhotoPreparer.prepare(data)
-        }).value else { return }
+        }).value else { return false }
         if fromCamera {
             // The camera hands over pixels without EXIF; the facts are known.
             var meta = PhotoMeta(takenAt: .now)
@@ -237,6 +210,7 @@ struct NewFontSheet: View {
             prepared = PhotoPreparer.Prepared(jpeg: prepared.jpeg, meta: meta)
         }
         model.photo = prepared
+        return true
     }
 
     private func helpButton(_ kind: LegendHelp.Kind) -> some View {

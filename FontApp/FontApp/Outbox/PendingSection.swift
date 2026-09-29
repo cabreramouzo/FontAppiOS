@@ -54,6 +54,7 @@ struct PendingSection: View {
 }
 
 private struct PendingRow: View {
+    @Environment(Outbox.self) private var outbox
     let item: OutboxItem
     let mine: Bool
 
@@ -78,7 +79,16 @@ private struct PendingRow: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
-            Text(L10n.fontName(item.fontName))
+            HStack(spacing: 10) {
+                // The photo that will go with it, so it is seen that it was attached.
+                if let data = outbox.photoData(of: item), let image = UIImage(data: data) {
+                    Image(uiImage: image).resizable().scaledToFill()
+                        .frame(width: 44, height: 44)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .accessibilityHidden(true)
+                }
+                Text(L10n.fontName(item.fontName))
+            }
             let notes = [
                 mine ? nil : L10n.t("offline.itemOther"),
                 item.needsAuth ? L10n.t("offline.itemNeedsAuth") : nil,
