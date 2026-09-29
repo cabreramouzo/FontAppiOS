@@ -11,15 +11,23 @@ struct NearbyBrowseTests {
                     latestConfirmations: nil, recentStatusReporters: nil, recentStatusConflict: nil)
     }
 
-    @Test func eachSideGetsTheNearestOnThatSideOnly() {
+    @Test func theSweepStopsAtTheFirstFountainItMeets() {
         let here = font("here", 41.0, 2.0)
-        // The nearest overall is on the left; the right one is farther but still the answer.
-        let leftNear = font("leftNear", 41.0, 1.999)
-        let rightFar = font("rightFar", 41.0, 2.005)
-        let rightFarther = font("rightFarther", 41.0, 2.01)
-        let all = [here, leftNear, rightFar, rightFarther]
-        #expect(NearbyBrowse.neighbour(of: here, on: .east, among: all)?.name == "rightFar")
-        #expect(NearbyBrowse.neighbour(of: here, on: .west, among: all)?.name == "leftNear")
+        // Closer as the crow flies but farther sideways: the sweep meets `sideways` first.
+        let straightRight = font("straightRight", 41.0, 2.004)
+        let sideways = font("sideways", 41.003, 2.001)
+        let left = font("left", 41.0, 1.998)
+        let all = [here, straightRight, sideways, left]
+        #expect(NearbyBrowse.neighbour(of: here, on: .east, among: all)?.name == "sideways")
+        #expect(NearbyBrowse.neighbour(of: here, on: .west, among: all)?.name == "left")
+    }
+
+    @Test func whatTheScreenDoesNotShowIsSkipped() {
+        let here = font("here", 41.0, 2.0)
+        let offScreen = font("offScreen", 41.05, 2.001)
+        let onScreen = font("onScreen", 41.001, 2.003)
+        let band = 40.99...41.01
+        #expect(NearbyBrowse.neighbour(of: here, on: .east, among: [here, offScreen, onScreen], latitudes: band)?.name == "onScreen")
     }
 
     @Test func theLineMovesWithEachStep() {

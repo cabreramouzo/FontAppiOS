@@ -201,8 +201,9 @@ struct MapScreen: View {
     /// The nearest fountain on each side of the current one, among those on the map.
     private func neighbours(of font: FontSummary) -> Neighbours {
         let fonts = filters.apply(model.fonts)
-        return Neighbours(west: NearbyBrowse.neighbour(of: font, on: .west, among: fonts),
-                          east: NearbyBrowse.neighbour(of: font, on: .east, among: fonts),
+        let band = controller.visibleLatitudes(covered: PresentationDetent.shortCardHeight)
+        return Neighbours(west: NearbyBrowse.neighbour(of: font, on: .west, among: fonts, latitudes: band),
+                          east: NearbyBrowse.neighbour(of: font, on: .east, among: fonts, latitudes: band),
                           from: font)
     }
 
@@ -210,7 +211,9 @@ struct MapScreen: View {
     /// rises as when tapped. The line then goes through the new one.
     private func step(_ side: NearbyBrowse.Side) {
         guard let current = selected,
-              let font = NearbyBrowse.neighbour(of: current, on: side, among: filters.apply(model.fonts)) else { return }
+              let font = NearbyBrowse.neighbour(of: current, on: side, among: filters.apply(model.fonts),
+                                                latitudes: controller.visibleLatitudes(covered: PresentationDetent.shortCardHeight))
+        else { return }
         selected = font
         controller.center(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
                           covered: PresentationDetent.shortCardHeight)

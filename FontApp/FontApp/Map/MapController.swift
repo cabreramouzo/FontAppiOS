@@ -69,6 +69,14 @@ final class MapController {
     /// visible above a sheet `covered` points tall, as Apple Maps does with a place. It
     /// moves always, not only when hidden: the sheet is the same, so the pin lands in the
     /// same place every time.
+    /// From the bottom to the top of the map on screen, the part not under the sheet.
+    func visibleLatitudes(covered: CGFloat) -> ClosedRange<Double>? {
+        guard let map = mapView else { return nil }
+        let top = map.convert(CGPoint(x: map.bounds.midX, y: map.safeAreaInsets.top), toCoordinateFrom: map).latitude
+        let bottom = map.convert(CGPoint(x: map.bounds.midX, y: map.bounds.height - covered), toCoordinateFrom: map).latitude
+        return min(top, bottom)...max(top, bottom)
+    }
+
     /// Always brings the point to the middle of what the sheet leaves in view.
     func center(_ coordinate: CLLocationCoordinate2D, covered: CGFloat) {
         reveal(coordinate, covered: covered, always: true)
