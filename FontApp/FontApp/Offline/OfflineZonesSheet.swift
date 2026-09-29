@@ -10,6 +10,9 @@ struct OfflineZonesSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var step: Step = .idle
     @State private var justSaved: OfflineZone?
+    @State private var clearedMaps = false
+
+    private static let cacheSize = ByteCountFormatter.string(fromByteCount: Int64(MapTileCache.maxBytes), countStyle: .file)
 
     enum Step: Equatable {
         case idle
@@ -47,6 +50,15 @@ struct OfflineZonesSheet: View {
                                 Task { for id in ids { await zones.delete(id) } }
                             }
                     }
+                }
+                // The tiles the map has drawn stay on the phone and are not asked for twice.
+                Section(L10n.t("ios.mapCache.title")) {
+                    Text(L10n.t("ios.mapCache.body", ["size": Self.cacheSize])).font(.footnote).foregroundStyle(.secondary)
+                    Button(L10n.t("ios.mapCache.clear")) {
+                        Task { await MapTileCache.clear(); clearedMaps = true }
+                    }
+                    .frame(minHeight: 44)
+                    .disabled(clearedMaps)
                 }
                 Section {
                     Text(L10n.t("zonaOff.note")).font(.footnote).foregroundStyle(.secondary)

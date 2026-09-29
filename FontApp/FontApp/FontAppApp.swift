@@ -13,6 +13,8 @@ struct FontAppApp: App {
     @State private var celebrations = BadgeCelebrations()
 
     init() {
+        // Before the first map: how much of the map seen is kept for not downloading it again.
+        MapTileCache.configure()
         let session = SessionStore()
         let outbox = Outbox.shared
         // Before anything is sent, the outbox has to know whose it is.

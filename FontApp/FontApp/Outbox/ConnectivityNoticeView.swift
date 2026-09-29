@@ -100,30 +100,38 @@ struct ConnectivityNoticeView: View {
     // MARK: Whole
 
     private func card(_ notice: ConnectivityNotice, _ input: ConnectivityNotice.Input) -> some View {
-        HStack(alignment: .center, spacing: 12) {
-            icon(notice.tone)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(notice.title).font(.subheadline.weight(.semibold))
-                Text(notice.detail).font(.caption).foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                icon(notice.tone).frame(width: 24, height: 24)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(notice.title).font(.subheadline.weight(.semibold))
+                    Text(notice.detail).font(.caption).foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            // Under the text and not beside it: beside, they squeezed the message — the one
+            // thing that has to be read — into a narrow column.
+            HStack(spacing: 16) {
                 // See, copy or keep what is stuck: so it is never trapped where nobody can read it.
                 if input.pending > 0 {
                     Button(L10n.t("offline.seeDetails")) { showsDetails = true }
                         .font(.caption.weight(.semibold))
-                        .frame(minHeight: 44, alignment: .leading)
+                        .frame(minHeight: 44)
                 }
                 // The way out for what can never go (another account's, already published by
                 // hand): small text, not a button — the exit must exist, not invite.
                 if outbox.discardPlan != nil {
                     Button(L10n.t("offline.discard"), role: .destructive) { confirmsDiscard = true }
                         .font(.caption)
-                        .frame(minHeight: 44, alignment: .leading)
+                        .frame(minHeight: 44)
                 }
+                Spacer(minLength: 0)
+                action(input)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            action(input)
+            .padding(.leading, 36)
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.top, 10).padding(.bottom, 6)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(border(notice.tone), lineWidth: 1))
         .shadow(color: .black.opacity(0.15), radius: 6, y: 2)
@@ -151,14 +159,16 @@ struct ConnectivityNoticeView: View {
             if input.needsAuth {
                 Button(L10n.t("nav.enter"), action: onSignIn)
                     .buttonStyle(.borderedProminent).tint(Color.warning)
+                    .controlSize(.small)
                     .frame(minHeight: 44)
             } else if input.others < input.pending {
                 Button(L10n.t(input.sending ? "offline.sending" : "offline.sendNow")) {
                     Task { await outbox.flush() }
                 }
                 .buttonStyle(.borderedProminent).tint(Color.warning)
-                .disabled(input.sending)
+                .controlSize(.small)
                 .frame(minHeight: 44)
+                .disabled(input.sending)
             }
         }
     }

@@ -34885,6 +34885,165 @@
         }
       }
     },
+    "ios.mapCache.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapes vistos"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maps seen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapas vistos"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ikusitako mapak"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cartes vues"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapas vistos"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mappe viste"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapas vistos"
+          }
+        }
+      }
+    },
+    "ios.mapCache.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Els trossos de mapa que mires es queden en aquest mòbil: no es tornen a baixar i hi són sense cobertura. Fins a {size}; se'n van els més antics. Les zones desades a dalt van a part i mai s'esborren per fer lloc."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The parts of the map you look at stay on this phone: they are not downloaded again and are there without signal. Up to {size}; the oldest go first. Zones saved above are kept apart and never removed to make room."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los trozos de mapa que miras se quedan en este móvil: no se vuelven a descargar y están ahí sin cobertura. Hasta {size}; se van los más antiguos. Las zonas guardadas arriba van aparte y nunca se borran para hacer sitio."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begiratzen dituzun mapa-zatiak telefono honetan gelditzen dira: ez dira berriro deskargatzen eta estalduraz kanpo ere hor daude. {size} arte; zaharrenak lehenago joaten dira. Goian gordetako guneak bereiz gordetzen dira eta ez dira sekula ezabatzen lekua egiteko."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les morceaux de carte que vous regardez restent sur ce téléphone : ils ne sont pas retéléchargés et sont là sans réseau. Jusqu'à {size} ; les plus anciens partent en premier. Les zones enregistrées ci-dessus sont à part et jamais supprimées pour faire de la place."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os anacos de mapa que miras quedan neste móbil: non se volven descargar e están aí sen cobertura. Ata {size}; van saíndo os máis antigos. As zonas gardadas arriba van á parte e nunca se borran para facer sitio."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I pezzi di mappa che guardi restano su questo telefono: non vengono scaricati di nuovo e ci sono anche senza copertura. Fino a {size}; i più vecchi se ne vanno per primi. Le zone salvate sopra restano a parte e non vengono mai eliminate per fare spazio."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os pedaços de mapa que vê ficam neste telemóvel: não são descarregados de novo e estão lá sem rede. Até {size}; os mais antigos saem primeiro. As zonas guardadas acima ficam à parte e nunca são apagadas para dar espaço."
+          }
+        }
+      }
+    },
+    "ios.mapCache.clear" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oblida els mapes vistos"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forget maps seen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olvidar mapas vistos"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahaztu ikusitako mapak"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oublier les cartes vues"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esquecer os mapas vistos"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dimentica le mappe viste"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esquecer os mapas vistos"
+          }
+        }
+      }
+    },
     "ios.passingBy.hint" : {
       "extractionState" : "manual",
       "localizations" : {
