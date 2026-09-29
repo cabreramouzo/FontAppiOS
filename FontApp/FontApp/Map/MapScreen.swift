@@ -414,6 +414,8 @@ private struct FountainSheet: View {
 
     /// How far the card follows the finger sideways, and how far it goes out.
     @State private var dragX: CGFloat = 0
+    /// A horizontal swipe is under way: the page's buttons wait.
+    @State private var swiping = false
     @State private var width: CGFloat = 400
 
     var body: some View {
@@ -441,6 +443,12 @@ private struct FountainSheet: View {
         // and the next one comes in from the other side. The sheet itself stays: iOS
         // keeps its glass card however the sheet's background is set, and moving UIKit's
         // sheet view is undone by its own layout.
+        // While swiping, nothing under the finger acts: a swipe that starts on a button
+        // used to share, star or open it on release.
+        .disabled(swiping)
+        // A card stepping aside: a little smaller and fainter the farther it goes.
+        .scaleEffect(1 - min(abs(dragX) / max(width, 1), 1) * 0.08)
+        .opacity(1 - min(abs(dragX) / max(width, 1), 1) * 0.35)
         .offset(x: dragX)
         .clipped()
         .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) { width = $0 }
@@ -450,11 +458,14 @@ private struct FountainSheet: View {
                 .onChanged { value in
                     let dx = value.translation.width, dy = value.translation.height
                     guard detent == .shortCard, neighbours?.isUseful == true, abs(dx) > abs(dy) * 1.5 else { return }
+                    swiping = true
                     // Towards a side with nothing there it resists, as a page at the end.
                     let side: NearbyBrowse.Side = dx < 0 ? .east : .west
                     dragX = neighbours?.has(side) == true ? dx : dx / 4
                 }
                 .onEnded { value in
+                    // After the release has reached the buttons, which then ignore it.
+                    Task { try? await Task.sleep(for: .milliseconds(150)); swiping = false }
                     guard detent == .shortCard, let neighbours,
                           let side = NearbyBrowse.swipe(dx: value.translation.width, dy: value.translation.height),
                           neighbours.has(side) else {
