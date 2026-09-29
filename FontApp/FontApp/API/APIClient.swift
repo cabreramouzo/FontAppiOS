@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 import Synchronization
 
@@ -166,12 +167,16 @@ nonisolated struct APIClient: Sendable {
     }
 
     /// Fountains by name. The server requires a term and, for the public, caps the pages.
-    func searchFonts(_ term: String, per: Int = 20) async throws -> [FontSummary] {
+    /// With a position, the server puts the nearest matches first before cutting the
+    /// page: of forty «Font del Roure», the one down the road. Rounded to about a kilometre.
+    func searchFonts(_ term: String, near: CLLocationCoordinate2D? = nil, per: Int = 20) async throws -> [FontSummary] {
         struct Page: Decodable { let items: [FontSummary] }
-        let page: Page = try await get("/fonts", query: [
-            URLQueryItem(name: "search", value: term),
-            URLQueryItem(name: "per", value: String(per)),
-        ])
+        var query = [URLQueryItem(name: "search", value: term), URLQueryItem(name: "per", value: String(per))]
+        if let near {
+            query.append(URLQueryItem(name: "lat", value: String(format: "%.2f", near.latitude)))
+            query.append(URLQueryItem(name: "long", value: String(format: "%.2f", near.longitude)))
+        }
+        let page: Page = try await get("/fonts", query: query)
         return page.items
     }
 

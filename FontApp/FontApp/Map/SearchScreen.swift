@@ -342,7 +342,7 @@ final class SearchModel: NSObject, MKLocalSearchCompleterDelegate {
             try? await Task.sleep(for: .milliseconds(300))
             guard !Task.isCancelled else { return }
             do {
-                let found = try await api.searchFonts(term)
+                let found = try await api.searchFonts(term, near: location?.coordinate)
                 guard !Task.isCancelled, let self else { return }
                 self.fountains = Self.sorted(found, from: location)
                 self.error = nil
