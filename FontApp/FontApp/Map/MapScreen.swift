@@ -185,7 +185,6 @@ struct MapScreen: View {
                     controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
                                     meters: 250, aboveSheet: true)
                 }
-                .id(font.id)
             }
         }
         // Another pin chosen: back to the short card, as the first one opened, even if
@@ -413,9 +412,15 @@ private struct FountainSheet: View {
     let onClose: () -> Void
     let reveal: (FontSummary) -> Void
 
+    /// How far the card follows the finger sideways, and how far it goes out.
+    @State private var dragX: CGFloat = 0
+    @State private var width: CGFloat = 400
+
     var body: some View {
         NavigationStack {
             FontDetailView(fontID: font.id, preview: font, onClose: onClose)
+                // A new page per fountain, its own state and scroll.
+                .id(font.id)
                 // Over the map it brings the fountain into view, close, and lowers the
                 // sheet to the short card so the map shows around it.
                 .environment(\.showOnMap) { font in
@@ -426,25 +431,54 @@ private struct FountainSheet: View {
                     reveal(font)
                 }
                 .background(SheetFinder(handle: handle))
-                // On the short card only: lifted, the page is being read or written in.
-                .simultaneousGesture(
-                    DragGesture(minimumDistance: 30).onEnded { value in
-                        guard detent == .shortCard, let neighbours,
-                              let side = NearbyBrowse.swipe(dx: value.translation.width, dy: value.translation.height),
-                              neighbours.has(side) else { return }
-                        onBrowse(side)
-                    }
-                )
                 .safeAreaInset(edge: .top, spacing: 0) {
                     if let neighbours, neighbours.isUseful, detent == .shortCard {
-                        BrowseBar(neighbours: neighbours, onBrowse: onBrowse)
+                        BrowseBar(neighbours: neighbours, onBrowse: { slide(to: $0) })
                     }
                 }
         }
+        // Each fountain as its own page: it follows the finger sideways, goes off the edge
+        // and the next one comes in from the other side. The sheet itself stays: iOS
+        // keeps its glass card however the sheet's background is set, and moving UIKit's
+        // sheet view is undone by its own layout.
+        .offset(x: dragX)
+        .clipped()
+        .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) { width = $0 }
+        // On the short card only: lifted, the page is being read or written in.
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 20)
+                .onChanged { value in
+                    let dx = value.translation.width, dy = value.translation.height
+                    guard detent == .shortCard, neighbours?.isUseful == true, abs(dx) > abs(dy) * 1.5 else { return }
+                    // Towards a side with nothing there it resists, as a page at the end.
+                    let side: NearbyBrowse.Side = dx < 0 ? .east : .west
+                    dragX = neighbours?.has(side) == true ? dx : dx / 4
+                }
+                .onEnded { value in
+                    guard detent == .shortCard, let neighbours,
+                          let side = NearbyBrowse.swipe(dx: value.translation.width, dy: value.translation.height),
+                          neighbours.has(side) else {
+                        withAnimation(.spring(duration: 0.3)) { dragX = 0 }
+                        return
+                    }
+                    slide(to: side)
+                }
+        )
         // Opens as the short card: status, the three chips and the way there, with the
         // map still in view. Up for the whole page.
         .presentationDetents([.shortCard, .large], selection: $detent)
         .presentationBackgroundInteraction(.enabled(upThrough: .shortCard))
+    }
+
+    /// Out to one side, in from the other with the next fountain.
+    private func slide(to side: NearbyBrowse.Side) {
+        let out: CGFloat = side == .east ? -width : width
+        if UIAccessibility.isReduceMotionEnabled { dragX = 0; onBrowse(side); return }
+        withAnimation(.easeIn(duration: 0.16)) { dragX = out } completion: {
+            onBrowse(side)
+            dragX = -out
+            withAnimation(.spring(duration: 0.34, bounce: 0.12)) { dragX = 0 }
+        }
     }
 }
 
