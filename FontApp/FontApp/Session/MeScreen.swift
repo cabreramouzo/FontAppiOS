@@ -2,18 +2,14 @@ import CoreLocation
 import SwiftUI
 
 /// The "Me" tab: what is yours — who you are, your score and collection, the fountains
-/// that depend on you, your fountains and reviews — with the bell, signing out and
-/// deleting the account. Favourites have their own tab.
+/// that depend on you, your fountains and reviews — with the bell and signing out.
+/// Deleting the account lives in Settings, as on the web. Favourites have their own tab.
 struct MeScreen: View {
     @Environment(SessionStore.self) private var session
     @Environment(Outbox.self) private var outbox
     @Environment(LocationService.self) private var location
     @State private var showsSignIn = false
     @State private var isSigningOut = false
-    @State private var confirmsDeletion = false
-    @State private var showsDangerZone = false
-    @State private var isDeleting = false
-    @State private var deletionError: String?
     @State private var profile = ProfileModel()
 
     var body: some View {
@@ -102,7 +98,7 @@ struct MeScreen: View {
                     }
                     .frame(minHeight: 44)
                 }
-                .disabled(isSigningOut || isDeleting)
+                .disabled(isSigningOut)
             }
             Section {
                 NavigationLink { GuideScreen() } label: {
@@ -113,7 +109,6 @@ struct MeScreen: View {
                 }
                 LegalLink()
             }
-            deletion
         }
         .refreshable { await reload() }
         // Switching the game off or on in Settings changes what the profile shows.
@@ -129,67 +124,6 @@ struct MeScreen: View {
         let near = location.location.map { (latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude) }
         async let lists: Void = profile.load(near: near)
         _ = await (account, lists)
-    }
-
-    /// Apple requires deleting the account from inside the app (App Store rule 5.1.1(v)).
-    /// The server anonymises it: personal data goes, contributions stay without a name.
-    /// Folded by default: deleting cannot be undone, so it takes a deliberate tap to
-    /// even see the button, and one more to confirm.
-    private var deletion: some View {
-        Section {
-            DisclosureGroup(isExpanded: $showsDangerZone) {
-                Text(L10n.t("profile.dangerZoneHint"))
-                    .font(.footnote).foregroundStyle(.secondary)
-                Button(role: .destructive) { confirmsDeletion = true } label: {
-                    HStack {
-                        Label(L10n.t("profile.deleteAccount"), systemImage: "trash")
-                            .foregroundStyle(.red)
-                        if isDeleting { Spacer(); ProgressView() }
-                    }
-                    .frame(minHeight: 44)
-                }
-                .disabled(isDeleting || isSigningOut)
-                if let deletionError {
-                    Text(deletionError).foregroundStyle(.red)
-                }
-            } label: {
-                Label(L10n.t("profile.dangerZone"), systemImage: "exclamationmark.triangle")
-                    .foregroundStyle(.secondary)
-                    .frame(minHeight: 44)
-            }
-        }
-        .confirmationDialog(L10n.t("profile.deleteAccount"), isPresented: $confirmsDeletion, titleVisibility: .visible) {
-            Button(L10n.t("profile.deleteAccount"), role: .destructive, action: deleteAccount)
-            Button(role: .cancel) {}
-        } message: {
-            Text(deletionMessage)
-        }
-    }
-
-    /// Contributions still on the phone would be lost for good: say so, with how many.
-    private var deletionMessage: String {
-        let pending = outbox.items.filter { $0.userID != nil && $0.userID == session.userID }.count
-        let warning = L10n.t("profile.confirmDelete")
-        guard pending > 0 else { return warning }
-        return warning + "\n\n" + L10n.t("ios.deleteAccount.pending", ["n": pending])
-    }
-
-    private func deleteAccount() {
-        guard let userID = session.userID else { return }
-        isDeleting = true
-        deletionError = nil
-        Task {
-            defer { isDeleting = false }
-            // What is waiting goes out first, under the account, like any contribution:
-            // the server keeps contributions anonymously after the deletion.
-            _ = await outbox.flush()
-            do {
-                try await session.deleteAccount()
-                outbox.discard(queuedBy: userID)
-            } catch {
-                deletionError = ErrorText.describe(error)
-            }
-        }
     }
 }
 
