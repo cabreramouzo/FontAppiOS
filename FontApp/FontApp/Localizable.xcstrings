@@ -7,6 +7,59 @@
     " → %@" : {
 
     },
+    "err.comment.alreadyReported" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ja vas dir aquest estat fa menys d'un dia. Si ha canviat, tria el nou."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You reported this state less than a day ago. If it has changed, choose the new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya dijiste este estado hace menos de un día. Si ha cambiado, elige el nuevo."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Egoera hau duela egun bat baino gutxiago esan zenuen. Aldatu bada, aukeratu berria."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez indiqué cet état il y a moins d'un jour. Si ça a changé, choisissez le nouveau."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xa dixeches este estado hai menos dun día. Se cambiou, escolle o novo."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai già indicato questo stato meno di un giorno fa. Se è cambiato, scegli quello nuovo."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Já indicaste este estado há menos de um dia. Se mudou, escolhe o novo."
+          }
+        }
+      }
+    },
     "ios.quick.youSaid" : {
       "extractionState" : "manual",
       "localizations" : {
