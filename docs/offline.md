@@ -8,7 +8,7 @@ the web's offline code. This file says where each one lives in the app and what 
 | R5.1, R5.5 outbox, owner, order, retries | `Outbox/Outbox.swift` |
 | When it is flushed (network back, foreground, sign-in, background) | `Outbox/OutboxSync.swift` |
 | R5.6 the notice (states, orange, shrinks after 3 s) | `Outbox/ConnectivityNotice.swift` (logic), `ConnectivityNoticeView.swift` (view, on the map) |
-| R5.7 see / copy / save what waits | `Outbox/PendingDetails.swift` |
+| R5.7 see / copy / save what waits | `Outbox/PendingDetails.swift` (readable text, not JSON), `Outbox/PhotoLibrarySaver.swift` (into Photos) |
 | R5.8 discard | `Outbox.discardPlan`, in the notice and in `PendingSection` (profile) |
 | R5.9 session without signal | `Session/SessionStore.swift` (`refresh`: only a 401 signs out) |
 | R5.14 one notice, not two | `Map/MapScreen.swift` (`banner` hides the error text while `OutboxSync.isOnline` is false) |

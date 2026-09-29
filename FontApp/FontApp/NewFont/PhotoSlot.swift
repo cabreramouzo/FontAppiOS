@@ -1,5 +1,6 @@
 import PhotosUI
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// The photo of a form, as the web's `ImagePicker` with `placeholder`: a big dashed zone
 /// with a camera and "Add photo", instead of two bare buttons. Tapping it asks whether to
@@ -51,8 +52,12 @@ struct PhotoSlot: View {
         .photosPicker(isPresented: $showsLibrary, selection: $item, matching: .images)
         .onChange(of: item) { _, chosen in
             guard let chosen else { return }
-            item = nil
-            Task { await read(chosen) }
+            // The selection is cleared only after it has been read: clearing it at once
+            // could cut the load short, and the photo was reported unreadable.
+            Task {
+                await read(chosen)
+                item = nil
+            }
         }
     }
 
@@ -102,9 +107,22 @@ struct PhotoSlot: View {
         unreadable = false
         isReading = true
         defer { isReading = false }
-        guard let data = try? await chosen.loadTransferable(type: Data.self), await onChosen(data) else {
+        // As an image first (what the library really holds: HEIC, JPEG, a Live Photo's still),
+        // and as plain data if that fails.
+        var data = (try? await chosen.loadTransferable(type: PickedImage.self))?.data
+        if data == nil { data = try? await chosen.loadTransferable(type: Data.self) }
+        guard let data, await onChosen(data) else {
             unreadable = true
             return
         }
+    }
+}
+
+/// A picked photo's original bytes, asked for as an image type.
+private struct PickedImage: Transferable {
+    let data: Data
+
+    static var transferRepresentation: some TransferRepresentation {
+        DataRepresentation(importedContentType: .image) { PickedImage(data: $0) }
     }
 }

@@ -45,39 +45,55 @@ nonisolated enum PendingExport {
         return out
     }
 
-    /// What "copy all" puts on the clipboard: every field, when it was queued (ISO) and how
-    /// many attempts it has had, in queue order.
-    static func json(_ items: [OutboxItem]) -> String {
-        let iso = ISO8601DateFormatter()
-        let list: [[String: Any]] = items.map { item in
-            var fields = fields(of: item)
-            fields["queuedAt"] = iso.string(from: item.queuedAt)
-            fields["attempts"] = item.attempts
-            return fields
+    /// What "copy all" puts on the clipboard: for a person, not a program — each contribution
+    /// with its kind, its fields in the reader's language, when it was queued and how many
+    /// attempts it has had, in queue order. Nothing internal (ids, keys, file names).
+    static func text(_ items: [OutboxItem]) -> String {
+        items.map(block).joined(separator: "\n\n")
+    }
+
+    static func block(_ item: OutboxItem) -> String {
+        var lines = [L10n.t(kindKey(of: item))]
+        lines += rows(of: item, includeID: false).map { "\($0.label): \($0.value)" }
+        if let lat = item.newFont?.latitude, let long = item.newFont?.longitude {
+            lines.append(String(format: "https://maps.apple.com/?ll=%.5f,%.5f", lat, long))
         }
-        guard let data = try? JSONSerialization.data(withJSONObject: list, options: [.prettyPrinted, .sortedKeys]),
-              let text = String(data: data, encoding: .utf8) else { return "[]" }
-        return text
+        if item.photoFile != nil { lines.append("📷 " + L10n.t("offline.itemPhoto")) }
+        lines.append([item.queuedAt.formatted(date: .abbreviated, time: .shortened),
+                      item.attempts > 0 ? L10n.t("offline.attempts", ["n": item.attempts]) : nil]
+            .compactMap { $0 }.joined(separator: " · "))
+        return lines.joined(separator: "\n")
+    }
+
+    static func kindKey(of item: OutboxItem) -> String {
+        switch item.kind {
+        case .review, .comment: "offline.itemReview"
+        case .photo: "offline.itemPhoto"
+        case .font: "offline.itemFont"
+        }
     }
 
     /// The fields that carry something, in a stable order, with their label.
-    static func rows(of item: OutboxItem) -> [(label: String, value: String)] {
+    static func rows(of item: OutboxItem, includeID: Bool = true) -> [(label: String, value: String)] {
         var rows: [(String, String)] = []
         func add(_ key: String, _ value: String?) {
             guard let value, !value.isEmpty else { return }
-            rows.append((L10n.t(key), value))
+            // The web's labels for type and drinkability end in a colon; here the label is its own line.
+            rows.append((L10n.t(key).trimmingCharacters(in: CharacterSet(charactersIn: ": ")), value))
         }
         let fields = fields(of: item)
-        add("offline.fName", (fields["name"] as? String).flatMap { $0.isEmpty ? nil : $0 })
+        add("offline.fName", fields["name"] as? String)
         if let lat = fields["latitude"] as? Double, let long = fields["longitude"] as? Double {
             add("offline.fCoords", String(format: "%.5f, %.5f", lat, long))
         }
         if let status = fields["waterStatus"] as? String {
             add("offline.fStatus", WaterStatus(status).map { L10n.t($0.labelKey) } ?? status)
         }
+        add("detail.type", (fields["source"] as? String).flatMap { L10n.lookup("source.\($0)") })
+        add("detail.drinkability", (fields["drinkable"] as? String).flatMap { L10n.lookup("drink.\($0)") })
         if let rating = fields["rating"] as? Int { add("offline.fRating", String(rating)) }
         add("offline.fText", (fields["text"] as? String) ?? (fields["description"] as? String))
-        add("offline.fFont", fields["fontID"] as? String)
+        if includeID { add("offline.fFont", fields["fontID"] as? String) }
         return rows
     }
 
@@ -115,7 +131,7 @@ struct PendingDetailsSheet: View {
                 if !outbox.items.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
-                            UIPasteboard.general.string = PendingExport.json(PendingExport.inQueueOrder(outbox.items))
+                            UIPasteboard.general.string = PendingExport.text(PendingExport.inQueueOrder(outbox.items))
                             copyCount += 1
                             withAnimation { copied = true }
                         } label: {
@@ -149,18 +165,12 @@ private struct PendingDetailRow: View {
     let item: OutboxItem
     let mine: Bool
 
-    private var kindKey: String {
-        switch item.kind {
-        case .review, .comment: "offline.itemReview"
-        case .photo: "offline.itemPhoto"
-        case .font: "offline.itemFont"
-        }
-    }
+    @State private var saved: PhotoLibrarySaver.Outcome?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                Text(L10n.t(kindKey)).font(.headline)
+                Text(L10n.t(PendingExport.kindKey(of: item))).font(.headline)
                 if !mine { tag(L10n.t("offline.itemOther")) }
                 if item.needsAuth { tag(L10n.t("offline.itemNeedsAuth")) }
             }
@@ -176,11 +186,18 @@ private struct PendingDetailRow: View {
                     .frame(maxHeight: 200)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .accessibilityHidden(true)
-                // The share sheet offers "Save Image": the way into the gallery.
-                ShareLink(item: Image(uiImage: image), preview: SharePreview(L10n.t("offline.itemPhoto"), image: Image(uiImage: image))) {
+                // Into the Photos library itself: the share sheet does not offer "Save" reliably.
+                Button {
+                    Task { saved = await PhotoLibrarySaver.save(data, meta: item.photoMeta) }
+                } label: {
                     Label(L10n.t("offline.savePhoto"), systemImage: "square.and.arrow.down")
                 }
                 .frame(minHeight: 44)
+                if let saved {
+                    Text(L10n.t(saved.messageKey))
+                        .font(.footnote)
+                        .foregroundStyle(saved == .saved ? Color.green : Color.red)
+                }
             }
             Text([RelativeTime.string(since: item.queuedAt),
                   item.attempts > 0 ? L10n.t("offline.attempts", ["n": item.attempts]) : nil]

@@ -16,6 +16,7 @@ project's build settings), translated in `FontApp/InfoPlist.xcstrings`.
 | Notifications | `UNUserNotificationCenter.requestAuthorization` (alert, sound, badge) + APNs | Push (a followed fountain went dry, incidents, someone writing to you) and the local "passing by" notice | After following a fountain or posting an incident (`askIfUseful`), from Settings, and when "passing by" is turned on | Only the in-app bell |
 | Motion & Fitness | `NSMotionUsageDescription` · `CMMotionActivityManager` | Not asking about a fountain when driving past it | Explainer sheet (`MotionExplainer`) when "passing by" is turned on, or its button in Settings for those who had it on before | Speed of the last fix is used instead; the odd notice while driving |
 | Camera | `NSCameraUsageDescription` · `UIImagePickerController` | Taking a fountain's photo | First time "take photo" is used (new fountain, review, gallery, edit) | Choosing from the library still works |
+| Photos, add only | `NSPhotoLibraryAddUsageDescription` · `PHPhotoLibrary.requestAuthorization(for: .addOnly)` | Saving the photo of a queued contribution ("See my data" → Save photo) | First time "Save photo" is tapped; the app cannot read the library | The photo stays in the queue and is still sent; the sheet says how to allow it |
 
 ## Not permissions (no prompt)
 

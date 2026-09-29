@@ -227,6 +227,59 @@
           }
         }
       }
+    },
+    "NSPhotoLibraryAddUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp desa a les teves fotos la imatge d'una font pendent d'enviar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp saves to your photos the picture of a fountain that is waiting to be sent."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp guarda en tus fotos la imagen de una fuente que está pendiente de enviar."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp-ek bidali gabe dagoen iturri baten irudia zure argazkietan gordetzen du."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp enregistre dans vos photos l’image d’une fontaine en attente d’envoi."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp garda nas túas fotos a imaxe dunha fonte pendente de enviar."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FontApp salva nelle tue foto l'immagine di una fontana in attesa di invio."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A FontApp guarda nas suas fotos a imagem de uma fonte por enviar."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

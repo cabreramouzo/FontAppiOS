@@ -17,30 +17,32 @@ struct PendingExportTests {
         try #require(JSONSerialization.jsonObject(with: Data(json.utf8)) as? [[String: Any]])
     }
 
-    @Test func aNewFountainExportsItsFieldsAndNeverItsPhoto() throws {
+    @Test func theCopiedTextIsForAPersonAndNotForAProgram() {
         let font = NewFont(name: "Font nova", latitude: 41.8, longitude: 2.1, image: nil, description: "Darrere el quiosc",
                            source: .fountain, drinkable: .yes, allowNearbyDuplicate: nil)
-        let list = try decode(PendingExport.json([item(.font, attempts: 2, newFont: font, status: "flowing", photo: "x.jpg")]))
-        let out = try #require(list.first)
-        #expect(out["type"] as? String == "new-fountain")
-        #expect(out["name"] as? String == "Font nova")
-        #expect(out["latitude"] as? Double == 41.8)
-        #expect(out["waterStatus"] as? String == "flowing")
-        #expect(out["hasPhoto"] as? Bool == true)
-        #expect(out["attempts"] as? Int == 2)
-        #expect(out["queuedAt"] as? String == "1970-01-01T00:16:40Z")
-        // The photo itself is never in the text.
-        #expect(!PendingExport.json([item(.font, newFont: font, photo: "x.jpg")]).contains("x.jpg"))
+        let text = PendingExport.text([item(.font, attempts: 2, newFont: font, status: "flowing", photo: "x.jpg")])
+        #expect(text.contains("Font nova"))
+        #expect(text.contains("41.80000, 2.10000"))
+        #expect(text.contains("Darrere el quiosc"))
+        #expect(text.contains("maps.apple.com/?ll=41.80000,2.10000"))
+        // Nothing that is a key, a file or an id.
+        #expect(!text.contains("{") && !text.contains("hasPhoto") && !text.contains("new-fountain"))
+        #expect(!text.contains("x.jpg"))
+        #expect(!text.contains(fontID.uuidString))
     }
 
-    @Test func aReviewNamesTheFountainAndItsStatus() throws {
+    @Test func aReviewReadsAsLabelsAndValuesWithoutTheFountainId() {
         let review = NewReview(waterStatus: "dry", confirmIfUnchanged: true, remoteDistanceM: nil)
-        let out = try #require(decode(PendingExport.json([item(.review, review: review)])).first)
-        #expect(out["type"] as? String == "review")
-        #expect(out["name"] as? String == "Font del Faig")
-        #expect(out["fontID"] as? String == fontID.uuidString)
-        #expect(out["waterStatus"] as? String == "dry")
-        #expect(out["hasPhoto"] as? Bool == false)
+        let text = PendingExport.text([item(.review, review: review)])
+        #expect(text.contains("Font del Faig"))
+        #expect(!text.contains(fontID.uuidString))
+        #expect(!text.contains("waterStatus"))
+    }
+
+    @Test func severalContributionsAreSeparatedByABlankLine() {
+        let review = NewReview(waterStatus: "dry", confirmIfUnchanged: true, remoteDistanceM: nil)
+        let text = PendingExport.text([item(.review, review: review), item(.review, review: review)])
+        #expect(text.components(separatedBy: "\n\n").count == 2)
     }
 
     @Test func rowsShowOnlyWhatCarriesSomething() {
