@@ -67,4 +67,19 @@ struct PassingByTests {
         // Near the fountain by definition: never remote, and "still the same" if it repeats.
         #expect(item?.review == NewReview(waterStatus: "trickle", confirmIfUnchanged: true, remoteDistanceM: nil))
     }
+
+    @Test func drivingPastIsNotPassingBy() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        func at(_ ago: TimeInterval, car: Bool, confident: Bool = true) -> MotionSample {
+            MotionSample(at: now.addingTimeInterval(-ago), automotive: car, onFoot: !car, confident: confident)
+        }
+        #expect(PassingByRules.isTravelling(motion: [at(60, car: true)], speed: nil, now: now))
+        // Parked and walked to it.
+        #expect(!PassingByRules.isTravelling(motion: [at(150, car: true), at(30, car: false)], speed: 20, now: now))
+        // Unsure or too old activity: the speed decides.
+        #expect(!PassingByRules.isTravelling(motion: [at(30, car: true, confident: false)], speed: 1.4, now: now))
+        #expect(PassingByRules.isTravelling(motion: [at(600, car: false)], speed: 15, now: now))
+        #expect(!PassingByRules.isTravelling(motion: [], speed: 5, now: now))
+        #expect(!PassingByRules.isTravelling(motion: [], speed: nil, now: now))
+    }
 }

@@ -34938,6 +34938,218 @@
         }
       }
     },
+    "ios.passingBy.motionBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per no preguntar-te per una font quan hi passes de llarg en cotxe, FontApp necessita el permís «Moviment i forma física». Només es fa servir al moment de l’avís i no es desa enlloc. Sense ell, t’avisarem igualment, però alguna vegada en passar en cotxe."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para no preguntarte por una fuente cuando pasas de largo en coche, FontApp necesita el permiso «Movimiento y forma física». Solo se usa en el momento del aviso y no se guarda en ningún sitio. Sin él, te avisaremos igual, pero alguna vez al pasar en coche."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para non preguntarche por unha fonte cando pasas de longo en coche, FontApp precisa o permiso «Movemento e forma física». Só se usa no momento do aviso e non se garda en ningún sitio. Sen el, avisarémoste igual, pero algunha vez ao pasar en coche."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoan iturri baten ondotik pasatzean horri buruz ez galdetzeko, FontApp-ek «Mugimendua eta sasoia» baimena behar du. Abisuaren unean bakarrik erabiltzen da eta ez da inon gordetzen. Hura gabe ere abisatuko dizugu, baina batzuetan autoan pasatzean."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So it does not ask about a fountain when you drive past, FontApp needs the “Motion & Fitness” permission. It is only used at the moment of the notice and is not stored anywhere. Without it you will still get notices, but sometimes while driving."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour ne pas vous interroger sur une fontaine quand vous passez en voiture, FontApp a besoin de l’autorisation « Mouvements et forme ». Elle n’est utilisée qu’au moment de la notification et rien n’est enregistré. Sans elle, vous serez quand même prévenu, mais parfois en voiture."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para não lhe perguntar por uma fonte quando passa de carro, a FontApp precisa da permissão «Movimento e forma física». Só é usada no momento do aviso e não é guardada em lado nenhum. Sem ela, continuará a ser avisado, mas por vezes ao passar de carro."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Per non chiederti di una fontana quando ci passi in auto, FontApp ha bisogno del permesso «Movimento e fitness». Si usa solo al momento dell’avviso e non viene salvato da nessuna parte. Senza, riceverai comunque gli avvisi, ma a volte mentre sei in auto."
+          }
+        }
+      }
+    },
+    "ios.passingBy.motionContinue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continua"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jarraitu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continua"
+          }
+        }
+      }
+    },
+    "ios.passingBy.motionNotNow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ara no"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ahora no"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agora non"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orain ez"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas maintenant"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agora não"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non ora"
+          }
+        }
+      }
+    },
+    "ios.passingBy.motionTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saber quan vas en cotxe"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saber cuándo vas en coche"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saber cando vas en coche"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoan zoazenean jakitea"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Know when you are driving"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Savoir quand vous êtes en voiture"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saber quando vai de carro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sapere quando sei in auto"
+          }
+        }
+      }
+    },
     "ios.passingBy.needsAlways" : {
       "extractionState" : "manual",
       "localizations" : {

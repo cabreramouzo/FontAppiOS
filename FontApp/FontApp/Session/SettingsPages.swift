@@ -261,6 +261,7 @@ struct PrivacySettingsScreen: View {
 struct NotificationsSettingsScreen: View {
     @Environment(SessionStore.self) private var session
     @State private var error: String?
+    @State private var explainingMotion = false
 
     var body: some View {
         Form {
@@ -325,10 +326,17 @@ struct NotificationsSettingsScreen: View {
     private var passingBySection: some View {
         let passing = PassingBy.shared
         return Section {
-            Toggle(isOn: Binding(get: { passing.isEnabled }, set: { on in Task { await passing.setEnabled(on) } })) {
+            Toggle(isOn: Binding(get: { passing.isEnabled || explainingMotion }, set: { on in
+                // Why the motion permission, before iOS asks it: said once, with the switch.
+                if on, passing.needsMotionAsk { explainingMotion = true } else { Task { await passing.setEnabled(on) } }
+            })) {
                 Text(L10n.t("ios.passingBy.title"))
             }
             .frame(minHeight: 44)
+            // Turned on before the question existed: offered here instead.
+            if passing.isEnabled, passing.needsMotionAsk {
+                Button(L10n.t("ios.passingBy.motionTitle")) { explainingMotion = true }.frame(minHeight: 44)
+            }
             if passing.isBlocked {
                 Text(L10n.t("ios.passingBy.needsAlways")).font(.subheadline).foregroundStyle(.secondary)
                 if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -338,6 +346,47 @@ struct NotificationsSettingsScreen: View {
         } footer: {
             Text(L10n.t("ios.passingBy.hint"))
         }
+        .sheet(isPresented: $explainingMotion) {
+            MotionExplainer { ask in
+                explainingMotion = false
+                Task {
+                    if ask { await passing.askMotion() }
+                    if !passing.isEnabled { await passing.setEnabled(true) }
+                }
+            }
+            .presentationDetents([.medium, .large])
+            .interactiveDismissDisabled()
+        }
+    }
+}
+
+/// Why "Motion & Fitness", told before iOS asks: without it, driving past a fountain
+/// would ask about it, and nobody stops a car to look.
+private struct MotionExplainer: View {
+    let done: (_ ask: Bool) -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "car.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.tint)
+                .accessibilityHidden(true)
+            Text(L10n.t("ios.passingBy.motionTitle"))
+                .font(.title2.bold())
+                .multilineTextAlignment(.center)
+            Text(L10n.t("ios.passingBy.motionBody"))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 0)
+            Button { done(true) } label: {
+                Text(L10n.t("ios.passingBy.motionContinue")).frame(maxWidth: .infinity, minHeight: 48)
+            }
+            .buttonStyle(.borderedProminent)
+            Button { done(false) } label: {
+                Text(L10n.t("ios.passingBy.motionNotNow")).frame(maxWidth: .infinity, minHeight: 48)
+            }
+        }
+        .padding(24)
     }
 }
 

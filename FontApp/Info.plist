@@ -56,6 +56,9 @@
 	     monitoring, which needs "Always" and no background location mode. -->
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Only if you turn on “Tell me when I pass a fountain”: FontApp uses your location in the background to ask how a fountain is when you pass near it. It is not stored anywhere.</string>
+	<!-- PassingBy only: no notice when driving past a fountain. -->
+	<key>NSMotionUsageDescription</key>
+	<string>Only if you turn on “Tell me when I pass a fountain”: FontApp checks whether you are in a car so it does not ask when you drive past. It is not stored anywhere.</string>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<false/>
 	<key>UIBackgroundModes</key>

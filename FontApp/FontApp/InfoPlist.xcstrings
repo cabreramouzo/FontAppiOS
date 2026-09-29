@@ -174,6 +174,59 @@
           }
         }
       }
+    },
+    "NSMotionUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Només si actives «Avisa’m quan passi per una font»: FontApp mira si vas en cotxe per no avisar-te quan hi passes de llarg. No es desa enlloc."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only if you turn on “Tell me when I pass a fountain”: FontApp checks whether you are in a car so it does not ask when you drive past. It is not stored anywhere."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo si activas «Avísame cuando pase por una fuente»: FontApp mira si vas en coche para no avisarte cuando pasas de largo. No se guarda en ningún sitio."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "«Abisatu iturri baten ondotik pasatzean» aktibatzen baduzu bakarrik: FontApp-ek autoan zoazen begiratzen du, gidatzen ari zarenean ez abisatzeko. Ez da inon gordetzen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seulement si vous activez « Me prévenir quand je passe près d’une fontaine » : FontApp vérifie si vous êtes en voiture pour ne pas vous prévenir quand vous passez sans vous arrêter. Rien n’est enregistré."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Só se activas «Avísame cando pase por unha fonte»: FontApp mira se vas en coche para non avisarte cando pasas de longo. Non se garda en ningún sitio."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo se attivi «Avvisami quando passo vicino a una fontana»: FontApp controlla se sei in auto per non avvisarti quando passi senza fermarti. Non viene salvato da nessuna parte."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Só se ativar «Avisar-me quando passar por uma fonte»: a FontApp verifica se vai de carro para não o avisar quando passa sem parar. Não é guardado em lado nenhum."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
