@@ -19,6 +19,8 @@ struct FontBadgesSection: View {
     /// The same 91 days from which the freshness curve pays "sentinel".
     static let dormantDays = 91
 
+    @State private var showcase: Showcase?
+
     private struct Row: Identifiable {
         let family: String
         let earned: Bool
@@ -52,7 +54,19 @@ struct FontBadgesSection: View {
         Section {
             ForEach(rows) { row in
                 HStack(spacing: 12) {
-                    BadgeImage(family: row.family, tier: row.tier, locked: !row.earned, size: 40)
+                    // Tappable, as everywhere a badge is drawn (web: `Abrible`): it opens the
+                    // badge large, with what it is for. Only the drawing, so the author's
+                    // name next to it keeps its own tap.
+                    Button {
+                        showcase = Showcase(kind: .badge, key: row.family, tier: row.tier, locked: !row.earned,
+                                            subtitle: row.by.map { "@\($0)" } ?? row.hint)
+                    } label: {
+                        BadgeImage(family: row.family, tier: row.tier, locked: !row.earned, size: 40)
+                            .frame(minWidth: 44, minHeight: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.borderless)
+                    .accessibilityLabel(L10n.t("badges.view", ["name": L10n.t("game.badge.\(row.family)")]))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(L10n.t("game.badge.\(row.family)"))
                             .font(.body.weight(.semibold))
@@ -69,12 +83,12 @@ struct FontBadgesSection: View {
                     }
                 }
                 .padding(.vertical, 2)
-                .accessibilityElement(children: .combine)
             }
         } header: {
             Text(L10n.t("detail.badges.title"))
         } footer: {
             Text(L10n.t("detail.badges.intro"))
         }
+        .sheet(item: $showcase) { BadgeShowcaseView(showcase: $0) }
     }
 }
