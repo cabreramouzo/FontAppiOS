@@ -367,7 +367,9 @@ struct MapScreen: View {
                     .frame(minHeight: 44)
             }
             .bannerStyle()
-        } else if let message = model.errorMessage {
+        } else if let message = model.errorMessage, OutboxSync.shared.isOnline {
+            // Without signal the connectivity notice already says so (and what is pending):
+            // a second "no connection to the server" under it said the same twice.
             Text(message).font(.subheadline).bannerStyle()
         }
     }
