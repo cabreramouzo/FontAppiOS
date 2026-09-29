@@ -69,7 +69,12 @@ final class MapController {
     /// visible above a sheet `covered` points tall, as Apple Maps does with a place. It
     /// moves always, not only when hidden: the sheet is the same, so the pin lands in the
     /// same place every time.
-    func reveal(_ coordinate: CLLocationCoordinate2D, covered: CGFloat) {
+    /// Always brings the point to the middle of what the sheet leaves in view.
+    func center(_ coordinate: CLLocationCoordinate2D, covered: CGFloat) {
+        reveal(coordinate, covered: covered, always: true)
+    }
+
+    func reveal(_ coordinate: CLLocationCoordinate2D, covered: CGFloat, always: Bool = false) {
         guard let map = mapView else { return }
         map.setUserTrackingMode(.none, animated: false, completionHandler: nil)
         let top = map.safeAreaInsets.top
@@ -80,7 +85,7 @@ final class MapController {
         let pinHeight: CGFloat = 60
         let clear = CGRect(x: 24, y: top + pinHeight + 16, width: map.bounds.width - 48,
                            height: map.bounds.height - covered - top - pinHeight - 40)
-        if clear.contains(pin) { return }
+        if !always, clear.contains(pin) { return }
         let centre = CGPoint(x: map.bounds.midX + pin.x - visibleMiddle.x,
                              y: map.bounds.midY + pin.y - visibleMiddle.y)
         map.setCenter(map.convert(centre, toCoordinateFrom: map), animated: true)

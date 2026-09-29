@@ -44,6 +44,8 @@ struct MapScreen: View {
     @State private var selected: FontSummary?
     @State private var detent: PresentationDetent = .shortCard
     @State private var sheetHandle = SheetHandle()
+    /// The fountains around the one tapped, to swipe through from its sheet.
+    @State private var browse: NearbyBrowse?
     @State private var followRequest = 0
     @State private var didAutoLocate = false
 
@@ -61,6 +63,7 @@ struct MapScreen: View {
                 controller.checkCoverage()
             },
             onSelect: { font in
+                browse = NearbyBrowse(anchor: font, among: filters.apply(model.fonts))
                 selected = font
                 // The pin into the part of the map the short card leaves in view.
                 controller.reveal(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
@@ -176,7 +179,8 @@ struct MapScreen: View {
         // the sheet on every new pin and UIKit kept (or grew to) the old height.
         .sheet(isPresented: Binding(get: { selected != nil }, set: { if !$0 { selected = nil } })) {
             if let font = selected {
-                FountainSheet(font: font, detent: $detent, handle: sheetHandle, onClose: { selected = nil }) { font in
+                FountainSheet(font: font, detent: $detent, handle: sheetHandle, browse: browse,
+                              onBrowse: step, onClose: { selected = nil }) { font in
                     controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
                                     meters: 250, aboveSheet: true)
                 }
@@ -186,10 +190,25 @@ struct MapScreen: View {
         // Another pin chosen: back to the short card, as the first one opened, even if
         // the sheet had been lifted. The page grows only when the person lifts it.
         .onChange(of: selected?.id) { old, new in
+            // Chosen some other way (search, a link): no longer browsing around the pin.
+            if let new, browse?.contains(new) != true { browse = nil }
+            if new == nil { browse = nil }
             guard FountainSheetPolicy.lowersOnSelection(from: old, to: new) else { return }
             detent = .shortCard
             sheetHandle.lowerToSmallest()
         }
+    }
+
+    /// The next or previous fountain around: the map glides to it, the sheet stays
+    /// the short card and the pin rises as when tapped.
+    private func step(_ swipe: NearbyBrowse.Swipe) {
+        guard var b = browse else { return }
+        let font = swipe == .next ? b.next() : b.previous()
+        guard let font else { return }
+        browse = b
+        selected = font
+        controller.center(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                          covered: PresentationDetent.shortCardHeight)
     }
 
     private func showFocus() {
@@ -380,6 +399,8 @@ private struct FountainSheet: View {
     let font: FontSummary
     @Binding var detent: PresentationDetent
     let handle: SheetHandle
+    let browse: NearbyBrowse?
+    let onBrowse: (NearbyBrowse.Swipe) -> Void
     let onClose: () -> Void
     let reveal: (FontSummary) -> Void
 
@@ -396,6 +417,18 @@ private struct FountainSheet: View {
                     reveal(font)
                 }
                 .background(SheetFinder(handle: handle))
+                // On the short card only: lifted, the page is being read or written in.
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 30).onEnded { value in
+                        guard detent == .shortCard, browse?.isUseful == true,
+                              let swipe = NearbyBrowse.swipe(dx: value.translation.width, dy: value.translation.height)
+                        else { return }
+                        onBrowse(swipe)
+                    }
+                )
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    if let browse, browse.isUseful, detent == .shortCard { BrowseBar(browse: browse, onBrowse: onBrowse) }
+                }
         }
         // Opens as the short card: status, the three chips and the way there, with the
         // map still in view. Up for the whole page.
@@ -460,5 +493,36 @@ private struct SheetFinder: UIViewControllerRepresentable {
             handle.probe = self
             if let sheet = SheetHandle.sheet(above: self) { handle.controller = sheet }
         }
+    }
+}
+
+/// "‹ 2 of 12 nearby ›": says the swipe exists, and does it for whoever cannot swipe.
+private struct BrowseBar: View {
+    let browse: NearbyBrowse
+    let onBrowse: (NearbyBrowse.Swipe) -> Void
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Button { onBrowse(.previous) } label: {
+                Image(systemName: "chevron.left").frame(width: 44, height: 32)
+            }
+            .disabled(!browse.hasPrevious)
+            .accessibilityLabel(L10n.t("ios.browse.previous"))
+            Text(L10n.t("ios.browse.position", ["i": browse.index + 1, "n": browse.fonts.count]))
+                .font(.footnote.weight(.medium)).foregroundStyle(.secondary)
+                .monospacedDigit()
+            Button { onBrowse(.next) } label: {
+                Image(systemName: "chevron.right").frame(width: 44, height: 32)
+            }
+            .disabled(!browse.hasNext)
+            .accessibilityLabel(L10n.t("ios.browse.next"))
+        }
+        .buttonStyle(.borderless)
+        .font(.footnote.weight(.semibold))
+        .frame(maxWidth: .infinity)
+        .padding(.top, 8)
+        // The page's own top margin already separates it from the title.
+        .padding(.bottom, -14)
+        .sensoryFeedback(.selection, trigger: browse.index)
     }
 }
