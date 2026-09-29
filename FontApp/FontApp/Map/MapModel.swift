@@ -16,6 +16,7 @@ final class MapModel {
 
     @ObservationIgnored private let api: APIClient
     @ObservationIgnored private let zones: OfflineZones
+    @ObservationIgnored private let pins: PinCache
     @ObservationIgnored private let log = Logger(subsystem: "net.fontapp.FontApp", category: "map")
     @ObservationIgnored private var throttle = ReloadThrottle()
     @ObservationIgnored private var loadTask: Task<Void, Never>?
@@ -24,9 +25,10 @@ final class MapModel {
     @ObservationIgnored private var lastSpan: MKCoordinateSpan?
     @ObservationIgnored private var lastRequested: (box: MapBox, width: Int, height: Int)?
 
-    init(api: APIClient = .shared, zones: OfflineZones = .shared) {
+    init(api: APIClient = .shared, zones: OfflineZones = .shared, pins: PinCache = .shared) {
         self.api = api
         self.zones = zones
+        self.pins = pins
     }
 
     /// Called when the map stops moving.
@@ -36,6 +38,12 @@ final class MapModel {
         let height = Int(size.height.rounded())
         pendingTask?.cancel()
         pendingTask = nil
+        // What is known shows at once; a view loaded lately needs nothing more.
+        if showKnown(in: box) {
+            loadTask?.cancel()
+            isLoading = false
+            return
+        }
         // MapKit keeps following through a pinch, but a zoom is always the user's doing:
         // only a pan at the same scale counts as the map moving on its own.
         let zoomed = lastSpan.map { abs(log2(region.span.longitudeDelta / $0.longitudeDelta)) > 0.2 } ?? true
@@ -57,9 +65,27 @@ final class MapModel {
     /// Reloads the current view after a contribution, so the pin shows the new colour
     /// without waiting for the map to move.
     func refresh() {
+        pins.invalidate()
         guard let last = lastRequested ?? lastLoaded else { return }
         lastLoaded = nil
         load(box: last.box, width: last.width, height: last.height)
+    }
+
+    /// Shows the pins already on the phone for a view. True when they are all there is
+    /// to show (the area was loaded lately), so no request is needed.
+    private func showKnown(in box: MapBox) -> Bool {
+        let known = pins.fonts(in: box)
+        // Too many to draw one by one: the server's clusters are the right answer.
+        guard known.count <= 3000 else { return false }
+        let fresh = pins.isFresh(box)
+        // Unknown areas keep what is on screen until the answer comes, rather than
+        // showing a partial set as if it were everything.
+        if fresh || !known.isEmpty && fonts.isEmpty {
+            if fonts != known { fonts = known }
+            if !clusters.isEmpty { clusters = [] }
+        }
+        if fresh { errorMessage = nil }
+        return fresh
     }
 
     private func schedule(at date: Date, _ action: @escaping (MapModel) -> Void) {
@@ -85,6 +111,7 @@ final class MapModel {
                 let response = try await api.map(box: box, width: width, height: height)
                 guard !Task.isCancelled, let self else { return }
                 self.lastLoaded = (box, width, height)
+                self.pins.store(response, for: box)
                 if self.fonts != response.fonts { self.fonts = response.fonts }
                 if self.clusters != response.clusters { self.clusters = response.clusters }
                 self.errorMessage = nil
@@ -105,8 +132,11 @@ final class MapModel {
                     // Without signal, a saved zone that covers this view shows its
                     // fountains; without one, what was on screen stays (an emptied map
                     // reads as "no fountains here").
-                    let saved = self.zones.fonts(in: box)
-                    if !saved.isEmpty {
+                    var saved = self.zones.fonts(in: box)
+                    // And anything seen here before, saved zone or not.
+                    let ids = Set(saved.map(\.id))
+                    saved += self.pins.fonts(in: box).filter { !ids.contains($0.id) }
+                    if !saved.isEmpty, saved.count <= 3000 {
                         self.fonts = saved
                         self.clusters = []
                     }

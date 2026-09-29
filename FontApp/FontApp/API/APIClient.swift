@@ -78,11 +78,13 @@ nonisolated struct Ignored: Decodable, Sendable {}
 /// Stateless and `Sendable`: screens hold a copy and call it from tasks. The bearer token
 /// comes from `Credentials` on every request.
 nonisolated struct APIClient: Sendable {
-    static let shared = APIClient(baseURL: APIEnvironment.baseURL)
+    static let shared = APIClient(baseURL: APIEnvironment.baseURL, responseCache: .shared)
 
     let baseURL: URL
     var session: URLSession = .shared
     var credentials: Credentials = .shared
+    /// Last answers for reading without signal; none in tests unless given.
+    var responseCache: ResponseCache? = nil
 
     /// Reads have a way out (the map keeps what it had, the list shows a retry), so they
     /// give up early. The web measured `/fonts/map` at 0.18–0.45 s in production.
@@ -634,6 +636,10 @@ nonisolated struct APIClient: Sendable {
             request.httpBody = form.body
         }
 
+        // Reads are kept for when there is no signal (see `ResponseCache`). The map has
+        // its own store of pins, by area, which suits it better than by exact URL.
+        let cacheKey = responseCache != nil && method == "GET" && path != "/fonts/map"
+            ? ResponseCache.key(url: components.url!, bearer: bearer ?? authorization) : nil
         let data: Data
         let response: URLResponse
         do {
@@ -643,6 +649,10 @@ nonisolated struct APIClient: Sendable {
         } catch let error as URLError where error.code == .cancelled {
             throw CancellationError()
         } catch {
+            if let cacheKey, let cached = responseCache?.data(for: cacheKey),
+               let value = try? Self.decoder.decode(T.self, from: cached) {
+                return value
+            }
             throw APIError.network
         }
         guard let http = response as? HTTPURLResponse else { throw APIError.network }
@@ -654,7 +664,9 @@ nonisolated struct APIClient: Sendable {
                              retryAfter: http.value(forHTTPHeaderField: "Retry-After"))
         }
         if T.self == Ignored.self { return Ignored() as! T }
-        return try Self.decoder.decode(T.self, from: data.isEmpty ? Data("null".utf8) : data)
+        let value = try Self.decoder.decode(T.self, from: data.isEmpty ? Data("null".utf8) : data)
+        if let cacheKey, !data.isEmpty { responseCache?.store(data, for: cacheKey) }
+        return value
     }
 
     static func error(status: Int, data: Data, retryAfter: String?) -> APIError {

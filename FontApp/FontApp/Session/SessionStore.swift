@@ -122,6 +122,8 @@ final class SessionStore {
     }
 
     private func clear() {
+        // What this account read stays with it, not with whoever signs in next.
+        ResponseCache.shared.clear()
         keychain.delete()
         api.credentials.set(nil)
         hasToken = false
