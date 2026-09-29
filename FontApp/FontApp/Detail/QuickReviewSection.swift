@@ -5,7 +5,8 @@ import SwiftUI
 /// them is how people find out that anyone can say how a fountain is.
 struct QuickReviewSection: View {
     @Bindable var model: QuickReviewModel
-    /// Your own report is the latest and less than a day old: nothing new to say yet.
+    /// Your own report is the latest and less than a day old: the same status again says
+    /// nothing new; a different one does.
     let ownRecent: CommentResponse?
     /// Reloads the fountain after a review lands or is undone.
     let onChange: () async -> Void
@@ -20,13 +21,14 @@ struct QuickReviewSection: View {
         Section(L10n.t("popup.howIsIt")) {
             // Once said, the chips give way to the thanks, as in the web popup: one tap is
             // one review, and a second tap cannot publish a twin. Undoing brings them back.
-            if model.hasSpoken {
-                EmptyView()
-            } else if let ownRecent, let status = ownRecent.waterStatus.flatMap(WaterStatus.init(rawValue:)) {
-                Text("\(status.emoji) \(L10n.t(status.labelKey))").font(.subheadline.weight(.semibold))
-                Text(L10n.t("err.confirm.tooSoon")).font(.footnote).foregroundStyle(.secondary)
-            } else {
+            if !model.hasSpoken {
                 chips
+                // Your own fresh report: its chip is already said (a twin adds nothing),
+                // but a change is news and stays one tap away, as the full form allows.
+                if let ownRecent, ownStatus != nil {
+                    Text(L10n.t("ios.quick.youSaid", ["when": RelativeTime.string(since: ownRecent.createdAt)]))
+                        .font(.footnote).foregroundStyle(.secondary)
+                }
             }
             if session.isSignedIn {
                 feedback
@@ -64,7 +66,8 @@ struct QuickReviewSection: View {
                 .buttonStyle(.bordered)
                 // Staff contribute in purple so it is never done as staff by mistake.
                 .tint(session.isStaff ? Color.staff : status.color)
-                .disabled(isSending)
+                .disabled(isSending || status == ownStatus)
+                .accessibilityAddTraits(status == ownStatus ? .isSelected : [])
             }
         }
         .listRowInsets(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
@@ -103,6 +106,10 @@ struct QuickReviewSection: View {
         case .idle, .sending:
             EmptyView()
         }
+    }
+
+    private var ownStatus: WaterStatus? {
+        ownRecent?.waterStatus.flatMap(WaterStatus.init(rawValue:))
     }
 
     private var isSending: Bool {

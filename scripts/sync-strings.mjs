@@ -49,6 +49,18 @@ const KEYS = [
 ]
 
 const IOS_ONLY = {
+  // Under the chips when the latest report is yours and fresh: that chip is already
+  // said; the others (it changed) are still there.
+  'ios.quick.youSaid': {
+    ca: 'Ho vas dir {when}. Si ha canviat, toca el nou estat.',
+    es: 'Lo dijiste {when}. Si ha cambiado, toca el nuevo estado.',
+    gl: 'Dixéchelo {when}. Se cambiou, toca o novo estado.',
+    eu: '{when} esan zenuen. Aldatu bada, sakatu egoera berria.',
+    en: 'You said so {when}. If it has changed, tap the new state.',
+    fr: 'Vous l’avez dit {when}. Si ça a changé, touchez le nouvel état.',
+    pt: 'Disseste-o {when}. Se mudou, toca no novo estado.',
+    it: 'L’hai detto {when}. Se è cambiato, tocca il nuovo stato.',
+  },
   // The web's `report.add` ("report an issue") read as if only breakdowns belonged
   // there; the section is for notes too, as its title says.
   'ios.report.add': {
