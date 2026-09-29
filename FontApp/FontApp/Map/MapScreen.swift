@@ -7,6 +7,7 @@ struct MapScreen: View {
     @Environment(LocationService.self) private var location
     @Environment(SessionStore.self) private var session
     @State private var model = MapModel()
+    @State private var showsLoading = false
     @State private var controller = MapController()
     @State private var filters = MapFilters()
     @State private var sheet: MapSheet?
@@ -81,6 +82,14 @@ struct MapScreen: View {
                 .padding(.top, 8)
         }
         .overlay(alignment: .top) { banner.padding(.trailing, 72) }
+        .overlay(alignment: .top) { loadingPill }
+        .animation(.easeInOut(duration: 0.25), value: showsLoading)
+        // Only a load that lasts: most answer in a fraction of a second.
+        .task(id: model.isLoading) {
+            guard model.isLoading else { showsLoading = false; return }
+            try? await Task.sleep(for: .milliseconds(700))
+            if !Task.isCancelled, model.isLoading { showsLoading = true }
+        }
         .overlay(alignment: .bottomLeading) { attribution }
         .overlay(alignment: .bottomTrailing) {
             AddFountainButton(staff: session.isStaff, action: startNewFont)
@@ -297,12 +306,25 @@ struct MapScreen: View {
             .bannerStyle()
         } else if let message = model.errorMessage {
             Text(message).font(.subheadline).bannerStyle()
-        } else if model.isLoading {
-            ProgressView()
-                .padding(10)
-                .background(.regularMaterial, in: Capsule())
-                .padding(.top, 8)
-                .accessibilityLabel(L10n.t("map.loading"))
+        }
+    }
+
+    /// Loading, said only when it is slow, as Apple Maps and Komoot do: a quick answer
+    /// needs no spinner (and the known pins already show at once), and one that flashes
+    /// on every pan reads as the app struggling. After a moment, a small pill centred
+    /// under the status bar, with words: a bare spinner says nothing about what loads.
+    @ViewBuilder private var loadingPill: some View {
+        if showsLoading, model.errorMessage == nil, model.rateLimitedUntil == nil, !controller.outsideCoverage {
+            HStack(spacing: 8) {
+                ProgressView().controlSize(.small)
+                Text(L10n.t("map.loading")).font(.footnote.weight(.medium))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .glassEffect(.regular, in: Capsule())
+            .padding(.top, 8)
+            .transition(.opacity.combined(with: .move(edge: .top)))
+            .accessibilityElement(children: .combine)
         }
     }
 
