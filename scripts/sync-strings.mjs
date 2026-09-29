@@ -291,6 +291,9 @@ const IOS_ONLY = {
   'ios.search.forget': {
     ca: 'Treu-la de les recents', es: 'Quitarla de recientes', gl: 'Quitala das recentes', eu: 'Kendu azkenetatik', en: 'Remove from recent', fr: 'Retirer des récentes', pt: 'Retirar das recentes', it: 'Rimuovi dalle recenti',
   },
+  'ios.profile.stale': {
+    ca: '{n} fonts que depenen de tu fa més de tres mesos que ningú hi torna', es: '{n} fuentes que dependen de ti llevan más de tres meses sin que nadie vuelva', gl: '{n} fontes que dependen de ti levan máis de tres meses sen que ninguén volva', eu: 'Zure menpeko {n} iturritara ez da inor itzuli hiru hilabete baino gehiagoan', en: '{n} fountains that depend on you have gone over three months without a visit', fr: '{n} fontaines qui dépendent de vous n’ont eu aucune visite depuis plus de trois mois', pt: '{n} fontes que dependem de si estão há mais de três meses sem visita', it: '{n} fontane che dipendono da te sono senza visite da più di tre mesi',
+  },
   'ios.showAll': {
     ca: 'Mostra-les totes ({n})', es: 'Mostrar todas ({n})', gl: 'Amosalas todas ({n})', eu: 'Erakutsi guztiak ({n})', en: 'Show all ({n})', fr: 'Tout afficher ({n})', pt: 'Mostrar todas ({n})', it: 'Mostra tutte ({n})',
   },

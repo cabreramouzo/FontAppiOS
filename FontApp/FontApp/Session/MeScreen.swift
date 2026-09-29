@@ -2,14 +2,14 @@ import CoreLocation
 import SwiftUI
 
 /// The "Me" tab: what is yours — who you are, your score and collection, the fountains
-/// that depend on you, your fountains and reviews — with the bell and signing out.
-/// Deleting the account lives in Settings, as on the web. Favourites have their own tab.
+/// that depend on you, your fountains and reviews — with the bell. Each list opens on its
+/// own screen, so the profile fits about one screen. Signing out and deleting the
+/// account live in Settings. Favourites have their own tab.
 struct MeScreen: View {
     @Environment(SessionStore.self) private var session
     @Environment(Outbox.self) private var outbox
     @Environment(LocationService.self) private var location
     @State private var showsSignIn = false
-    @State private var isSigningOut = false
     @State private var profile = ProfileModel()
 
     var body: some View {
@@ -48,9 +48,18 @@ struct MeScreen: View {
                 }
             }
             .navigationTitle(L10n.t("nav.profile"))
+            // Small: the name under the avatar is the real title of this page.
+            .navigationBarTitleDisplayMode(session.isSignedIn ? .inline : .automatic)
             .navigationDestination(for: UUID.self) { FontDetailView(fontID: $0) }
             .toolbar {
-                if session.isSignedIn { ToolbarItem(placement: .topBarTrailing) { BellButton() } }
+                if session.isSignedIn {
+                    // Settings as the gear, as in Apple's own apps: not a row of your data.
+                    ToolbarItem(placement: .topBarLeading) {
+                        NavigationLink { SettingsScreen() } label: { Image(systemName: "gearshape") }
+                            .accessibilityLabel(L10n.t("settings.title"))
+                    }
+                    ToolbarItem(placement: .topBarTrailing) { BellButton() }
+                }
             }
             .sheet(isPresented: $showsSignIn) { SignInView() }
         }
@@ -58,47 +67,55 @@ struct MeScreen: View {
 
     private var account: some View {
         List {
-            Section {
-                if let user = session.user {
-                    ProfileHeader(user: user, staff: session.isStaff)
-                    NavigationLink {
-                        SettingsScreen()
-                    } label: {
-                        Label(L10n.t("settings.title"), systemImage: "gearshape")
+            if let user = session.user {
+                Section {
+                    ProfileHero(user: user, staff: session.isStaff, game: profile.game)
+                    ImpactStrip(game: profile.game, visited: profile.collection?.visited)
+                }
+            } else {
+                Section { ProgressView().frame(maxWidth: .infinity) }
+            }
+            // The one thing here that asks you to do something: said first, when true.
+            if let guarded = profile.guarded, case let stale = guarded.filter(\.stale).count, stale > 0 {
+                Section {
+                    NavigationLink { guardedScreen(guarded) } label: {
+                        Label(L10n.t("ios.profile.stale", ["n": stale]), systemImage: "exclamationmark.circle.fill")
+                            .foregroundStyle(.orange)
                             .frame(minHeight: 44)
                     }
-                } else {
-                    ProgressView()
                 }
             }
             PendingSection()
-            if let game = profile.game { GameSection(game: game) }
-            if let collection = profile.collection { CollectionSection(collection: collection) }
-            if let guarded = profile.guarded { GuardedSection(fonts: guarded) }
             if let failed = profile.failed {
-                Section { Text(failed).foregroundStyle(.secondary) }
-            }
-            CappedSection(title: L10n.t("profile.myFonts"), systemImage: "mappin.and.ellipse",
-                          hint: L10n.t("profile.myFontsHint"), empty: L10n.t("profile.noFonts"),
-                          items: profile.fonts) { ProfileFontRow(font: $0) }
-            CappedSection(title: L10n.t("profile.myReviews"), systemImage: "bubble.left",
-                          empty: L10n.t("profile.noReviews"),
-                          items: profile.comments) { ProfileReviewRow(comment: $0) }
-            Section {
-                Button(role: .destructive) {
-                    isSigningOut = true
-                    Task {
-                        await session.signOut()
-                        isSigningOut = false
-                    }
-                } label: {
-                    HStack {
-                        Text(L10n.t("nav.logout"))
-                        if isSigningOut { Spacer(); ProgressView() }
-                    }
-                    .frame(minHeight: 44)
+                Section {
+                    Text(failed).foregroundStyle(.secondary)
+                    Button(L10n.t("error.retry")) { Task { await reload() } }.frame(minHeight: 44)
                 }
-                .disabled(isSigningOut)
+            }
+            Section {
+                ProfileLinkRow(title: L10n.t("badges.title"), systemImage: "rosette") {
+                    CollectionScreen(collection: profile.collection)
+                }
+                if let guarded = profile.guarded, !guarded.isEmpty {
+                    ProfileLinkRow(title: L10n.t("guard.title"), systemImage: "shield", count: guarded.count) {
+                        guardedScreen(guarded)
+                    }
+                }
+                ProfileLinkRow(title: L10n.t("profile.myFonts"), systemImage: "mappin.and.ellipse",
+                               count: profile.fonts?.count) {
+                    ProfileListScreen(title: L10n.t("profile.myFonts"), hint: L10n.t("profile.myFontsHint"),
+                                      empty: L10n.t("profile.noFonts"), items: profile.fonts ?? []) { ProfileFontRow(font: $0) }
+                }
+                ProfileLinkRow(title: L10n.t("profile.myReviews"), systemImage: "bubble.left",
+                               count: profile.comments?.count) {
+                    ProfileListScreen(title: L10n.t("profile.myReviews"), empty: L10n.t("profile.noReviews"),
+                                      items: profile.comments ?? []) { ProfileReviewRow(comment: $0) }
+                }
+                if let user = session.user {
+                    ProfileLinkRow(title: L10n.t("privacy.viewPublic"), systemImage: "person.crop.circle") {
+                        UserProfileScreen(handle: user.username)
+                    }
+                }
             }
             Section {
                 NavigationLink { GuideScreen() } label: {
@@ -116,6 +133,12 @@ struct MeScreen: View {
             if profile.owner != session.userID { profile.clear(for: session.userID) }
             await reload()
         }
+    }
+
+    private func guardedScreen(_ fonts: [GuardedFont]) -> some View {
+        List { GuardedSection(fonts: fonts) }
+            .navigationTitle(L10n.t("guard.title"))
+            .navigationBarTitleDisplayMode(.inline)
     }
 
     private func reload() async {

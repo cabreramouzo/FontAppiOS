@@ -1,92 +1,5 @@
 import SwiftUI
 
-/// Your contribution, as the web's `GamificationCard`: first the impact on the map, then
-/// the drops. "12 fountains have a photo thanks to you" says something true about the
-/// world; "1,240 drops" only about the counter. Nothing is drawn with the game switched
-/// off, nor before you have contributed: a scoreboard at zero on day one tells you that
-/// you are last.
-struct GameSection: View {
-    let game: GamificationSummary
-
-    var body: some View {
-        if game.gotes > 0 || game.pending > 0 {
-            Section {
-                if !impacts.isEmpty {
-                    LazyVGrid(columns: [GridItem(.flexible(), alignment: .top), GridItem(.flexible(), alignment: .top)],
-                              alignment: .leading, spacing: 12) {
-                        ForEach(impacts, id: \.label) { impact in
-                            HStack(alignment: .top, spacing: 8) {
-                                Image(systemName: impact.systemImage).foregroundStyle(Color.accentColor)
-                                    .frame(width: 26)
-                                VStack(alignment: .leading, spacing: 0) {
-                                    Text(impact.count, format: .number).font(.title2.bold())
-                                    Text(impact.label).font(.caption).foregroundStyle(.secondary)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                }
-                            }
-                            .accessibilityElement(children: .combine)
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-                score
-                NavigationLink {
-                    BadgesScreen()
-                } label: {
-                    Label(L10n.t("badges.title"), systemImage: "rosette")
-                }
-            } header: {
-                Label(L10n.t("game.title"), systemImage: "drop")
-            } footer: {
-                if game.provisional { Text(L10n.t("game.provisional")) }
-            }
-        }
-    }
-
-    private var score: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 6) {
-                Text(game.gotes, format: .number).font(.title3.bold())
-                Text(L10n.t("game.gotes")).foregroundStyle(.secondary)
-                Text(levelName(game.level))
-                    .font(.caption.bold())
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Color.accentColor.opacity(0.15), in: Capsule())
-            }
-            // Already earned but not settled: without it, the card showed the old level for
-            // 72 h after the congratulation.
-            if let pendingLevel = game.pendingLevel {
-                Text(L10n.t("game.pendingLevel", ["level": levelName(pendingLevel)]))
-                    .font(.footnote.bold()).foregroundStyle(.orange)
-            }
-            if game.pending > 0 {
-                Text(L10n.t("game.pending", ["n": game.pending]) + " · " + L10n.t("game.pendingHint"))
-                    .font(.footnote).foregroundStyle(.secondary)
-            }
-            if let next = game.nextLevel, let left = game.gotesToNextLevel, left > 0 {
-                ProgressView(value: Double(game.gotes), total: Double(game.gotes + left))
-                Text(L10n.t("game.toNext", ["n": left.formatted(), "level": levelName(next)]))
-                    .font(.footnote).foregroundStyle(.secondary)
-            }
-        }
-        .padding(.vertical, 4)
-    }
-
-    private var impacts: [(systemImage: String, count: Int, label: String)] {
-        [("camera", game.impact.fontsWithPhotoThanksToYou, L10n.t("game.impact.photos")),
-         ("eye", game.impact.fontsYouKeepFresh, L10n.t("game.impact.fresh")),
-         ("mappin.and.ellipse", game.impact.fontsYouPutOnTheMap, L10n.t("game.impact.created")),
-         ("trophy", game.mayorCount ?? 0, L10n.t("game.impact.guardian"))]
-            .filter { $0.count > 0 }
-    }
-
-    /// The server sends the key (`river`); an unknown one shows nothing rather than a key.
-    private func levelName(_ key: String) -> String {
-        L10n.lookup("game.level.\(key)") ?? ""
-    }
-}
-
 /// The collection: how many distinct fountains you reviewed, the kinds you have, and
 /// how many of the ones around you. Silent until you have visited one.
 struct CollectionSection: View {
@@ -163,5 +76,24 @@ struct GuardedSection: View {
                 }
             }
         }
+    }
+}
+
+/// Your collection: the fountains you visited and their kinds, then the badges and
+/// levels. One place for both, where the profile used to have two «collections».
+struct CollectionScreen: View {
+    let collection: VisitedCollection?
+
+    var body: some View {
+        List {
+            if let collection { CollectionSection(collection: collection) }
+            Section {
+                NavigationLink { BadgesScreen() } label: {
+                    Label(L10n.t("gamePage.badges"), systemImage: "rosette").frame(minHeight: 44)
+                }
+            }
+        }
+        .navigationTitle(L10n.t("badges.title"))
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

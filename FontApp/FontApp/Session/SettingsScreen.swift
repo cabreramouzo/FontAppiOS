@@ -15,6 +15,7 @@ struct SettingsScreen: View {
     @State private var showsDangerZone = false
     @State private var confirmsDeletion = false
     @State private var isDeleting = false
+    @State private var isSigningOut = false
     @State private var deletionError: String?
 
     var body: some View {
@@ -36,6 +37,23 @@ struct SettingsScreen: View {
                     }
                 } footer: {
                     Text(L10n.t("settings.intro"))
+                }
+                // Signing out goes last but one, as in the phone's own Settings.
+                Section {
+                    Button(role: .destructive) {
+                        isSigningOut = true
+                        Task {
+                            await session.signOut()
+                            isSigningOut = false
+                        }
+                    } label: {
+                        HStack {
+                            Text(L10n.t("nav.logout"))
+                            if isSigningOut { Spacer(); ProgressView() }
+                        }
+                        .frame(minHeight: 44)
+                    }
+                    .disabled(isSigningOut || isDeleting)
                 }
                 dangerZone
             } else {
