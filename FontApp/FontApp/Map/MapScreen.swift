@@ -43,6 +43,7 @@ struct MapScreen: View {
     }
     @State private var selected: FontSummary?
     @State private var detent: PresentationDetent = .shortCard
+    @State private var sheetHandle = SheetHandle()
     @State private var followRequest = 0
     @State private var didAutoLocate = false
 
@@ -171,13 +172,24 @@ struct MapScreen: View {
         .onAppear(perform: locateOnce)
         .onChange(of: location.isAuthorized) { locateOnce() }
         .onReceive(NotificationCenter.default.publisher(for: .fontChanged)) { _ in model.refresh() }
-        .sheet(item: $selected) { font in
-            FountainSheet(font: font, detent: $detent, onClose: { selected = nil }) { font in
-                controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
-                                meters: 250, aboveSheet: true)
+        // One presentation for as long as a fountain is chosen: `.sheet(item:)` swapped
+        // the sheet on every new pin and UIKit kept (or grew to) the old height.
+        .sheet(isPresented: Binding(get: { selected != nil }, set: { if !$0 { selected = nil } })) {
+            if let font = selected {
+                FountainSheet(font: font, detent: $detent, handle: sheetHandle, onClose: { selected = nil }) { font in
+                    controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+                                    meters: 250, aboveSheet: true)
+                }
+                .id(font.id)
             }
         }
-        .onChange(of: selected?.id) { detent = .shortCard }
+        // Another pin chosen: back to the short card, as the first one opened, even if
+        // the sheet had been lifted. The page grows only when the person lifts it.
+        .onChange(of: selected?.id) { old, new in
+            guard FountainSheetPolicy.lowersOnSelection(from: old, to: new) else { return }
+            detent = .shortCard
+            sheetHandle.lowerToSmallest()
+        }
     }
 
     private func showFocus() {
@@ -367,10 +379,9 @@ extension UTType {
 private struct FountainSheet: View {
     let font: FontSummary
     @Binding var detent: PresentationDetent
+    let handle: SheetHandle
     let onClose: () -> Void
     let reveal: (FontSummary) -> Void
-
-    @State private var sheet = SheetHandle()
 
     var body: some View {
         NavigationStack {
@@ -381,10 +392,10 @@ private struct FountainSheet: View {
                     detent = .shortCard
                     // Once the sheet was dragged up, SwiftUI changes the selection and
                     // leaves the sheet where it is (seen on iOS 26): UIKit's sheet is told.
-                    sheet.lowerToSmallest()
+                    handle.lowerToSmallest()
                     reveal(font)
                 }
-                .background(SheetFinder(handle: sheet))
+                .background(SheetFinder(handle: handle))
         }
         // Opens as the short card: status, the three chips and the way there, with the
         // map still in view. Up for the whole page.
@@ -393,15 +404,38 @@ private struct FountainSheet: View {
     }
 }
 
-/// UIKit's sheet behind a SwiftUI sheet, found from inside it.
+/// When the fountain's sheet goes back to the short card.
+nonisolated enum FountainSheetPolicy {
+    /// A different fountain chosen while the sheet is open, or the first one.
+    static func lowersOnSelection(from old: UUID?, to new: UUID?) -> Bool {
+        new != nil && new != old
+    }
+}
+
+/// UIKit's sheet behind a SwiftUI sheet, found from inside it. SwiftUI ignores a new
+/// detent once the sheet was dragged (seen on iOS 26 and 27): UIKit's sheet is told.
 @MainActor final class SheetHandle {
     weak var controller: UISheetPresentationController?
+    /// A view inside the sheet, to find it again when the content was replaced.
+    weak var probe: UIViewController?
 
     /// The smallest height that is not the full page: the short card.
     func lowerToSmallest() {
+        if controller == nil { controller = probe.flatMap(Self.sheet(above:)) }
         guard let sheet = controller,
               let short = sheet.detents.first(where: { $0.identifier != .large }) else { return }
+        guard sheet.selectedDetentIdentifier != short.identifier else { return }
         sheet.animateChanges { sheet.selectedDetentIdentifier = short.identifier }
+    }
+
+    /// Up the parents to the one presented as a sheet.
+    static func sheet(above start: UIViewController) -> UISheetPresentationController? {
+        var current: UIViewController? = start
+        while let c = current {
+            if c.presentingViewController != nil, let sheet = c.sheetPresentationController { return sheet }
+            current = c.parent
+        }
+        return nil
     }
 }
 
@@ -416,17 +450,15 @@ private struct SheetFinder: UIViewControllerRepresentable {
         init(handle: SheetHandle) { self.handle = handle; super.init(nibName: nil, bundle: nil) }
         required init?(coder: NSCoder) { fatalError() }
 
+        override func didMove(toParent parent: UIViewController?) {
+            super.didMove(toParent: parent)
+            handle.probe = self
+        }
+
         override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
-            // Up the parents to the one presented as a sheet.
-            var current: UIViewController? = self
-            while let c = current {
-                if let sheet = c.sheetPresentationController, c.presentingViewController != nil {
-                    handle.controller = sheet
-                    return
-                }
-                current = c.parent
-            }
+            handle.probe = self
+            if let sheet = SheetHandle.sheet(above: self) { handle.controller = sheet }
         }
     }
 }
