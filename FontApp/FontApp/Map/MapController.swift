@@ -75,6 +75,12 @@ final class MapController {
         let top = map.safeAreaInsets.top
         let visibleMiddle = CGPoint(x: map.bounds.midX, y: (top + map.bounds.height - covered) / 2)
         let pin = map.convert(coordinate, toPointTo: map)
+        // Already in view above the card: the map stays still, as Apple Maps does. Moving
+        // it anyway made every tap feel like a jump.
+        let pinHeight: CGFloat = 60
+        let clear = CGRect(x: 24, y: top + pinHeight + 16, width: map.bounds.width - 48,
+                           height: map.bounds.height - covered - top - pinHeight - 40)
+        if clear.contains(pin) { return }
         let centre = CGPoint(x: map.bounds.midX + pin.x - visibleMiddle.x,
                              y: map.bounds.midY + pin.y - visibleMiddle.y)
         map.setCenter(map.convert(centre, toCoordinateFrom: map), animated: true)

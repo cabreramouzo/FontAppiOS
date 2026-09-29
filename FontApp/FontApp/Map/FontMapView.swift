@@ -39,10 +39,9 @@ struct FontMapView: UIViewRepresentable {
         map.compassViewMargins = CGPoint(x: 12, y: 96)
         map.allowsTilting = false
         let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.tapped(_:)))
-        // Let MapLibre's own taps (double tap to zoom) go first.
-        for recognizer in map.gestureRecognizers ?? [] where (recognizer as? UITapGestureRecognizer)?.numberOfTapsRequired == 2 {
-            tap.require(toFail: recognizer)
-        }
+        // A tap on a pin selects at once, as in Apple Maps; anywhere else it waits for
+        // MapLibre's double tap to zoom to fail (a third of a second), as before.
+        tap.delegate = context.coordinator
         map.addGestureRecognizer(tap)
         context.coordinator.shownLayer = controller.layer
         controller.attach(map)
@@ -65,7 +64,7 @@ struct FontMapView: UIViewRepresentable {
         coordinator.select(selected, on: map)
     }
 
-    final class Coordinator: NSObject, MLNMapViewDelegate {
+    final class Coordinator: NSObject, MLNMapViewDelegate, UIGestureRecognizerDelegate {
         var parent: FontMapView
         var followRequest = 0
         var shownLayer: MapLayer?
@@ -291,6 +290,27 @@ struct FontMapView: UIViewRepresentable {
 
         // MARK: Taps
 
+        /// Whether the finger came down on a fountain, decided when it touches.
+        private var touchOnPin = false
+
+        func gestureRecognizer(_ gesture: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+            if let map = gesture.view as? MLNMapView {
+                let point = touch.location(in: map)
+                let rect = CGRect(x: point.x - 22, y: point.y - 22, width: 44, height: 44)
+                touchOnPin = map.visibleFeatures(in: rect, styleLayerIdentifiers: ["fa-pins", "fa-local", "fa-server"])
+                    .contains { $0.attribute(forKey: "id") != nil && $0.attribute(forKey: "count") == nil && !($0 is MLNPointFeatureCluster) }
+            }
+            return true
+        }
+
+        func gestureRecognizer(_ gesture: UIGestureRecognizer, shouldRequireFailureOf other: UIGestureRecognizer) -> Bool {
+            !touchOnPin && (other as? UITapGestureRecognizer)?.numberOfTapsRequired == 2
+        }
+
+        func gestureRecognizer(_ gesture: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
+            true
+        }
+
         @objc func tapped(_ gesture: UITapGestureRecognizer) {
             guard let map = gesture.view as? MLNMapView else { return }
             let point = gesture.location(in: map)
@@ -391,8 +411,8 @@ final class SelectedFountain: MLNPointAnnotation {
 }
 
 /// A balloon marker in the fountain's status colour with the drop inside, its tip on the
-/// spot. It rises as Apple Maps raises a selected place: grows from the tip past its size,
-/// settles with a little sway, and a light tap in the hand. Reduce Motion: it just fades in.
+/// spot. It rises as Apple Maps raises a selected place: grows quickly from the tip with a
+/// small settle, and a light tap in the hand. Reduce Motion: it just fades in.
 final class SelectedPinView: MLNAnnotationView {
     private let head = UIView()
     private let tail = CAShapeLayer()
@@ -404,8 +424,9 @@ final class SelectedPinView: MLNAnnotationView {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
         let size = Self.headSize
         frame = CGRect(x: 0, y: 0, width: size, height: size + Self.tailHeight)
-        // The tip, not the middle, sits on the coordinate; and it grows from there.
-        centerOffset = CGVector(dx: 0, dy: -(size + Self.tailHeight) / 2)
+        // The tip sits on the coordinate and it grows from there. The anchor alone does
+        // it: MapLibre places the view's position, which the anchor makes the tip. A
+        // `centerOffset` as well lifted the tip half a pin above the fountain.
         layer.anchorPoint = CGPoint(x: 0.5, y: 1)
         scalesWithViewingDistance = false
         isUserInteractionEnabled = false
@@ -453,20 +474,15 @@ final class SelectedPinView: MLNAnnotationView {
             UIView.animate(withDuration: 0.2) { self.alpha = 1 }
             return
         }
-        transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
+        // As Apple Maps: a quick grow from the tip with a small settle, no dance. A
+        // long bounce read as slow, and the sway moved the tip off the fountain.
+        transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
         alpha = 0
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.8) {
+        UIView.animate(withDuration: 0.32, delay: 0, usingSpringWithDamping: 0.72, initialSpringVelocity: 0.6,
+                       options: [.allowUserInteraction]) {
             self.transform = .identity
             self.alpha = 1
         }
-        // The little dance: a sway either side that dies out, about the tip.
-        let sway = CAKeyframeAnimation(keyPath: "transform.rotation.z")
-        sway.values = [0, -0.14, 0.1, -0.05, 0.02, 0]
-        sway.keyTimes = [0, 0.25, 0.5, 0.7, 0.85, 1]
-        sway.duration = 0.7
-        sway.beginTime = CACurrentMediaTime() + 0.15
-        sway.timingFunction = CAMediaTimingFunction(name: .easeOut)
-        head.layer.superlayer?.add(sway, forKey: "sway")
     }
 
     func lower(_ done: @escaping () -> Void) {
