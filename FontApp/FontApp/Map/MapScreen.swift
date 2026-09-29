@@ -85,7 +85,14 @@ struct MapScreen: View {
                 .padding(.trailing, 12)
                 .padding(.top, 8)
         }
-        .overlay(alignment: .top) { banner.padding(.trailing, 72) }
+        .overlay(alignment: .top) {
+            // What waits to be sent and whether there is signal, above the map's own notices.
+            VStack(spacing: 0) {
+                ConnectivityNoticeView { showsSignIn = true }
+                banner
+            }
+            .padding(.trailing, 72)
+        }
         .overlay(alignment: .top) { loadingPill }
         .animation(.easeInOut(duration: 0.25), value: showsLoading)
         // Only a load that lasts: most answer in a fraction of a second.

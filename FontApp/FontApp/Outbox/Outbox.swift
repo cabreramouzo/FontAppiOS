@@ -60,6 +60,9 @@ final class Outbox {
     private(set) var isFlushing = false
     /// Items sent by the last flush; the UI can say "sent".
     private(set) var lastSent = 0
+    /// A flush already ran since something was last queued: the notice then says "it will
+    /// be retried" instead of "it will be sent".
+    private(set) var flushTried = false
 
     /// The account signed in now. Set by the app from `SessionStore`.
     var currentUserID: UUID?
@@ -139,6 +142,7 @@ final class Outbox {
 
     private func append(_ item: OutboxItem) -> OutboxItem {
         items.append(item)
+        flushTried = false
         save()
         log.info("queued \(item.kind.rawValue, privacy: .public), \(self.items.count) pending")
         return item
@@ -211,6 +215,7 @@ final class Outbox {
             }
         }
         lastSent = sent
+        flushTried = true
         return sent
     }
 
