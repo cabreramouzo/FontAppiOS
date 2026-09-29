@@ -44,8 +44,8 @@ struct MapScreen: View {
     @State private var selected: FontSummary?
     @State private var detent: PresentationDetent = .shortCard
     @State private var sheetHandle = SheetHandle()
-    /// The fountains around the one tapped, to swipe through from its sheet.
-    @State private var browse: NearbyBrowse?
+    /// Whether the open fountain came from a pin, and so can be swiped from.
+    @State private var browsing = false
     @State private var followRequest = 0
     @State private var didAutoLocate = false
 
@@ -63,7 +63,7 @@ struct MapScreen: View {
                 controller.checkCoverage()
             },
             onSelect: { font in
-                browse = NearbyBrowse(anchor: font, among: filters.apply(model.fonts))
+                browsing = true
                 selected = font
                 // The pin into the part of the map the short card leaves in view.
                 controller.reveal(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
@@ -179,7 +179,8 @@ struct MapScreen: View {
         // the sheet on every new pin and UIKit kept (or grew to) the old height.
         .sheet(isPresented: Binding(get: { selected != nil }, set: { if !$0 { selected = nil } })) {
             if let font = selected {
-                FountainSheet(font: font, detent: $detent, handle: sheetHandle, browse: browse,
+                FountainSheet(font: font, detent: $detent, handle: sheetHandle,
+                              neighbours: browsing ? neighbours(of: font) : nil,
                               onBrowse: step, onClose: { selected = nil }) { font in
                     controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
                                     meters: 250, aboveSheet: true)
@@ -190,22 +191,26 @@ struct MapScreen: View {
         // Another pin chosen: back to the short card, as the first one opened, even if
         // the sheet had been lifted. The page grows only when the person lifts it.
         .onChange(of: selected?.id) { old, new in
-            // Chosen some other way (search, a link): no longer browsing around the pin.
-            if let new, browse?.contains(new) != true { browse = nil }
-            if new == nil { browse = nil }
+            if new == nil { browsing = false }
             guard FountainSheetPolicy.lowersOnSelection(from: old, to: new) else { return }
             detent = .shortCard
             sheetHandle.lowerToSmallest()
         }
     }
 
-    /// The next or previous fountain around: the map glides to it, the sheet stays
-    /// the short card and the pin rises as when tapped.
-    private func step(_ swipe: NearbyBrowse.Swipe) {
-        guard var b = browse else { return }
-        let font = swipe == .next ? b.next() : b.previous()
-        guard let font else { return }
-        browse = b
+    /// The nearest fountain on each side of the current one, among those on the map.
+    private func neighbours(of font: FontSummary) -> Neighbours {
+        let fonts = filters.apply(model.fonts)
+        return Neighbours(west: NearbyBrowse.neighbour(of: font, on: .west, among: fonts),
+                          east: NearbyBrowse.neighbour(of: font, on: .east, among: fonts),
+                          from: font)
+    }
+
+    /// To that side: the map glides to it, the sheet stays the short card and the pin
+    /// rises as when tapped. The line then goes through the new one.
+    private func step(_ side: NearbyBrowse.Side) {
+        guard let current = selected,
+              let font = NearbyBrowse.neighbour(of: current, on: side, among: filters.apply(model.fonts)) else { return }
         selected = font
         controller.center(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
                           covered: PresentationDetent.shortCardHeight)
@@ -218,6 +223,7 @@ struct MapScreen: View {
         case .fountain(let font):
             controller.show(CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
                             meters: 400, aboveSheet: true)
+            browsing = false
             selected = font
         case .place(let rect):
             controller.show(rect)
@@ -399,8 +405,8 @@ private struct FountainSheet: View {
     let font: FontSummary
     @Binding var detent: PresentationDetent
     let handle: SheetHandle
-    let browse: NearbyBrowse?
-    let onBrowse: (NearbyBrowse.Swipe) -> Void
+    let neighbours: Neighbours?
+    let onBrowse: (NearbyBrowse.Side) -> Void
     let onClose: () -> Void
     let reveal: (FontSummary) -> Void
 
@@ -420,14 +426,16 @@ private struct FountainSheet: View {
                 // On the short card only: lifted, the page is being read or written in.
                 .simultaneousGesture(
                     DragGesture(minimumDistance: 30).onEnded { value in
-                        guard detent == .shortCard, browse?.isUseful == true,
-                              let swipe = NearbyBrowse.swipe(dx: value.translation.width, dy: value.translation.height)
-                        else { return }
-                        onBrowse(swipe)
+                        guard detent == .shortCard, let neighbours,
+                              let side = NearbyBrowse.swipe(dx: value.translation.width, dy: value.translation.height),
+                              neighbours.has(side) else { return }
+                        onBrowse(side)
                     }
                 )
                 .safeAreaInset(edge: .top, spacing: 0) {
-                    if let browse, browse.isUseful, detent == .shortCard { BrowseBar(browse: browse, onBrowse: onBrowse) }
+                    if let neighbours, neighbours.isUseful, detent == .shortCard {
+                        BrowseBar(neighbours: neighbours, onBrowse: onBrowse)
+                    }
                 }
         }
         // Opens as the short card: status, the three chips and the way there, with the
@@ -496,33 +504,56 @@ private struct SheetFinder: UIViewControllerRepresentable {
     }
 }
 
-/// "‹ 2 of 12 nearby ›": says the swipe exists, and does it for whoever cannot swipe.
+/// The nearest fountain on each side of the open one.
+struct Neighbours {
+    let west: FontSummary?
+    let east: FontSummary?
+    let from: FontSummary
+
+    var isUseful: Bool { west != nil || east != nil }
+    func has(_ side: NearbyBrowse.Side) -> Bool { (side == .east ? east : west) != nil }
+
+    func distance(to font: FontSummary?) -> String? {
+        guard let font else { return nil }
+        let meters = CLLocation(latitude: from.latitude, longitude: from.longitude)
+            .distance(from: CLLocation(latitude: font.latitude, longitude: font.longitude))
+        return Measurement(value: meters, unit: UnitLength.meters).formatted(.measurement(width: .abbreviated, usage: .road))
+    }
+}
+
+/// "‹ 120 m · 80 m ›": which side has a fountain and how far, so the swipe explains
+/// itself, and a tap for whoever cannot swipe.
 private struct BrowseBar: View {
-    let browse: NearbyBrowse
-    let onBrowse: (NearbyBrowse.Swipe) -> Void
+    let neighbours: Neighbours
+    let onBrowse: (NearbyBrowse.Side) -> Void
 
     var body: some View {
-        HStack(spacing: 4) {
-            Button { onBrowse(.previous) } label: {
-                Image(systemName: "chevron.left").frame(width: 44, height: 32)
-            }
-            .disabled(!browse.hasPrevious)
-            .accessibilityLabel(L10n.t("ios.browse.previous"))
-            Text(L10n.t("ios.browse.position", ["i": browse.index + 1, "n": browse.fonts.count]))
-                .font(.footnote.weight(.medium)).foregroundStyle(.secondary)
-                .monospacedDigit()
-            Button { onBrowse(.next) } label: {
-                Image(systemName: "chevron.right").frame(width: 44, height: 32)
-            }
-            .disabled(!browse.hasNext)
-            .accessibilityLabel(L10n.t("ios.browse.next"))
+        HStack {
+            side(.west)
+            Spacer()
+            side(.east)
         }
-        .buttonStyle(.borderless)
         .font(.footnote.weight(.semibold))
-        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 20)
         .padding(.top, 8)
         // The page's own top margin already separates it from the title.
         .padding(.bottom, -14)
-        .sensoryFeedback(.selection, trigger: browse.index)
+        .sensoryFeedback(.selection, trigger: neighbours.from.id)
+    }
+
+    @ViewBuilder private func side(_ side: NearbyBrowse.Side) -> some View {
+        let font = side == .east ? neighbours.east : neighbours.west
+        Button { onBrowse(side) } label: {
+            HStack(spacing: 4) {
+                if side == .west { Image(systemName: "chevron.left") }
+                Text(neighbours.distance(to: font) ?? "").monospacedDigit()
+                if side == .east { Image(systemName: "chevron.right") }
+            }
+            .frame(minWidth: 44, minHeight: 32)
+        }
+        .buttonStyle(.borderless)
+        .opacity(font == nil ? 0 : 1)
+        .disabled(font == nil)
+        .accessibilityLabel(L10n.t(side == .east ? "ios.browse.next" : "ios.browse.previous"))
     }
 }

@@ -1,56 +1,27 @@
 import CoreLocation
 import Foundation
 
-/// Going through the fountains around the one first tapped, from its sheet: swipe left
-/// for the next nearest, right to go back. An ordered list and not "whichever lies on
-/// that side of the map": a fountain straight above has no side, and going back must
-/// always return to the same one.
-nonisolated struct NearbyBrowse: Equatable, Sendable {
-    /// Enough for a walk around; a list of hundreds is not browsed by swiping.
-    static let limit = 20
+/// Going from fountain to fountain from its sheet, as the map lies: an imaginary vertical
+/// line through the current one; swiping left brings the nearest fountain on its right
+/// (the map slides left, as a page would), swiping right the nearest on its left. After
+/// each step the line moves to the new fountain.
+nonisolated enum NearbyBrowse {
+    enum Side: Equatable { case east, west }
 
-    let fonts: [FontSummary]
-    private(set) var index: Int
-
-    /// The tapped fountain first, then the others on the map by distance from it.
-    init(anchor: FontSummary, among visible: [FontSummary]) {
-        let here = CLLocation(latitude: anchor.latitude, longitude: anchor.longitude)
-        let others = visible.filter { $0.id != anchor.id }
-            .map { ($0, here.distance(from: CLLocation(latitude: $0.latitude, longitude: $0.longitude))) }
-            .sorted { $0.1 < $1.1 }
-            .prefix(Self.limit - 1)
-            .map(\.0)
-        fonts = [anchor] + others
-        index = 0
-    }
-
-    var current: FontSummary { fonts[index] }
-    var hasNext: Bool { index + 1 < fonts.count }
-    var hasPrevious: Bool { index > 0 }
-    /// Worth showing only when there is somewhere to go.
-    var isUseful: Bool { fonts.count > 1 }
-
-    func contains(_ id: UUID) -> Bool { fonts.contains { $0.id == id } }
-
-    @discardableResult
-    mutating func next() -> FontSummary? {
-        guard hasNext else { return nil }
-        index += 1
-        return current
-    }
-
-    @discardableResult
-    mutating func previous() -> FontSummary? {
-        guard hasPrevious else { return nil }
-        index -= 1
-        return current
+    /// The nearest fountain on that side of the line through `current`. One exactly on
+    /// the line belongs to neither side.
+    static func neighbour(of current: FontSummary, on side: Side, among fonts: [FontSummary]) -> FontSummary? {
+        let here = CLLocation(latitude: current.latitude, longitude: current.longitude)
+        return fonts
+            .filter { $0.id != current.id && (side == .east ? $0.longitude > current.longitude : $0.longitude < current.longitude) }
+            .min { here.distance(from: CLLocation(latitude: $0.latitude, longitude: $0.longitude))
+                < here.distance(from: CLLocation(latitude: $1.latitude, longitude: $1.longitude)) }
     }
 
     /// A swipe on the short card: horizontal, clear and long enough. Anything more
-    /// vertical belongs to the sheet (up and down).
-    enum Swipe { case next, previous }
-    static func swipe(dx: Double, dy: Double) -> Swipe? {
+    /// vertical belongs to the sheet (up and down). Left brings what is on the right.
+    static func swipe(dx: Double, dy: Double) -> Side? {
         guard abs(dx) >= 60, abs(dx) > abs(dy) * 2 else { return nil }
-        return dx < 0 ? .next : .previous
+        return dx < 0 ? .east : .west
     }
 }

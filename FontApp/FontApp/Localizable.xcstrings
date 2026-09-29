@@ -2398,102 +2398,49 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Font següent"
+            "value" : "Font més propera a la dreta"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Next fountain"
+            "value" : "Nearest fountain to the right"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fuente siguiente"
+            "value" : "Fuente más cercana a la derecha"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hurrengo iturria"
+            "value" : "Eskuineko iturririk hurbilena"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fontaine suivante"
+            "value" : "Fontaine la plus proche à droite"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fonte seguinte"
+            "value" : "Fonte máis próxima á dereita"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fontana successiva"
+            "value" : "Fontana più vicina a destra"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fonte seguinte"
-          }
-        }
-      }
-    },
-    "ios.browse.position" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{i} de {n} a prop"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{i} of {n} nearby"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{i} de {n} cerca"
-          }
-        },
-        "eu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{i}/{n} gertu"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{i} sur {n} à proximité"
-          }
-        },
-        "gl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{i} de {n} preto"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{i} di {n} vicine"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "{i} de {n} perto"
+            "value" : "Fonte mais próxima à direita"
           }
         }
       }
@@ -2504,49 +2451,49 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Font anterior"
+            "value" : "Font més propera a l’esquerra"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Previous fountain"
+            "value" : "Nearest fountain to the left"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fuente anterior"
+            "value" : "Fuente más cercana a la izquierda"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aurreko iturria"
+            "value" : "Ezkerreko iturririk hurbilena"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fontaine précédente"
+            "value" : "Fontaine la plus proche à gauche"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fonte anterior"
+            "value" : "Fonte máis próxima á esquerda"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fontana precedente"
+            "value" : "Fontana più vicina a sinistra"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fonte anterior"
+            "value" : "Fonte mais próxima à esquerda"
           }
         }
       }
