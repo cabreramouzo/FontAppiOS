@@ -25,7 +25,9 @@ struct SearchScreen: View {
     let onShow: (MapFocus.Target) -> Void
 
     @Environment(LocationService.self) private var location
+    @Environment(SessionStore.self) private var session
     @State private var model = SearchModel()
+    @State private var recent: [FontSummary] = []
     @State private var isActive = false
 
     var body: some View {
@@ -33,6 +35,7 @@ struct SearchScreen: View {
             List {
                 // Before typing, what is near, as Apple Maps does.
                 if model.query.trimmingCharacters(in: .whitespaces).count < 2 {
+                    recentSection
                     nearbySection
                 }
                 // A place that is exactly what was typed (a town) goes first; otherwise
@@ -59,6 +62,7 @@ struct SearchScreen: View {
             .autocorrectionDisabled()
         }
         .onChange(of: model.query) { model.queryChanged(near: location.location) }
+        .onChange(of: session.userID, initial: true) { _, user in recent = RecentFountains.list(for: user) }
         // Again once the position arrives: the first fix often comes after the tab opens.
         .task(id: location.location == nil) { await model.loadNearby(from: location.location) }
     }
@@ -67,6 +71,57 @@ struct SearchScreen: View {
     private func show(_ target: MapFocus.Target) {
         isActive = false
         onShow(target)
+    }
+
+    /// Fountains opened from here, the latest first: looking one up again is common, and
+    /// typing its name on a phone is not. Each can be forgotten on its own.
+    @ViewBuilder private var recentSection: some View {
+        if !recent.isEmpty {
+            Section {
+                ForEach(recent) { font in
+                    HStack {
+                        Button {
+                            choose(font)
+                        } label: {
+                            FountainResultRow(font: font, from: location.location)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
+                        }
+                        // Two buttons in one row: without their own styles the list makes
+                        // the whole row one tap, and the ✕ would open the fountain too.
+                        .buttonStyle(.plain)
+                        Button {
+                            withAnimation { recent = RecentFountains.remove(font.id, for: session.userID) }
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                                .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.borderless)
+                        .tint(.secondary)
+                        .accessibilityLabel(L10n.t("ios.search.forget"))
+                    }
+                }
+            } header: {
+                HStack {
+                    Text(L10n.t("search.recent"))
+                    Spacer()
+                    Button(L10n.t("search.clearHistory")) {
+                        withAnimation { recent = RecentFountains.clear(for: session.userID) }
+                    }
+                    .font(.footnote)
+                    .textCase(nil)
+                }
+            }
+        }
+    }
+
+    /// A fountain chosen from the results or the recent ones: remembered, then shown.
+    private func choose(_ font: FontSummary) {
+        recent = RecentFountains.add(font, for: session.userID)
+        show(.fountain(font))
     }
 
     @ViewBuilder private var nearbySection: some View {
@@ -96,7 +151,7 @@ struct SearchScreen: View {
             Section(L10n.t("ios.search.fountains")) {
                 ForEach(model.fountains) { font in
                     Button {
-                        show(.fountain(font))
+                        choose(font)
                     } label: {
                         FountainResultRow(font: font, from: location.location)
                     }
@@ -189,6 +244,38 @@ private struct FountainResultRow: View {
         let meters = from.distance(from: CLLocation(latitude: font.latitude, longitude: font.longitude))
         return Measurement(value: meters, unit: UnitLength.meters)
             .formatted(.measurement(width: .abbreviated, usage: .road))
+    }
+}
+
+/// The last fountains opened from Search, per account (and one list signed out), on
+/// this phone only, as the web keeps them in the browser.
+nonisolated enum RecentFountains {
+    static let limit = 5
+
+    private static func key(_ user: UUID?) -> String { "search.recent.v1.\(user?.uuidString ?? "anon")" }
+
+    static func list(for user: UUID?, _ defaults: UserDefaults = .standard) -> [FontSummary] {
+        defaults.data(forKey: key(user)).flatMap { try? JSONDecoder().decode([FontSummary].self, from: $0) } ?? []
+    }
+
+    @discardableResult
+    static func add(_ font: FontSummary, for user: UUID?, _ defaults: UserDefaults = .standard) -> [FontSummary] {
+        save(Array(([font] + list(for: user, defaults).filter { $0.id != font.id }).prefix(limit)), for: user, defaults)
+    }
+
+    @discardableResult
+    static func remove(_ id: UUID, for user: UUID?, _ defaults: UserDefaults = .standard) -> [FontSummary] {
+        save(list(for: user, defaults).filter { $0.id != id }, for: user, defaults)
+    }
+
+    @discardableResult
+    static func clear(for user: UUID?, _ defaults: UserDefaults = .standard) -> [FontSummary] {
+        save([], for: user, defaults)
+    }
+
+    private static func save(_ fonts: [FontSummary], for user: UUID?, _ defaults: UserDefaults) -> [FontSummary] {
+        defaults.set(try? JSONEncoder().encode(fonts), forKey: key(user))
+        return fonts
     }
 }
 

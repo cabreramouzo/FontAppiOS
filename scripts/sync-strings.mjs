@@ -28,6 +28,7 @@ const KEYS = [
   'relocate.notYours', 'relocate.accuracy', 'relocate.poorAccuracy',
   'cap.blocked.restricted', 'cap.blocked.optedOut', 'cap.blocked.unavailable',
   'cap.blocked.recentlyVoided', 'cap.blocked.activeDays',
+  'search.recent', 'search.clearHistory',
   'zones.allCountries', 'font.unnamed', 'nav.map', 'nav.profile', 'zones.title', 'review.anon',
   'report.resolved', 'report.resolvedBy',
   'source.tap', 'source.mountain', 'source.spring', 'source.well', 'source.fountain', 'source.other',
@@ -286,6 +287,9 @@ const IOS_ONLY = {
   },
   'ios.passingBy.notSeen': {
     ca: 'No l’he vista', es: 'No la he visto', gl: 'Non a vin', eu: 'Ez dut ikusi', en: 'I didn’t see it', fr: 'Je ne l’ai pas vue', pt: 'Não a vi', it: 'Non l’ho vista',
+  },
+  'ios.search.forget': {
+    ca: 'Treu-la de les recents', es: 'Quitarla de recientes', gl: 'Quitala das recentes', eu: 'Kendu azkenetatik', en: 'Remove from recent', fr: 'Retirer des récentes', pt: 'Retirar das recentes', it: 'Rimuovi dalle recenti',
   },
   'ios.showAll': {
     ca: 'Mostra-les totes ({n})', es: 'Mostrar todas ({n})', gl: 'Amosalas todas ({n})', eu: 'Erakutsi guztiak ({n})', en: 'Show all ({n})', fr: 'Tout afficher ({n})', pt: 'Mostrar todas ({n})', it: 'Mostra tutte ({n})',
