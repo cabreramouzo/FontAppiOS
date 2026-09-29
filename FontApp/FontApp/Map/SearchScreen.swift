@@ -63,6 +63,8 @@ struct SearchScreen: View {
         }
         .onChange(of: model.query) { model.queryChanged(near: location.location) }
         .onChange(of: session.userID, initial: true) { _, user in recent = RecentFountains.list(for: user) }
+        // Fountains opened elsewhere since the tab was last shown.
+        .onAppear { recent = RecentFountains.list(for: session.userID) }
         // Again once the position arrives: the first fix often comes after the tab opens.
         .task(id: location.location == nil) { await model.loadNearby(from: location.location) }
     }
@@ -73,7 +75,7 @@ struct SearchScreen: View {
         onShow(target)
     }
 
-    /// Fountains opened from here, the latest first: looking one up again is common, and
+    /// Fountains opened lately, here or anywhere, the latest first: looking one up again is common, and
     /// typing its name on a phone is not. Each can be forgotten on its own.
     @ViewBuilder private var recentSection: some View {
         if !recent.isEmpty {
@@ -247,7 +249,7 @@ private struct FountainResultRow: View {
     }
 }
 
-/// The last fountains opened from Search, per account (and one list signed out), on
+/// The last fountains opened, from Search or anywhere else, per account (and one list signed out), on
 /// this phone only, as the web keeps them in the browser.
 nonisolated enum RecentFountains {
     static let limit = 5

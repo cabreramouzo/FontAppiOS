@@ -121,6 +121,11 @@ struct FontDetailView: View {
             photoAuthor = try? await APIClient.shared.photoAuthor(font.id)
         }
         .task(id: session.userID) { capabilities = await Capabilities.of(session.userID) }
+        // Any fountain opened, from the map, a list or a notice, is a recent one in
+        // Search, as on the web: finding it again should not mean finding it on the map.
+        .onChange(of: loadedFont?.id, initial: true) { _, id in
+            if id != nil, let font = loadedFont { RecentFountains.add(FontSummary(font), for: session.userID) }
+        }
         .task(id: "\(session.userID?.uuidString ?? "")\(loadedFont?.image ?? "")") {
             photoRemoval = nil
             guard session.isSignedIn, let font = loadedFont, font.image != nil else { return }
