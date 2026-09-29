@@ -23,7 +23,6 @@ struct PhotoSlot: View {
 
     @State private var asks = false
     @State private var showsLibrary = false
-    @State private var item: PhotosPickerItem?
     @State private var isReading = false
     @State private var unreadable = false
     @State private var unreadableReason = ""
@@ -45,7 +44,8 @@ struct PhotoSlot: View {
                 placeholder
             }
             if unreadable {
-                Text(L10n.t("ios.photo.unreadable")).font(.footnote).foregroundStyle(.red)
+                Text(L10n.t(OutboxSync.shared.isOnline ? "ios.photo.unreadable" : "ios.photo.icloud"))
+                    .font(.footnote).foregroundStyle(.red)
                 #if DEBUG
                 Text(unreadableReason).font(.caption2).foregroundStyle(.secondary)
                 #endif
@@ -55,15 +55,13 @@ struct PhotoSlot: View {
             if canTakePhoto { Button(L10n.t("ios.takePhoto"), action: onTakePhoto) }
             Button(L10n.t("ios.choosePhoto")) { showsLibrary = true }
         }
-        .photosPicker(isPresented: $showsLibrary, selection: $item, matching: .images)
-        .onChange(of: item) { _, chosen in
-            guard let chosen else { return }
-            // The selection is cleared only after it has been read: clearing it at once
-            // could cut the load short, and the photo was reported unreadable.
-            Task {
-                await read(chosen)
-                item = nil
+        .sheet(isPresented: $showsLibrary) {
+            LibraryPicker { provider in
+                showsLibrary = false
+                guard let provider else { return }
+                Task { await read(provider) }
             }
+            .ignoresSafeArea()
         }
     }
 
@@ -109,7 +107,7 @@ struct PhotoSlot: View {
             .padding(.top, 12)
     }
 
-    private func read(_ chosen: PhotosPickerItem) async {
+    private func read(_ provider: NSItemProvider) async {
         unreadable = false
         isReading = true
         onReadingChanged(true)
@@ -117,19 +115,10 @@ struct PhotoSlot: View {
             isReading = false
             onReadingChanged(false)
         }
-        // Three ways to get the original bytes, from the most to the least specific: the
-        // library holds HEIC, JPEG, Live Photo stills and iCloud originals, and any one of
-        // them may refuse what another gives.
-        var reasons: [String] = []
-        var data: Data?
-        do { data = try await chosen.loadTransferable(type: PickedImage.self)?.data } catch { reasons.append("image: \(error)") }
-        if data == nil {
-            do { data = try await chosen.loadTransferable(type: Data.self) } catch { reasons.append("data: \(error)") }
+        let data: Data
+        do { data = try await LibraryPhoto.data(from: provider) } catch {
+            return fail("could not load the photo (\((error as? LibraryPhoto.Failure)?.detail ?? "\(error)"))")
         }
-        if data == nil {
-            do { data = try await chosen.loadTransferable(type: PickedFile.self)?.data } catch { reasons.append("file: \(error)") }
-        }
-        guard let data else { return fail("could not load the photo (\(reasons.joined(separator: "; ")))") }
         guard await onChosen(data) else { return fail("could not prepare \(data.count) bytes") }
     }
 
@@ -137,25 +126,5 @@ struct PhotoSlot: View {
         Logger(subsystem: "net.fontapp.FontApp", category: "photo").error("choosing a photo failed: \(reason, privacy: .public)")
         unreadableReason = reason
         unreadable = true
-    }
-}
-
-/// A picked photo's original bytes, asked for as an image type.
-private struct PickedImage: Transferable {
-    let data: Data
-
-    static var transferRepresentation: some TransferRepresentation {
-        DataRepresentation(importedContentType: .image) { PickedImage(data: $0) }
-    }
-}
-
-/// The same, received as a file (an iCloud original is downloaded first) and read at once.
-private struct PickedFile: Transferable {
-    let data: Data
-
-    static var transferRepresentation: some TransferRepresentation {
-        FileRepresentation(importedContentType: .image) { received in
-            PickedFile(data: try Data(contentsOf: received.file))
-        }
     }
 }

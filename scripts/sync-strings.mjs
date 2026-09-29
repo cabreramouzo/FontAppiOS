@@ -537,6 +537,16 @@ const IOS_ONLY = {
     pt: 'Agora não',
     it: 'Non ora',
   },
+  'ios.photo.icloud': {
+    ca: 'Aquesta foto no és en aquest mòbil (és a iCloud) i no hi ha connexió per baixar-la. Tria\'n una desada al mòbil o fes-ne una de nova.',
+    es: 'Esa foto no está en este móvil (está en iCloud) y no hay conexión para descargarla. Elige una guardada en el móvil o haz una nueva.',
+    gl: 'Esa foto non está neste móbil (está en iCloud) e non hai conexión para descargala. Escolle unha gardada no móbil ou fai unha nova.',
+    eu: 'Argazki hori ez dago telefono honetan (iCloud-en dago) eta ez dago konexiorik deskargatzeko. Aukeratu telefonoan gordeta dagoen bat edo atera berri bat.',
+    en: 'That photo is not on this phone (it is in iCloud) and there is no connection to download it. Choose one saved on the phone, or take a new one.',
+    fr: 'Cette photo n\'est pas sur ce téléphone (elle est dans iCloud) et il n\'y a pas de connexion pour la télécharger. Choisissez-en une enregistrée sur le téléphone ou prenez-en une nouvelle.',
+    pt: 'Essa foto não está neste telemóvel (está no iCloud) e não há ligação para a descarregar. Escolha uma guardada no telemóvel ou tire uma nova.',
+    it: 'Quella foto non è su questo telefono (è su iCloud) e non c’è connessione per scaricarla. Scegline una salvata sul telefono o scattane una nuova.',
+  },
 }
 
 const wanted = Object.keys(dictionaries.ca)

@@ -55563,6 +55563,59 @@
           }
         }
       }
+    },
+    "ios.photo.icloud" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aquesta foto no és en aquest mòbil (és a iCloud) i no hi ha connexió per baixar-la. Tria'n una desada al mòbil o fes-ne una de nova."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That photo is not on this phone (it is in iCloud) and there is no connection to download it. Choose one saved on the phone, or take a new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esa foto no está en este móvil (está en iCloud) y no hay conexión para descargarla. Elige una guardada en el móvil o haz una nueva."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Argazki hori ez dago telefono honetan (iCloud-en dago) eta ez dago konexiorik deskargatzeko. Aukeratu telefonoan gordeta dagoen bat edo atera berri bat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette photo n'est pas sur ce téléphone (elle est dans iCloud) et il n'y a pas de connexion pour la télécharger. Choisissez-en une enregistrée sur le téléphone ou prenez-en une nouvelle."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esa foto non está neste móbil (está en iCloud) e non hai conexión para descargala. Escolle unha gardada no móbil ou fai unha nova."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quella foto non è su questo telefono (è su iCloud) e non c’è connessione per scaricarla. Scegline una salvata sul telefono o scattane una nuova."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essa foto não está neste telemóvel (está no iCloud) e não há ligação para a descarregar. Escolha uma guardada no telemóvel ou tire uma nova."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
