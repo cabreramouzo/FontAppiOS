@@ -5,6 +5,9 @@ import Observation
 extension Notification.Name {
     /// A contribution changed a fountain (object: its `UUID`). The map reloads its pins.
     static let fontChanged = Notification.Name("FontAppFontChanged")
+    /// A fountain was deleted (object: its `UUID`). It leaves the map and every copy kept on
+    /// the phone at once, not when the next load stops bringing it.
+    static let fontDeleted = Notification.Name("FontAppFontDeleted")
 }
 
 /// The three chips: flowing, trickle, dry. Never `unknown` (says nothing from someone in

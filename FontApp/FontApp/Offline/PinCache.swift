@@ -107,6 +107,15 @@ nonisolated final class PinCache: @unchecked Sendable {
         scheduleSave()
     }
 
+    /// A deleted fountain: gone from what is known, so no view shows it again.
+    func remove(_ id: UUID) {
+        lock.withLock {
+            pins[id] = nil
+            seen[id] = nil
+        }
+        scheduleSave()
+    }
+
     /// After a contribution: the area is loaded again, whatever its age.
     func invalidate() {
         lock.withLock { areas.removeAll() }

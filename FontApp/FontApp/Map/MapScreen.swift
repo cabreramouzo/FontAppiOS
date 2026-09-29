@@ -183,6 +183,12 @@ struct MapScreen: View {
         .onAppear(perform: locateOnce)
         .onChange(of: location.isAuthorized) { locateOnce() }
         .onReceive(NotificationCenter.default.publisher(for: .fontChanged)) { _ in model.refresh() }
+        // Deleted: off the map before the reload answers, and its card closed.
+        .onReceive(NotificationCenter.default.publisher(for: .fontDeleted)) { note in
+            guard let id = note.object as? UUID else { return }
+            model.remove(deleted: id)
+            if selected?.id == id { selected = nil }
+        }
         // One presentation for as long as a fountain is chosen: `.sheet(item:)` swapped
         // the sheet on every new pin and UIKit kept (or grew to) the old height.
         .sheet(isPresented: Binding(get: { selected != nil }, set: { if !$0 { selected = nil } })) {

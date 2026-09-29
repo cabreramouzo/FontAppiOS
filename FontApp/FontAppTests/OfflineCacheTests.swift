@@ -79,3 +79,36 @@ struct PhotoPreparerFallbackTests {
         #expect(throws: (any Error).self) { try PhotoPreparer.prepare(Data("not an image".utf8)) }
     }
 }
+
+@MainActor
+struct DeletedFountainTests {
+    private func font(_ lat: Double, _ long: Double) -> FontSummary {
+        FontSummary(id: UUID(), name: nil, latitude: lat, longitude: long, image: nil, description: nil, source: nil,
+                    drinkable: nil, country: nil, region: nil, createdAt: nil, lastWaterStatus: nil, lastUpdate: nil,
+                    latestConfirmations: nil, recentStatusReporters: nil, recentStatusConflict: nil)
+    }
+
+    @Test func aDeletedFountainLeavesTheMapThePinCacheAndTheZones() async throws {
+        let box = MapBox(minLat: 41, maxLat: 42, minLong: 2, maxLong: 3)!
+        let gone = font(41.3, 2.3), stays = font(41.4, 2.4)
+        let pins = PinCache(file: nil)
+        pins.store(MapResponse(total: 2, fonts: [gone, stays], clusters: []), for: box)
+        let zones = OfflineZones(directory: FileManager.default.temporaryDirectory.appending(path: UUID().uuidString))
+        let model = MapModel(zones: zones, pins: pins)
+        model.add(created: gone)   // just created: it would be put back on every answer
+        model.add(created: stays)
+        #expect(model.fonts.count == 2)
+
+        model.remove(deleted: gone.id)
+
+        #expect(model.fonts.map(\.id) == [stays.id])
+        #expect(pins.fonts(in: box).map(\.id) == [stays.id])
+        #expect(!model.isJustCreated(gone.id))
+    }
+
+    @Test func aDeletedFountainIsRemovedFromSavedZones() {
+        let zones = OfflineZones(directory: FileManager.default.temporaryDirectory.appending(path: UUID().uuidString))
+        #expect(zones.font(UUID()) == nil) // no crash on an empty store
+        zones.remove(font: UUID())
+    }
+}

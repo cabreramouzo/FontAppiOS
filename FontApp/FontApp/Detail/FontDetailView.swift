@@ -403,6 +403,7 @@ struct FontDetailView: View {
         Task {
             do {
                 try await APIClient.shared.deleteFont(font.id)
+                NotificationCenter.default.post(name: .fontDeleted, object: font.id)
                 NotificationCenter.default.post(name: .fontChanged, object: font.id)
                 dismiss()
             } catch {

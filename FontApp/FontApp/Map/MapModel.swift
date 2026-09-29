@@ -29,6 +29,10 @@ final class MapModel {
     /// them: a fountain that is not there after "created" gets added a second time.
     private(set) var justCreated: [UUID: (font: FontSummary, at: Date)] = [:]
     static let justCreatedFor: TimeInterval = 30 * 60
+    /// Fountains deleted from here: kept out of any answer for a while, in case a cached or
+    /// slow one still brings them.
+    @ObservationIgnored private var deleted: [UUID: Date] = [:]
+    static let deletedFor: TimeInterval = 10 * 60
 
     init(api: APIClient = .shared, zones: OfflineZones = .shared, pins: PinCache = .shared) {
         self.api = api
@@ -82,6 +86,23 @@ final class MapModel {
         fonts = withJustCreated(fonts, in: nil)
     }
 
+    /// A fountain deleted: off the map at once, and out of every copy kept on the phone (the
+    /// pins seen and the saved zones), so it does not come back from them without signal or
+    /// from an answer that has not caught up. Its page would say "not found".
+    func remove(deleted id: UUID) {
+        deleted[id] = .now
+        justCreated[id] = nil
+        pins.remove(id)
+        zones.remove(font: id)
+        fonts.removeAll { $0.id == id }
+    }
+
+    /// Without the fountains deleted here lately.
+    private func withoutDeleted(_ list: [FontSummary]) -> [FontSummary] {
+        deleted = deleted.filter { Date.now.timeIntervalSince($0.value) < Self.deletedFor }
+        return deleted.isEmpty ? list : list.filter { deleted[$0.id] == nil }
+    }
+
     func isJustCreated(_ id: UUID) -> Bool {
         justCreated[id].map { Date.now.timeIntervalSince($0.at) < Self.justCreatedFor } ?? false
     }
@@ -96,7 +117,7 @@ final class MapModel {
             return font.latitude >= box.minLat && font.latitude <= box.maxLat
                 && font.longitude >= box.minLong && font.longitude <= box.maxLong
         }
-        return missing.isEmpty ? list : list + missing
+        return withoutDeleted(missing.isEmpty ? list : list + missing)
     }
 
     /// Shows the pins already on the phone for a view. True when they are all there is

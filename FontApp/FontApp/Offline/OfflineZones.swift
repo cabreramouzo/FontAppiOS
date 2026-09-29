@@ -134,6 +134,16 @@ final class OfflineZones {
         return FileManager.default.fileExists(atPath: file.path()) ? file : nil
     }
 
+    /// A deleted fountain leaves the zones that had it (its photo file stays until the zone goes).
+    func remove(font id: UUID) {
+        var changed = false
+        for i in zones.indices where zones[i].fonts.contains(where: { $0.id == id }) {
+            zones[i].fonts.removeAll { $0.id == id }
+            changed = true
+        }
+        if changed { save() }
+    }
+
     // MARK: Saving
 
     enum SaveError: Error { case empty, tooMany }
