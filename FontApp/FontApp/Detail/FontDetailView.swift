@@ -40,7 +40,15 @@ struct FontDetailView: View {
     private enum CoverAction { case remove, request }
 
     /// A review or a note waiting for "delete?" to be confirmed.
-    private enum Deletion { case review(CommentResponse), report(ReportResponse) }
+    private enum Deletion {
+        case review(CommentResponse), report(ReportResponse)
+        var id: UUID {
+            switch self {
+            case .review(let review): review.id
+            case .report(let report): report.id
+            }
+        }
+    }
 
     /// A new comment, or a reply to one.
     private struct ReportTarget: Identifiable {
@@ -134,14 +142,6 @@ struct FontDetailView: View {
             guard session.isSignedIn, let font = loadedFont, font.image != nil else { return }
             photoRemoval = try? await APIClient.shared.photoRemovalStatus(font.id)
         }
-        .confirmationDialog(L10n.t(coverAction == .remove ? "image.confirmRemove" : "image.confirmRequestRemoval"),
-                            isPresented: Binding(get: { coverAction != nil }, set: { if !$0 { coverAction = nil } }),
-                            titleVisibility: .visible) {
-            Button(L10n.t(coverAction == .remove ? "image.remove" : "image.requestRemoval"), role: .destructive) {
-                if let action = coverAction { cover(action) }
-            }
-            Button(L10n.t("form.cancel"), role: .cancel) {}
-        }
         .fullScreenCover(item: $viewingReviewPhoto) { photo in
             photo.viewer(name: L10n.fontName(loadedFont?.name ?? preview?.name), zoom: reviewPhotoZoom)
         }
@@ -159,12 +159,6 @@ struct FontDetailView: View {
             if let font = loadedFont {
                 ReportSheet(fontID: font.id, editing: report) { await model.load() }
             }
-        }
-        .confirmationDialog(deleting.map { if case .review = $0 { L10n.t("review.confirmDelete") } else { L10n.t("detail.confirmDeleteIncident") } } ?? "",
-                            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
-                            titleVisibility: .visible) {
-            Button(L10n.t("detail.delete"), role: .destructive) { if let deleting { delete(deleting) } }
-            Button(L10n.t("form.cancel"), role: .cancel) {}
         }
         .sheet(item: $reportTarget) { target in
             if let font = loadedFont {
@@ -186,18 +180,6 @@ struct FontDetailView: View {
             if let font = loadedFont {
                 DuplicateSheet(font: font) { notice = $0 }
             }
-        }
-        .confirmationDialog(L10n.t("detail.confirmDeleteFont"), isPresented: $confirmsDelete, titleVisibility: .visible) {
-            Button(L10n.t("detail.delete"), role: .destructive, action: deleteFont)
-            Button(L10n.t("form.cancel"), role: .cancel) {}
-        }
-        .confirmationDialog(L10n.t("flag.fontTitle"), isPresented: $flagging, titleVisibility: .visible) {
-            ForEach(["fake", "duplicate", "nonexistent", "spam", "abuse"], id: \.self) { reason in
-                Button(L10n.t("flag.reason.\(reason)"), role: .destructive) { flag(reason) }
-            }
-            Button(L10n.t("form.cancel"), role: .cancel) {}
-        } message: {
-            Text(L10n.t("flag.fontHelp"))
         }
         .alert(notice ?? "", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
             Button("OK", role: .cancel) {}
@@ -393,6 +375,17 @@ struct FontDetailView: View {
         } label: {
             CircleIcon(systemImage: "ellipsis")
         }
+        // On the button the menu came from, as iOS 26 does.
+        .confirmsDestructive(L10n.t("detail.confirmDeleteFont"), isPresented: $confirmsDelete,
+                             action: L10n.t("detail.delete"), perform: deleteFont)
+        .confirmationDialog(L10n.t("flag.fontTitle"), isPresented: $flagging, titleVisibility: .visible) {
+            ForEach(["fake", "duplicate", "nonexistent", "spam", "abuse"], id: \.self) { reason in
+                Button(L10n.t("flag.reason.\(reason)"), role: .destructive) { flag(reason) }
+            }
+            Button(L10n.t("form.cancel"), role: .cancel) {}
+        } message: {
+            Text(L10n.t("flag.fontHelp"))
+        }
         .accessibilityLabel(L10n.t("ios.more"))
         .sensoryFeedback(.success, trigger: copied)
         .accessibilityIdentifier("fontDetail.more")
@@ -471,6 +464,8 @@ struct FontDetailView: View {
                 Label(L10n.t("image.remove"), systemImage: "photo.badge.minus")
             }
             .frame(minHeight: 44)
+            .confirmsDestructive(L10n.t("image.confirmRemove"), isPresented: coverBinding(.remove),
+                                 action: L10n.t("image.remove")) { cover(.remove) }
         } else if let status = photoRemoval, status.canRequest {
             if status.pending {
                 HStack {
@@ -484,6 +479,8 @@ struct FontDetailView: View {
                     Label(L10n.t("image.requestRemoval"), systemImage: "photo.badge.minus")
                 }
                 .frame(minHeight: 44)
+                .confirmsDestructive(L10n.t("image.confirmRequestRemoval"), isPresented: coverBinding(.request),
+                                     action: L10n.t("image.requestRemoval")) { cover(.request) }
             }
         }
     }
@@ -545,6 +542,14 @@ struct FontDetailView: View {
                 notice = ErrorText.describe(error)
             }
         }
+    }
+
+    private func coverBinding(_ action: CoverAction) -> Binding<Bool> {
+        Binding(get: { coverAction == action }, set: { if !$0 { coverAction = nil } })
+    }
+
+    private func deletionBinding(_ id: UUID) -> Binding<Bool> {
+        Binding(get: { deleting?.id == id }, set: { if !$0 { deleting = nil } })
     }
 
     private func delete(_ deletion: Deletion) {
@@ -756,6 +761,8 @@ struct FontDetailView: View {
                         }
                     }
                     .contextMenu { reviewMenu(latest, font) }
+                    .confirmsDestructive(L10n.t("review.confirmDelete"), isPresented: deletionBinding(latest.id),
+                                         action: L10n.t("detail.delete")) { delete(.review(latest)) }
                     reviewActions(latest)
                 } else {
                     Text(L10n.t("detail.beFirst")).foregroundStyle(.secondary)
@@ -774,7 +781,9 @@ struct FontDetailView: View {
                 let previous = model.previousReviews
                 if !previous.isEmpty {
                     NavigationLink {
-                        PreviousReviewsScreen(model: model, fontName: L10n.fontName(font.name)) { review in
+                        PreviousReviewsScreen(model: model, fontName: L10n.fontName(font.name),
+                                              confirmsDeletion: { deletionBinding($0.id) },
+                                              delete: { delete(.review($0)) }) { review in
                             reviewMenu(review, font)
                         }
                     } label: {
@@ -789,6 +798,8 @@ struct FontDetailView: View {
                 }
                 ForEach(model.reports) { report in
                     ReportRow(report: report)
+                        .confirmsDestructive(L10n.t("detail.confirmDeleteIncident"), isPresented: deletionBinding(report.id),
+                                             action: L10n.t("detail.delete")) { delete(.report(report)) }
                         .swipeActions {
                             if report.userID != nil && report.userID == session.userID || isAdmin {
                                 Button(role: .destructive) { deleting = .report(report) } label: {
@@ -1183,6 +1194,9 @@ private extension View {
 struct PreviousReviewsScreen<Menu: View>: View {
     let model: FontDetailModel
     let fontName: String
+    /// Deleting is asked here, on the row, not on the page underneath.
+    let confirmsDeletion: (CommentResponse) -> Binding<Bool>
+    let delete: (CommentResponse) -> Void
     @ViewBuilder let menu: (CommentResponse) -> Menu
 
     @State private var viewing: PhotoToView?
@@ -1192,6 +1206,8 @@ struct PreviousReviewsScreen<Menu: View>: View {
         List(model.previousReviews) { review in
             ReviewRow(review: review, zoom: zoom, onPhoto: { viewing = PhotoToView(review: review) })
                 .contextMenu { menu(review) }
+                .confirmsDestructive(L10n.t("review.confirmDelete"), isPresented: confirmsDeletion(review),
+                                     action: L10n.t("detail.delete")) { delete(review) }
         }
         .listStyle(.insetGrouped)
         .navigationTitle(L10n.t("detail.statusReviews"))

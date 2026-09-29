@@ -115,6 +115,11 @@ struct NewFontSheet: View {
                 Section {
                     Button(L10n.t("draft.discard"), role: .destructive) { confirmsDiscard = true }
                         .frame(minHeight: 44)
+                        .confirmsDestructive(L10n.t("draft.discard"), isPresented: $confirmsDiscard,
+                                             action: L10n.t("draft.discard")) {
+                            model.discard()
+                            dismiss()
+                        }
                 }
             }
             .navigationTitle(L10n.t("newFont.title"))
@@ -135,12 +140,6 @@ struct NewFontSheet: View {
                         .buttonStyle(.glassProminent)
                         .tint(session.isStaff ? Color.staff : .accentColor)
                     }
-                }
-            }
-            .confirmationDialog(L10n.t("draft.discard"), isPresented: $confirmsDiscard) {
-                Button(L10n.t("draft.discard"), role: .destructive) {
-                    model.discard()
-                    dismiss()
                 }
             }
             .alert(duplicateTitle, isPresented: duplicateBinding) {

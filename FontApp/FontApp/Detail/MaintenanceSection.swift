@@ -82,6 +82,10 @@ struct MaintenanceSection: View {
                         Button(role: .destructive) { confirmsRetire = true } label: {
                             Label(L10n.t("maint.retire"), systemImage: "mappin.slash")
                         }
+                        .confirmsDestructive(L10n.t("maint.confirmRetire"), isPresented: $confirmsRetire,
+                                             action: L10n.t("maint.retire")) {
+                            run { try await APIClient.shared.retireFont(font.id, true) }
+                        }
                     }
                 }
                 if isModerator {
@@ -93,26 +97,20 @@ struct MaintenanceSection: View {
                         Button(role: .destructive) { hidesForAbuse = true } label: {
                             Label(L10n.t("maint.hideAbuse"), systemImage: "exclamationmark.octagon")
                         }
+                        .confirmationDialog(L10n.t("maint.abuseTitle"), isPresented: $hidesForAbuse, titleVisibility: .visible) {
+                            ForEach(["spam", "fake", "abuse"], id: \.self) { reason in
+                                Button(L10n.t("maint.abuse.\(reason)"), role: .destructive) {
+                                    run { try await APIClient.shared.hideForAbuse(font.id, reason: reason) }
+                                }
+                            }
+                            Button(L10n.t("form.cancel"), role: .cancel) {}
+                        } message: {
+                            Text(L10n.t("maint.abuseHelp"))
+                        }
                     }
                 }
             }
             .disabled(isBusy)
-            .confirmationDialog(L10n.t("maint.confirmRetire"), isPresented: $confirmsRetire, titleVisibility: .visible) {
-                Button(L10n.t("maint.retire"), role: .destructive) {
-                    run { try await APIClient.shared.retireFont(font.id, true) }
-                }
-                Button(L10n.t("form.cancel"), role: .cancel) {}
-            }
-            .confirmationDialog(L10n.t("maint.abuseTitle"), isPresented: $hidesForAbuse, titleVisibility: .visible) {
-                ForEach(["spam", "fake", "abuse"], id: \.self) { reason in
-                    Button(L10n.t("maint.abuse.\(reason)"), role: .destructive) {
-                        run { try await APIClient.shared.hideForAbuse(font.id, reason: reason) }
-                    }
-                }
-                Button(L10n.t("form.cancel"), role: .cancel) {}
-            } message: {
-                Text(L10n.t("maint.abuseHelp"))
-            }
         }
     }
 

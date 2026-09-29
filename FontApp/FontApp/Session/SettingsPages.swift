@@ -128,6 +128,9 @@ struct AccountSettingsScreen: View {
                 .swipeActions {
                     Button(L10n.t("detail.delete"), role: .destructive) { removing = key }
                 }
+                .confirmsDestructive(L10n.t("passkey.confirmDelete"),
+                                     isPresented: Binding(get: { removing?.id == key.id }, set: { if !$0 { removing = nil } }),
+                                     action: L10n.t("detail.delete")) { removePasskey(key) }
             }
             Button {
                 passkeyLabel = L10n.t("passkey.defaultLabel")
@@ -150,11 +153,6 @@ struct AccountSettingsScreen: View {
             TextField(L10n.t("passkey.defaultLabel"), text: $passkeyLabel)
             Button(L10n.t("passkey.add"), action: addPasskey)
             Button(L10n.t("form.cancel"), role: .cancel) {}
-        }
-        .confirmationDialog(L10n.t("passkey.confirmDelete"),
-                            isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
-                            titleVisibility: .visible, presenting: removing) { key in
-            Button(L10n.t("detail.delete"), role: .destructive) { removePasskey(key) }
         }
     }
 

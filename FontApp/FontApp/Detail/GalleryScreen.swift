@@ -36,6 +36,10 @@ struct GalleryScreen: View {
                         Section(L10n.t("gallery.kind.\(kind.rawValue)")) {
                             ForEach(group) { photo in
                                 GalleryRow(photo: photo)
+                                    .confirmsDestructive(L10n.t("image.confirmRemove"),
+                                                         isPresented: Binding(get: { removing?.id == photo.id },
+                                                                              set: { if !$0 { removing = nil } }),
+                                                         action: L10n.t("image.remove")) { remove(photo) }
                                     .contextMenu {
                                         if canManage(photo) {
                                             Button {
@@ -79,22 +83,17 @@ struct GalleryScreen: View {
             }
             Button(L10n.t("form.cancel"), role: .cancel) {}
         }
-        .confirmationDialog(L10n.t("image.confirmRemove"),
-                            isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
-                            titleVisibility: .visible) {
-            Button(L10n.t("image.remove"), role: .destructive) {
-                guard let photo = removing else { return }
-                Task {
-                    do {
-                        try await APIClient.shared.deleteFontPhoto(photo.id, of: fontID)
-                        await load()
-                    } catch { self.error = ErrorText.describe(error) }
-                }
-            }
-            Button(L10n.t("form.cancel"), role: .cancel) {}
-        }
         .sheet(isPresented: $adding) {
             AddGalleryPhotoSheet(fontID: fontID) { await load() }
+        }
+    }
+
+    private func remove(_ photo: FontPhoto) {
+        Task {
+            do {
+                try await APIClient.shared.deleteFontPhoto(photo.id, of: fontID)
+                await load()
+            } catch { self.error = ErrorText.describe(error) }
         }
     }
 

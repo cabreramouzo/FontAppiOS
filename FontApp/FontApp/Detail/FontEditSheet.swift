@@ -89,6 +89,11 @@ struct FontEditSheet: View {
                         else { model.discard(); dismiss() }
                     }
                     .disabled(busy)
+                    .confirmationDialog(L10n.t("form.discardTitle"), isPresented: $confirmsDiscard,
+                                        titleVisibility: .visible) {
+                        Button(L10n.t("form.discard"), role: .destructive) { model.discard(); dismiss() }
+                        Button(L10n.t("form.keepEditing"), role: .cancel) {}
+                    } message: { Text(L10n.t("form.discardBody")) }
                 }
                 .frame(maxWidth: .infinity, minHeight: 48)
                 .padding(.horizontal).padding(.vertical, 8)
@@ -101,11 +106,6 @@ struct FontEditSheet: View {
                 }
             }
             .interactiveDismissDisabled(busy)
-            .confirmationDialog(L10n.t("form.discardTitle"), isPresented: $confirmsDiscard,
-                                titleVisibility: .visible) {
-                Button(L10n.t("form.discard"), role: .destructive) { model.discard(); dismiss() }
-                Button(L10n.t("form.keepEditing"), role: .cancel) {}
-            } message: { Text(L10n.t("form.discardBody")) }
             .task { await model.prepare() }
             .onChange(of: session.userID) { _, id in
                 if id != model.userID { dismiss() }

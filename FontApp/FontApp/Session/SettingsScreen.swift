@@ -117,6 +117,9 @@ struct SettingsScreen: View {
                     .frame(minHeight: 44)
                 }
                 .disabled(isDeleting)
+                .confirmsDestructive(L10n.t("profile.deleteAccount"), isPresented: $confirmsDeletion,
+                                     action: L10n.t("profile.deleteAccount"), message: deletionMessage,
+                                     perform: deleteAccount)
                 if let deletionError {
                     Text(deletionError).foregroundStyle(.red)
                 }
@@ -125,12 +128,6 @@ struct SettingsScreen: View {
                     .foregroundStyle(.red)
                     .frame(minHeight: 44)
             }
-        }
-        .confirmationDialog(L10n.t("profile.deleteAccount"), isPresented: $confirmsDeletion, titleVisibility: .visible) {
-            Button(L10n.t("profile.deleteAccount"), role: .destructive, action: deleteAccount)
-            Button(role: .cancel) {}
-        } message: {
-            Text(deletionMessage)
         }
     }
 
