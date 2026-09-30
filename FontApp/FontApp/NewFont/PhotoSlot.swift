@@ -29,16 +29,15 @@ struct PhotoSlot: View {
 
     private static let thumbnail: CGFloat = 140
 
-    /// TODO: offer "choose from the library" again. Hidden on purpose (30/09/2026): on a
-    /// real phone some photos cannot be read from the library — a photo kept in iCloud while
-    /// offline, or an HEIC whose original is not on the phone, fails with "no compatible
-    /// representations" for every way of asking (`LibraryPhoto.data`) — and a form that
-    /// sometimes refuses the photo is worse than one that only takes it on the spot. The
-    /// picker (`LibraryPicker`) and its fallbacks stay in the code. Before turning this on:
-    /// try `PHPickerConfiguration.preferredAssetRepresentationMode = .compatible`, and
-    /// `PHAsset` with limited library access, on photos that are only in iCloud.
-    /// Without a camera (simulator, some iPads) the library is still offered: it is the only way.
-    private static let offersLibrary = false
+    /// The library is offered only with signal. Without it, a photo kept in iCloud cannot be
+    /// read ("no compatible representations" for every way of asking, `LibraryPhoto.data`),
+    /// and a form that sometimes refuses the photo is worse than one that only takes it on
+    /// the spot, which is what someone without signal is doing anyway.
+    /// TODO: offer it offline too, for the photos that are on the phone (30/09/2026: some
+    /// that are not fail either way). Try `PHPickerConfiguration.preferredAssetRepresentationMode
+    /// = .compatible`, and `PHAsset` with limited library access, on iCloud-only photos.
+    /// Without a camera (simulator, some iPads) the library is always offered: it is the only way.
+    private var offersLibrary: Bool { OutboxSync.shared.isOnline }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -64,7 +63,7 @@ struct PhotoSlot: View {
         }
         .confirmationDialog(L10n.plain("image.add"), isPresented: $asks, titleVisibility: .hidden) {
             if canTakePhoto { Button(L10n.t("ios.takePhoto"), action: onTakePhoto) }
-            if Self.offersLibrary || !canTakePhoto { Button(L10n.t("ios.choosePhoto")) { showsLibrary = true } }
+            if offersLibrary || !canTakePhoto { Button(L10n.t("ios.choosePhoto")) { showsLibrary = true } }
         }
         .sheet(isPresented: $showsLibrary) {
             LibraryPicker { provider in
@@ -80,8 +79,8 @@ struct PhotoSlot: View {
         Button {
             unreadable = false
             if canTakePhoto {
-                // Only the camera is offered (see `offersLibrary`): no question to ask.
-                if Self.offersLibrary { asks = true } else { onTakePhoto() }
+                // Only the camera is offered (no signal, see `offersLibrary`): no question to ask.
+                if offersLibrary { asks = true } else { onTakePhoto() }
             } else {
                 showsLibrary = true
             }
