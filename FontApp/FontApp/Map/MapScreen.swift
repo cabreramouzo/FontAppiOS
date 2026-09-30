@@ -103,7 +103,7 @@ struct MapScreen: View {
         .overlay(alignment: .top) {
             // What waits to be sent and whether there is signal, above the map's own notices.
             VStack(spacing: 0) {
-                ConnectivityNoticeView { showsSignIn = true }
+                ConnectivityNoticeView(serverUnavailable: model.serverUnavailable) { showsSignIn = true }
                 banner
             }
             .padding(.trailing, 72)
@@ -398,9 +398,7 @@ struct MapScreen: View {
                     .frame(minHeight: 44)
             }
             .bannerStyle()
-        } else if let message = model.errorMessage, OutboxSync.shared.isOnline {
-            // Without signal the connectivity notice already says so (and what is pending):
-            // a second "no connection to the server" under it said the same twice.
+        } else if let message = model.errorMessage {
             Text(message).font(.subheadline).bannerStyle()
         }
     }

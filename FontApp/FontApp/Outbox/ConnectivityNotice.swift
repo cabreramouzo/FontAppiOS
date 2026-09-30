@@ -35,6 +35,8 @@ nonisolated struct ConnectivityNotice: Equatable, Sendable {
     /// The queue as the notice sees it.
     struct Input: Equatable, Sendable {
         var online: Bool
+        /// A map request could not reach the backend even though iOS still sees a network path.
+        var serverUnavailable: Bool = false
         var pending: Int
         /// Saved by another account than the one signed in.
         var others: Int
@@ -48,13 +50,13 @@ nonisolated struct ConnectivityNotice: Equatable, Sendable {
 
     /// `nil` when there is nothing to say: online, nothing pending, nothing just sent.
     static func make(_ i: Input) -> ConnectivityNotice? {
-        if i.pending == 0, !i.justSynced, i.online { return nil }
+        if i.pending == 0, !i.justSynced, i.online, !i.serverUnavailable { return nil }
 
-        if !i.online {
+        if !i.online || i.serverUnavailable {
             return i.pending > 0
                 ? ConnectivityNotice(tone: .warning, titleKey: "offline.offlinePending", titleCount: i.pending,
                                      detailKey: "offline.savedSafe", detailCount: nil)
-                : ConnectivityNotice(tone: .neutral, titleKey: "offline.banner", titleCount: nil,
+                : ConnectivityNotice(tone: .warning, titleKey: "offline.banner", titleCount: nil,
                                      detailKey: "offline.connectionHint", detailCount: nil)
         }
         if i.pending == 0 {
@@ -76,7 +78,7 @@ nonisolated struct ConnectivityNotice: Equatable, Sendable {
     /// Whether the card may shrink to a chip: not while sending nor during the "synced"
     /// confirmation — both go away on their own — and never when there is no notice.
     static func mayShrink(_ i: Input) -> Bool {
-        !(i.sending || i.justSynced) && !(i.online && i.pending == 0)
+        !(i.sending || i.justSynced) && !(i.online && !i.serverUnavailable && i.pending == 0)
     }
 
     /// How long the card stays whole before it becomes a chip. The chip carries the same

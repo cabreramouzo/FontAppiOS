@@ -17,12 +17,10 @@ nonisolated struct APIError: Error, Equatable, Sendable {
 
 /// Which backend the app talks to.
 ///
-/// Debug builds use the local backend (`swift run App serve` in FontAppBE), whose data is
-/// seeded: writing reviews and photos while developing must never reach production. Pass
-/// `-FontAppAPI https://fontapp.fly.dev` as a launch argument to point a Debug build
-/// elsewhere (a phone cannot reach the Mac's 127.0.0.1); it is remembered, also when the
-/// app is opened from the home screen, until `-FontAppAPI local`. Release always uses
-/// production.
+/// Simulator Debug builds use the seeded local backend (`swift run App serve` in
+/// FontAppBE). A physical iPhone cannot reach the Mac at 127.0.0.1, so it uses production
+/// by default. `-FontAppAPI <url>` overrides either Debug default and is remembered when
+/// the app is later opened from the home screen. Release always uses production.
 nonisolated enum APIEnvironment {
     static let production = URL(string: "https://fontapp.fly.dev")!
     static let local = URL(string: "http://127.0.0.1:8080")!
@@ -42,7 +40,11 @@ nonisolated enum APIEnvironment {
         if let remembered = defaults.string(forKey: rememberedKey), let url = URL(string: remembered) {
             return url
         }
+        #if targetEnvironment(simulator)
         return local
+        #else
+        return production
+        #endif
         #else
         return production
         #endif

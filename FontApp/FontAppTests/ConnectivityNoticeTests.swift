@@ -3,9 +3,11 @@ import Testing
 @testable import FontApp
 
 struct ConnectivityNoticeTests {
-    private func input(online: Bool = true, pending: Int = 0, others: Int = 0, needsAuth: Bool = false,
+    private func input(online: Bool = true, serverUnavailable: Bool = false,
+                       pending: Int = 0, others: Int = 0, needsAuth: Bool = false,
                        sending: Bool = false, tried: Bool = false, justSynced: Bool = false) -> ConnectivityNotice.Input {
-        .init(online: online, pending: pending, others: others, needsAuth: needsAuth,
+        .init(online: online, serverUnavailable: serverUnavailable,
+              pending: pending, others: others, needsAuth: needsAuth,
               sending: sending, tried: tried, justSynced: justSynced)
     }
 
@@ -13,10 +15,17 @@ struct ConnectivityNoticeTests {
         #expect(ConnectivityNotice.make(input()) == nil)
     }
 
-    @Test func offlineWithNothingPendingInformsWithoutShouting() {
+    @Test func offlineWithNothingPendingUsesTheOrangeConnectionNotice() {
         let notice = ConnectivityNotice.make(input(online: false))
         #expect(notice?.titleKey == "offline.banner")
-        #expect(notice?.tone == .neutral)
+        #expect(notice?.tone == .warning)
+    }
+
+    @Test func aServerFailureUsesTheSameNoticeEvenWhenThePhoneHasNetwork() {
+        let notice = ConnectivityNotice.make(input(serverUnavailable: true))
+        #expect(notice?.titleKey == "offline.banner")
+        #expect(notice?.tone == .warning)
+        #expect(ConnectivityNotice.mayShrink(input(serverUnavailable: true)))
     }
 
     @Test func offlineWithPendingIsOrangeAndSaysItIsSafe() {

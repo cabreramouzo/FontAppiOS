@@ -12,6 +12,7 @@ struct ConnectivityNoticeView: View {
     @Environment(Outbox.self) private var outbox
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let sync = OutboxSync.shared
+    let serverUnavailable: Bool
     /// Signed out (or the session expired) with something pending: sending needs an account.
     let onSignIn: () -> Void
 
@@ -23,7 +24,8 @@ struct ConnectivityNoticeView: View {
     @State private var confirmsDiscard = false
 
     private var input: ConnectivityNotice.Input {
-        ConnectivityNotice.Input(online: sync.isOnline, pending: outbox.items.count, others: outbox.othersCount,
+        ConnectivityNotice.Input(online: sync.isOnline, serverUnavailable: serverUnavailable,
+                                 pending: outbox.items.count, others: outbox.othersCount,
                                  needsAuth: outbox.needsAuth || outbox.currentUserID == nil,
                                  sending: outbox.isFlushing, tried: outbox.flushTried, justSynced: justSynced)
     }
@@ -39,7 +41,7 @@ struct ConnectivityNoticeView: View {
         Group {
             if let notice = ConnectivityNotice.make(input) {
                 if shrunk && ConnectivityNotice.mayShrink(input) {
-                    chip(notice)
+                    chip(notice, input)
                         .transition(.scale(scale: 0.8, anchor: .leading).combined(with: .opacity))
                 } else {
                     card(notice, input)
@@ -78,19 +80,18 @@ struct ConnectivityNoticeView: View {
 
     // MARK: Shrunk
 
-    /// The same label as the card's title, so shrinking hides nothing. Orange when
-    /// something is pending; neutral when it only says there is no signal.
-    private func chip(_ notice: ConnectivityNotice) -> some View {
-        let pending = notice.tone == .warning
+    /// The same label as the card's title, so shrinking hides nothing.
+    private func chip(_ notice: ConnectivityNotice, _ input: ConnectivityNotice.Input) -> some View {
+        let warning = notice.tone == .warning
         return Button {
             expandedAt += 1
         } label: {
-            Label(notice.title, systemImage: pending ? "exclamationmark.arrow.triangle.2.circlepath" : "icloud.slash")
+            Label(notice.title, systemImage: input.pending > 0 ? "exclamationmark.arrow.triangle.2.circlepath" : "icloud.slash")
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(pending ? Color.onWarning : Color.primary)
+                .foregroundStyle(warning ? Color.onWarning : Color.primary)
                 .padding(.horizontal, 12)
                 .frame(minHeight: 44)
-                .background(pending ? AnyShapeStyle(Color.warning) : AnyShapeStyle(.regularMaterial), in: Capsule())
+                .background(warning ? AnyShapeStyle(Color.warning) : AnyShapeStyle(.regularMaterial), in: Capsule())
                 .shadow(color: .black.opacity(0.2), radius: 3, y: 1)
         }
         .buttonStyle(.plain)
@@ -105,7 +106,8 @@ struct ConnectivityNoticeView: View {
                 icon(notice.tone).frame(width: 24, height: 24)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(notice.title).font(.subheadline.weight(.semibold))
-                    Text(notice.detail).font(.caption).foregroundStyle(.secondary)
+                    Text(notice.detail).font(.caption)
+                        .foregroundStyle(notice.tone == .warning ? Color.onWarning.opacity(0.9) : Color.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -132,7 +134,10 @@ struct ConnectivityNoticeView: View {
         }
         .padding(.horizontal, 14)
         .padding(.top, 10).padding(.bottom, 6)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20))
+        .foregroundStyle(notice.tone == .warning ? Color.onWarning : Color.primary)
+        .tint(notice.tone == .warning ? Color.onWarning : Color.accentColor)
+        .background(notice.tone == .warning ? AnyShapeStyle(Color.warning) : AnyShapeStyle(.regularMaterial),
+                    in: RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(border(notice.tone), lineWidth: 1))
         .shadow(color: .black.opacity(0.15), radius: 6, y: 2)
         .accessibilityElement(children: .contain)
@@ -145,7 +150,8 @@ struct ConnectivityNoticeView: View {
     @ViewBuilder private func icon(_ tone: ConnectivityNotice.Tone) -> some View {
         switch tone {
         case .neutral: Image(systemName: "icloud.slash").foregroundStyle(.secondary)
-        case .warning: Image(systemName: "exclamationmark.arrow.triangle.2.circlepath").foregroundStyle(Color.warning)
+        case .warning: Image(systemName: "exclamationmark.arrow.triangle.2.circlepath")
+                .foregroundStyle(Color.onWarning)
         case .success: Image(systemName: "checkmark.icloud").foregroundStyle(.green)
         case .progress: ProgressView()
         }
@@ -158,14 +164,14 @@ struct ConnectivityNoticeView: View {
         if input.online, input.pending > 0 {
             if input.needsAuth {
                 Button(L10n.t("nav.enter"), action: onSignIn)
-                    .buttonStyle(.borderedProminent).tint(Color.warning)
+                    .buttonStyle(.bordered)
                     .controlSize(.small)
                     .frame(minHeight: 44)
             } else if input.others < input.pending {
                 Button(L10n.t(input.sending ? "offline.sending" : "offline.sendNow")) {
                     Task { await outbox.flush() }
                 }
-                .buttonStyle(.borderedProminent).tint(Color.warning)
+                .buttonStyle(.bordered)
                 .controlSize(.small)
                 .frame(minHeight: 44)
                 .disabled(input.sending)

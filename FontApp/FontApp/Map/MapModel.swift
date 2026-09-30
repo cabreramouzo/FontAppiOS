@@ -13,6 +13,8 @@ final class MapModel {
     private(set) var rateLimitedUntil: Date?
     /// Last failure other than a 429, already translated. Cleared by the next success.
     private(set) var errorMessage: String?
+    /// A transport failure is shown by the shared connectivity notice, not this map banner.
+    private(set) var serverUnavailable = false
 
     @ObservationIgnored private let api: APIClient
     @ObservationIgnored private let zones: OfflineZones
@@ -166,6 +168,7 @@ final class MapModel {
                 if self.fonts != fonts { self.fonts = fonts }
                 if self.clusters != response.clusters { self.clusters = response.clusters }
                 self.errorMessage = nil
+                self.serverUnavailable = false
                 self.rateLimitedUntil = nil
                 self.isLoading = false
             } catch is CancellationError {
@@ -175,11 +178,13 @@ final class MapModel {
                 self.isLoading = false
                 // Keep the pins already on screen: an empty map reads as "no fountains".
                 if let e = error as? APIError, e.status == 429 {
+                    self.serverUnavailable = false
                     let until = Date.now.addingTimeInterval(e.retryAfter ?? 60)
                     self.rateLimitedUntil = until
                     self.schedule(at: until) { $0.load(box: box, width: width, height: height) }
                 } else {
-                    self.errorMessage = ErrorText.describe(error)
+                    self.serverUnavailable = (error as? APIError)?.status == 0
+                    self.errorMessage = self.serverUnavailable ? nil : ErrorText.describe(error)
                     // Without signal, a saved zone that covers this view shows its
                     // fountains; without one, what was on screen stays (an emptied map
                     // reads as "no fountains here").
