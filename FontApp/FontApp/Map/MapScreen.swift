@@ -347,10 +347,9 @@ struct MapScreen: View {
         }
     }
 
-    /// Opening the app centres on the user once, as the web does. A refusal leaves the
-    /// time-zone view in place.
+    /// Centre once when location is already allowed. The location button asks for
+    /// permission when tapped, so a fresh launch never interrupts the welcome.
     private func locateOnce() {
-        location.requestIfNeeded()
         guard location.isAuthorized, !didAutoLocate else { return }
         didAutoLocate = true
         followRequest += 1

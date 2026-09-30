@@ -29,6 +29,7 @@ struct MeScreen: View {
                         PendingSection()
                         Section {
                             NavigationLink(L10n.t("nav.guide")) { GuideScreen() }
+                            NavigationLink(L10n.t("support.title")) { SupportScreen() }
                             LegalLink()
                         }
                     }
@@ -43,6 +44,7 @@ struct MeScreen: View {
                             .controlSize(.large)
                         // Before an account: what it is for, and the rules of the game.
                         NavigationLink(L10n.t("nav.guide")) { GuideScreen() }
+                        NavigationLink(L10n.t("support.title")) { SupportScreen() }
                         LegalLink()
                     }
                 }
@@ -123,6 +125,9 @@ struct MeScreen: View {
                 }
                 NavigationLink { GamificationGuideScreen() } label: {
                     Label(L10n.t("gamePage.title"), systemImage: "drop").frame(minHeight: 44)
+                }
+                NavigationLink { SupportScreen() } label: {
+                    Label(L10n.t("support.title"), systemImage: "heart").frame(minHeight: 44)
                 }
                 LegalLink()
             }

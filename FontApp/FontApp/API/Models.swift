@@ -588,3 +588,53 @@ nonisolated struct PulseSnapshot: Codable, Hashable, Sendable {
 
     var isEmpty: Bool { promotions.isEmpty && climbers.isEmpty }
 }
+nonisolated struct PlaceSummary: Decodable, Identifiable, Sendable {
+    var id: String { slug }
+    let slug: String
+    let name: String
+    let latitude: Double
+    let longitude: Double
+    let country: String?
+    let region: String?
+    let fontCount: Int
+}
+
+nonisolated struct PlacePage: Decodable, Sendable {
+    let place: PlaceSummary
+    let fonts: [FontSummary]
+    let nearby: [PlaceSummary]
+}
+
+nonisolated struct MunicipalityCandidate: Decodable, Identifiable, Sendable {
+    var id: String { ine }
+    let municipality: String
+    let ine: String
+    let fonts: Int
+}
+
+nonisolated struct MunicipalReport: Decodable, Sendable {
+    let municipality: String
+    let ine: String
+    let fonts: Int
+    let withPhoto: Int
+    let checkedEver: Int
+    let neverChecked: Int
+    let staleOverYear: Int
+    let openReports: Int
+    let bySource: [String: Int]
+    let items: [MunicipalFont]
+}
+
+nonisolated struct MunicipalFont: Decodable, Identifiable, Sendable {
+    let id: UUID
+    let name: String?
+    let latitude: Double
+    let longitude: Double
+    let source: String?
+    let drinkable: String?
+    let hasPhoto: Bool
+    let reviews: Int
+    let lastStatus: String?
+    let days: Int?
+    let openReports: Int
+}

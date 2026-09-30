@@ -11,8 +11,11 @@ struct FontAppApp: App {
     @State private var bell = Bell()
     @State private var favorites = Favorites()
     @State private var celebrations = BadgeCelebrations()
+    @State private var showsWelcome: Bool
 
     init() {
+        // Decide before the stores below create files on a genuinely fresh install.
+        _showsWelcome = State(initialValue: WelcomeGate.shouldPresent())
         // Before the first map: how much of the map seen is kept for not downloading it again.
         MapTileCache.configure()
         let session = SessionStore()
@@ -26,7 +29,7 @@ struct FontAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(showsWelcome: $showsWelcome)
                 .environment(location)
                 .environment(session)
                 .environment(outbox)

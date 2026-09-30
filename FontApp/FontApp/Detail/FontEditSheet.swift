@@ -1,5 +1,4 @@
 import CoreLocation
-import PhotosUI
 import SwiftUI
 
 struct FontEditSheet: View {
@@ -8,16 +7,15 @@ struct FontEditSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(SessionStore.self) private var session
     @Environment(LocationService.self) private var location
-    @State private var pickerItem: PhotosPickerItem?
     @State private var showsCamera = false
     @State private var confirmsDiscard = false
-    @State private var preparingPhoto = false
     @State private var usedAccuracy: Double?
     @State private var locating = false
     @State private var locationError: String?
     @AppStorage("map.layer") private var layerID = MapLayer.world.rawValue
 
-    private var busy: Bool { model.saving || preparingPhoto }
+    @State private var readingPhoto = false
+    private var busy: Bool { model.saving || readingPhoto }
     private var layer: MapLayer { MapLayer(rawValue: layerID) ?? .world }
 
     var body: some View {
@@ -121,7 +119,7 @@ struct FontEditSheet: View {
                         meta.latitude = fix.coordinate.latitude
                         meta.longitude = fix.coordinate.longitude
                     }
-                    Task { preparingPhoto = true; await model.usePhoto(data, cameraMeta: meta); preparingPhoto = false }
+                    Task { await model.usePhoto(data, cameraMeta: meta) }
                 }.ignoresSafeArea()
             }
         }
@@ -183,28 +181,15 @@ struct FontEditSheet: View {
 
     @ViewBuilder private var photoControls: some View {
         if model.needsPhotoAgain { Text(L10n.t("draft.photoAgain")).font(.footnote) }
-        if let photo = model.photo, let image = UIImage(data: photo.jpeg) {
-            Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 180)
-            Button(L10n.t("form.discard")) { model.photo = nil }.frame(minHeight: 44)
-        }
-        if preparingPhoto { ProgressView() }
-        if UIImagePickerController.isSourceTypeAvailable(.camera) {
-            Button { showsCamera = true } label: {
-                Label(L10n.t("ios.takePhoto"), systemImage: "camera").frame(minHeight: 44)
-            }
-        }
-        PhotosPicker(selection: $pickerItem, matching: .images) {
-            Label(L10n.t("ios.choosePhoto"), systemImage: "photo.on.rectangle").frame(minHeight: 44)
-        }
-        .onChange(of: pickerItem) { _, item in
-            guard let item else { return }
-            pickerItem = nil
-            Task {
-                preparingPhoto = true
-                defer { preparingPhoto = false }
-                if let data = try? await item.loadTransferable(type: Data.self) { await model.usePhoto(data) }
-            }
-        }
+        PhotoSlot(jpeg: model.photo?.jpeg,
+                  canTakePhoto: UIImagePickerController.isSourceTypeAvailable(.camera),
+                  onTakePhoto: { showsCamera = true },
+                  onChosen: { data in
+                      await model.usePhoto(data)
+                      return model.photo != nil
+                  },
+                  onRemove: { model.photo = nil },
+                  onReadingChanged: { readingPhoto = $0 })
     }
 
     private func useCurrentLocation() {

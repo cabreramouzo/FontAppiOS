@@ -1,4 +1,3 @@
-import PhotosUI
 import SwiftUI
 
 /// Other photos and documents of a fountain, as the web's gallery: another view, the
@@ -137,11 +136,10 @@ private struct AddGalleryPhotoSheet: View {
     let onAdded: () async -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @State private var pickerItem: PhotosPickerItem?
-    @State private var photo: Data?
+    @State private var photo: PhotoPreparer.Prepared?
     /// The camera hands over pixels without EXIF: the date and position are the facts.
-    @State private var fromCamera = false
     @State private var showsCamera = false
+    @State private var readingPhoto = false
     @Environment(LocationService.self) private var location
     @State private var kind: FontPhoto.Kind = .fountain
     @State private var caption = ""
@@ -155,20 +153,16 @@ private struct AddGalleryPhotoSheet: View {
                     Section { Text(error).foregroundStyle(.red) }
                 }
                 Section {
-                    // Standing in front of it is when there is something to photograph.
-                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                        Button { showsCamera = true } label: {
-                            Label(L10n.t("ios.takePhoto"), systemImage: "camera")
-                                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                        }
-                    }
-                    PhotosPicker(selection: $pickerItem, matching: .images) {
-                        Label(L10n.t("gallery.choose"), systemImage: "photo.on.rectangle")
-                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                    }
-                    if let photo, let image = UIImage(data: photo) {
-                        Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 200)
-                    }
+                    PhotoSlot(jpeg: photo?.jpeg,
+                              canTakePhoto: UIImagePickerController.isSourceTypeAvailable(.camera),
+                              onTakePhoto: { showsCamera = true },
+                              onChosen: { data in
+                                  guard let prepared = try? PhotoPreparer.prepare(data) else { return false }
+                                  photo = prepared
+                                  return true
+                              },
+                              onRemove: { photo = nil },
+                              onReadingChanged: { readingPhoto = $0 })
                 } footer: {
                     Text(L10n.t("gallery.addHelp"))
                 }
@@ -193,23 +187,26 @@ private struct AddGalleryPhotoSheet: View {
                     if isSending {
                         ProgressView()
                     } else {
-                        Button(L10n.t("form.save"), action: send).disabled(photo == nil)
+                        Button(L10n.t("form.save"), action: send).disabled(photo == nil || readingPhoto)
                     }
-                }
-            }
-            .onChange(of: pickerItem) { _, item in
-                guard let item else { return }
-                Task {
-                    photo = try? await item.loadTransferable(type: Data.self)
-                    fromCamera = false
                 }
             }
             .fullScreenCover(isPresented: $showsCamera) {
                 CameraPicker { jpeg in
                     showsCamera = false
                     guard let jpeg else { return }
-                    photo = jpeg
-                    fromCamera = true
+                    guard let prepared = try? PhotoPreparer.prepare(jpeg) else {
+                        error = L10n.t("ios.photo.unreadable")
+                        return
+                    }
+                    var meta = PhotoMeta(takenAt: .now)
+                    if location.isAuthorized, let fix = location.location,
+                       fix.horizontalAccuracy >= 0, fix.horizontalAccuracy <= RemoteReview.maxAccuracy,
+                       abs(fix.timestamp.timeIntervalSinceNow) < 180 {
+                        meta.latitude = fix.coordinate.latitude
+                        meta.longitude = fix.coordinate.longitude
+                    }
+                    photo = PhotoPreparer.Prepared(jpeg: prepared.jpeg, meta: meta)
                 }
                 .ignoresSafeArea()
             }
@@ -223,18 +220,7 @@ private struct AddGalleryPhotoSheet: View {
         Task {
             defer { isSending = false }
             do {
-                var prepared = try await Task.detached(priority: .userInitiated) {
-                    try PhotoPreparer.prepare(photo)
-                }.value
-                if fromCamera {
-                    var meta = PhotoMeta(takenAt: .now)
-                    if location.isAuthorized, let fix = location.location, fix.horizontalAccuracy <= RemoteReview.maxAccuracy {
-                        meta.latitude = fix.coordinate.latitude
-                        meta.longitude = fix.coordinate.longitude
-                    }
-                    prepared = PhotoPreparer.Prepared(jpeg: prepared.jpeg, meta: meta)
-                }
-                let url = try await APIClient.shared.uploadImage(prepared.jpeg, meta: prepared.meta)
+                let url = try await APIClient.shared.uploadImage(photo.jpeg, meta: photo.meta)
                 let text = caption.trimmingCharacters(in: .whitespacesAndNewlines)
                 _ = try await APIClient.shared.addFontPhoto(fontID, url: url, kind: kind, caption: text.isEmpty ? nil : text)
                 await onAdded()

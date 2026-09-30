@@ -18,7 +18,7 @@ const { dictionaries } = await import(join(backend, 'web/src/i18n/dictionaries.t
 // Web language code → Apple localization. The web's Portuguese is European.
 const LANGS = { ca: 'ca', es: 'es', gl: 'gl', eu: 'eu', en: 'en', fr: 'fr', pt: 'pt-PT', it: 'it' }
 
-const PREFIXES = ['country.', 'layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.',
+const PREFIXES = ['country.', 'layer.', 'legend.', 'status.', 'confidence.', 'drink.', 'time.', 'error.', 'err.', 'incident.', 'activity.', 'news.', 'places.', 'place.', 'muni.', 'support.', 'donate.', 'feedback.', 'welcome.',
   'login.', 'notif.', 'popup.', 'profile.', 'guard.', 'game.', 'privacy.', 'settings.', 'remote.', 'confirm.', 'toast.', 'offline.', 'zonaOff.', 'gpx.', 'gpxIn.', 'newFont.', 'draft.', 'mission.', 'flag.', 'update.', 'comment.', 'report.', 'gallery.', 'dup.', 'image.', 'maint.', 'hidden.', 'badges.', 'celebrate.', 'waterHelp.', 'drinkHelp.', 'sourceLimit.', 'carousel.', 'approach.', 'detail.badges.', 'exif.', 'user.', 'gamePage.', 'gameHelp.', 'passkey.', 'pulse.']
 const KEYS = [
   'map.geoDenied', 'map.geoUnavailable',
@@ -49,6 +49,117 @@ const KEYS = [
 ]
 
 const IOS_ONLY = {
+  'ios.permission.continue': {
+    ca: 'Continua', es: 'Continuar', gl: 'Continuar', eu: 'Jarraitu',
+    en: 'Continue', fr: 'Continuer', pt: 'Continuar', it: 'Continua',
+  },
+  'ios.permission.notNow': {
+    ca: 'Ara no', es: 'Ahora no', gl: 'Agora non', eu: 'Orain ez',
+    en: 'Not now', fr: 'Pas maintenant', pt: 'Agora não', it: 'Non ora',
+  },
+  'ios.permission.locationTitle': {
+    ca: 'Troba fonts a prop teu', es: 'Encuentra fuentes cerca de ti', gl: 'Atopa fontes preto de ti',
+    eu: 'Aurkitu inguruko iturriak', en: 'Find fountains near you',
+    fr: 'Trouvez des fontaines près de vous', pt: 'Encontra fontes perto de ti', it: 'Trova fontane vicino a te',
+  },
+  'ios.permission.locationBody': {
+    ca: 'Amb la ubicació mentre fas servir l’app, el mapa et pot centrar i mostrar distàncies i fonts properes. Pots continuar sense donar-hi accés.',
+    es: 'Con la ubicación mientras usas la app, el mapa puede centrarte y mostrar distancias y fuentes cercanas. Puedes continuar sin dar acceso.',
+    gl: 'Coa localización mentres usas a app, o mapa pode centrarte e mostrar distancias e fontes próximas. Podes continuar sen dar acceso.',
+    eu: 'Aplikazioa erabiltzean kokapena emanez gero, mapak inguruko iturriak eta distantziak erakutsiko dizkizu. Baimenik gabe ere jarrai dezakezu.',
+    en: 'While you use the app, location can centre the map and show distances and nearby fountains. You can continue without it.',
+    fr: 'Pendant l’utilisation, la position permet de centrer la carte et d’afficher les distances et les fontaines proches. Vous pouvez continuer sans elle.',
+    pt: 'Ao usar a app, a localização permite centrar o mapa e mostrar distâncias e fontes próximas. Podes continuar sem ela.',
+    it: 'Mentre usi l’app, la posizione centra la mappa e mostra distanze e fontane vicine. Puoi continuare senza concederla.',
+  },
+  'ios.permission.notificationsTitle': {
+    ca: 'Avisos que importen', es: 'Avisos que importan', gl: 'Avisos que importan',
+    eu: 'Garrantzitsuak diren abisuak', en: 'Notices that matter', fr: 'Des alertes utiles',
+    pt: 'Avisos importantes', it: 'Avvisi importanti',
+  },
+  'ios.permission.notificationsBody': {
+    ca: 'T’avisarem si una font que segueixes es queda seca, té una incidència o algú et respon. La resta queda a la campana de l’app.',
+    es: 'Te avisaremos si una fuente que sigues se queda seca, tiene una incidencia o alguien te responde. El resto queda en la campana de la app.',
+    gl: 'Avisarémoste se unha fonte que segues queda seca, ten unha incidencia ou alguén che responde. O resto queda na campá da app.',
+    eu: 'Jarraitzen duzun iturri bat lehortzen bada, arazo bat badu edo norbaitek erantzuten badizu, abisatuko dizugu. Besteak aplikazioko kanpaian geratzen dira.',
+    en: 'Get an alert if a fountain you follow runs dry, has a problem, or someone replies to you. Other updates stay in the in-app bell.',
+    fr: 'Recevez une alerte si une fontaine suivie est à sec, a un problème ou si quelqu’un vous répond. Le reste reste dans la cloche de l’app.',
+    pt: 'Recebe um aviso se uma fonte que segues ficar seca, tiver um problema ou alguém te responder. O resto fica na campainha da app.',
+    it: 'Ricevi un avviso se una fontana che segui si prosciuga, ha un problema o qualcuno ti risponde. Il resto rimane nella campanella dell’app.',
+  },
+  'ios.permission.passingTitle': {
+    ca: 'Quan passis per una font', es: 'Cuando pases por una fuente', gl: 'Cando pases por unha fonte',
+    eu: 'Iturri baten ondotik pasatzean', en: 'When you pass a fountain', fr: 'Quand vous passez près d’une fontaine',
+    pt: 'Quando passares por uma fonte', it: 'Quando passi vicino a una fontana',
+  },
+  'ios.permission.passingBody': {
+    ca: 'Si actives aquesta funció, l’iPhone pot detectar fonts properes amb la ubicació «Sempre» i enviar-te un avís local per confirmar si ragen. Pots deixar-la desactivada.',
+    es: 'Si activas esta función, el iPhone puede detectar fuentes cercanas con la ubicación «Siempre» y enviarte un aviso local para confirmar si manan. Puedes dejarla desactivada.',
+    gl: 'Se activas esta función, o iPhone pode detectar fontes próximas coa localización «Sempre» e enviarche un aviso local para confirmar se botan auga. Podes deixala desactivada.',
+    eu: 'Funtzio hau aktibatuz gero, iPhoneak inguruko iturriak antzeman ditzake «Beti» kokapenarekin, eta tokiko abisu bat bidali ura darien galdetzeko. Desaktibatuta utz dezakezu.',
+    en: 'If you turn this on, your iPhone can detect nearby fountains using Always location and send a local notice to ask if water is flowing. You can leave it off.',
+    fr: 'Si vous activez cette fonction, l’iPhone peut détecter les fontaines proches avec la position « Toujours » et demander par alerte locale si l’eau coule. Vous pouvez la laisser désactivée.',
+    pt: 'Se ativares esta função, o iPhone pode detetar fontes próximas com localização «Sempre» e enviar um aviso local para confirmar se corre água. Podes deixá-la desligada.',
+    it: 'Se attivi questa funzione, l’iPhone può rilevare le fontane vicine con la posizione «Sempre» e chiederti con un avviso locale se scorre acqua. Puoi lasciarla disattivata.',
+  },
+  'ios.permission.cameraTitle': {
+    ca: 'Fotografia una font', es: 'Fotografía una fuente', gl: 'Fotografía unha fonte',
+    eu: 'Atera argazkia iturriari', en: 'Photograph a fountain', fr: 'Photographiez une fontaine',
+    pt: 'Fotografa uma fonte', it: 'Fotografa una fontana',
+  },
+  'ios.permission.cameraBody': {
+    ca: 'La càmera et permet afegir una foto nova a una font o a un avís. També pots triar una foto existent sense donar accés a tota la fototeca.',
+    es: 'La cámara te permite añadir una foto nueva a una fuente o un aviso. También puedes elegir una foto existente sin dar acceso a toda la fototeca.',
+    gl: 'A cámara permíteche engadir unha foto nova a unha fonte ou aviso. Tamén podes escoller unha foto existente sen dar acceso a toda a fototeca.',
+    eu: 'Kamerarekin argazki berria gehi diezaiokezu iturri edo abisu bati. Lehendik dagoen argazki bat ere aukera dezakezu fototeka osoaren baimenik gabe.',
+    en: 'Use the camera to add a new photo to a fountain or report. You can also choose an existing photo without giving access to your whole library.',
+    fr: 'L’appareil photo permet d’ajouter une nouvelle image à une fontaine ou un signalement. Vous pouvez aussi choisir une photo existante sans ouvrir toute la photothèque.',
+    pt: 'A câmara permite juntar uma foto nova a uma fonte ou aviso. Também podes escolher uma foto existente sem dar acesso à biblioteca toda.',
+    it: 'La fotocamera permette di aggiungere una nuova foto a una fontana o segnalazione. Puoi anche scegliere una foto esistente senza aprire tutta la libreria.',
+  },
+  'ios.permission.photosTitle': {
+    ca: 'Desa una foto teva', es: 'Guarda una foto tuya', gl: 'Garda unha foto túa',
+    eu: 'Gorde zure argazkia', en: 'Save your photo', fr: 'Enregistrez votre photo',
+    pt: 'Guarda uma foto tua', it: 'Salva una tua foto',
+  },
+  'ios.permission.photosBody': {
+    ca: 'Si tens una aportació pendent, pots desar-ne la foto a Fotos. Només demanem permís per afegir-la; no llegim la teva fototeca.',
+    es: 'Si tienes una aportación pendiente, puedes guardar su foto en Fotos. Solo pedimos permiso para añadirla; no leemos tu fototeca.',
+    gl: 'Se tes unha achega pendente, podes gardar a súa foto en Fotos. Só pedimos permiso para engadila; non lemos a túa fototeca.',
+    eu: 'Bidaltzeko ekarpen bat baduzu, haren argazkia Argazkiak aplikazioan gorde dezakezu. Gehitzeko baimena baino ez dugu eskatzen; ez dugu zure fototeka irakurtzen.',
+    en: 'If you have a contribution waiting to send, you can save its photo to Photos. We only ask to add it; we cannot read your library.',
+    fr: 'Si une contribution attend l’envoi, vous pouvez enregistrer sa photo dans Photos. Nous demandons seulement l’ajout ; nous ne lisons pas votre photothèque.',
+    pt: 'Se tiveres uma contribuição por enviar, podes guardar a foto em Fotografias. Só pedimos permissão para a adicionar; não lemos a tua biblioteca.',
+    it: 'Se hai un contributo in attesa di invio, puoi salvare la foto in Foto. Chiediamo solo di aggiungerla; non leggiamo la tua libreria.',
+  },
+  'ios.welcome.waterTitle': {
+    ca: 'Sàpigues si raja abans d’anar-hi', es: 'Sabe si mana antes de ir',
+    gl: 'Sabe se bota auga antes de ir', eu: 'Jakin ura darion joan aurretik',
+    en: 'Know before you go', fr: 'Sachez si l’eau coule avant de partir',
+    pt: 'Sabe se corre água antes de ir', it: 'Sai se c’è acqua prima di andare',
+  },
+  'ios.welcome.reportTitle': {
+    ca: 'Actualitza l’estat en un toc', es: 'Actualiza el estado en un toque',
+    gl: 'Actualiza o estado cun toque', eu: 'Eguneratu egoera ukitu batekin',
+    en: 'Update the status in one tap', fr: 'Actualisez l’état en un geste',
+    pt: 'Atualiza o estado com um toque', it: 'Aggiorna lo stato con un tocco',
+  },
+  'ios.welcome.routeTitle': {
+    ca: 'Troba aigua a la teva ruta', es: 'Encuentra agua en tu ruta',
+    gl: 'Atopa auga na túa ruta', eu: 'Aurkitu ura zure ibilbidean',
+    en: 'Find water along your route', fr: 'Trouvez de l’eau sur votre itinéraire',
+    pt: 'Encontra água no teu percurso', it: 'Trova acqua lungo il percorso',
+  },
+  'ios.welcome.routeBody': {
+    ca: 'Importa una ruta GPX i mira les fonts del camí i els darrers avisos abans de sortir.',
+    es: 'Importa una ruta GPX y mira las fuentes del camino y los últimos avisos antes de salir.',
+    gl: 'Importa unha ruta GPX e mira as fontes do camiño e os últimos avisos antes de saír.',
+    eu: 'Inportatu GPX ibilbide bat eta ikusi bideko iturriak eta azken oharrak abiatu aurretik.',
+    en: 'Import a GPX route to see fountains along the way and recent reports before you leave.',
+    fr: 'Importez un itinéraire GPX pour voir les fontaines du trajet et les derniers signalements avant de partir.',
+    pt: 'Importa um percurso GPX para veres as fontes pelo caminho e os avisos recentes antes de saíres.',
+    it: 'Importa un percorso GPX per vedere le fontane lungo la strada e le ultime segnalazioni prima di partire.',
+  },
   // Under the chips when the latest report is yours and fresh: that chip is already
   // said; the others (it changed) are still there.
   'ios.quick.youSaid': {

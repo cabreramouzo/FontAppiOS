@@ -1,4 +1,3 @@
-import PhotosUI
 import SwiftUI
 
 /// The full review, as the web's "new update": status, stars, what you saw and a photo,
@@ -15,12 +14,11 @@ struct ReviewSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(LocationService.self) private var location
     @State private var draft = Draft()
-    @State private var pickerItem: PhotosPickerItem?
-    @State private var photo: Data?
+    @State private var photo: PhotoPreparer.Prepared?
     /// A photo just taken: the camera's JPEG carries no EXIF, so when and where come from
     /// the moment and the position (as the new-fountain form does).
-    @State private var cameraMeta: PhotoMeta?
     @State private var showsCamera = false
+    @State private var readingPhoto = false
     @State private var isSending = false
     @State private var error: String?
 
@@ -56,25 +54,16 @@ struct ReviewSheet: View {
                     MentionField(placeholder: L10n.t("update.howNowOpt"), text: $draft.body)
                 }
                 Section {
-                    if let photo, let image = UIImage(data: photo) {
-                        Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 180)
-                        Button(L10n.t("form.discard"), role: .destructive) {
-                            self.photo = nil; cameraMeta = nil
-                        }
-                        .frame(minHeight: 44)
-                    }
-                    // Taken on the spot or chosen from the library; Files is left out, a
-                    // fountain's photo is almost never there.
-                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                        Button { showsCamera = true } label: {
-                            Label(L10n.t("ios.takePhoto"), systemImage: "camera").frame(minHeight: 44)
-                        }
-                    }
-                    PhotosPicker(selection: $pickerItem, matching: .images) {
-                        Label(photo == nil ? L10n.t("ios.choosePhoto") : L10n.t("detail.replacePhoto"),
-                              systemImage: "photo.on.rectangle")
-                            .frame(minHeight: 44)
-                    }
+                    PhotoSlot(jpeg: photo?.jpeg,
+                              canTakePhoto: UIImagePickerController.isSourceTypeAvailable(.camera),
+                              onTakePhoto: { showsCamera = true },
+                              onChosen: { data in
+                                  guard let prepared = try? PhotoPreparer.prepare(data) else { return false }
+                                  photo = prepared
+                                  return true
+                              },
+                              onRemove: { photo = nil },
+                              onReadingChanged: { readingPhoto = $0 })
                 }
             }
             .navigationTitle(L10n.t(editing == nil ? "detail.newUpdate" : "detail.edit"))
@@ -93,7 +82,7 @@ struct ReviewSheet: View {
                                systemImage: editing == nil ? "arrow.up" : "checkmark", action: send)
                             .buttonStyle(.glassProminent)
                             .tint(session.isStaff ? Color.staff : .accentColor)
-                            .disabled(draft.isEmpty && photo == nil)
+                            .disabled((draft.isEmpty && photo == nil) || readingPhoto)
                     }
                 }
             }
@@ -108,13 +97,6 @@ struct ReviewSheet: View {
             .onChange(of: draft) {
                 if editing == nil { FormDraft.save(draft.isEmpty ? nil : draft, key: draftKey) }
             }
-            .onChange(of: pickerItem) { _, item in
-                guard let item else { return }
-                pickerItem = nil
-                Task {
-                    if let data = try? await item.loadTransferable(type: Data.self) { photo = data; cameraMeta = nil }
-                }
-            }
             .fullScreenCover(isPresented: $showsCamera) {
                 CameraPicker { data in
                     showsCamera = false
@@ -126,8 +108,11 @@ struct ReviewSheet: View {
                         meta.latitude = fix.coordinate.latitude
                         meta.longitude = fix.coordinate.longitude
                     }
-                    photo = data
-                    cameraMeta = meta
+                    if let prepared = try? PhotoPreparer.prepare(data) {
+                        photo = PhotoPreparer.Prepared(jpeg: prepared.jpeg, meta: meta)
+                    } else {
+                        error = L10n.t("ios.photo.unreadable")
+                    }
                 }
                 .ignoresSafeArea()
             }
@@ -143,15 +128,10 @@ struct ReviewSheet: View {
                                         rating: draft.rating > 0 ? draft.rating : nil,
                                         body: draft.body.trimmingCharacters(in: .whitespacesAndNewlines),
                                         image: editing?.image)
-            var prepared: PhotoPreparer.Prepared?
+            let prepared = photo
             do {
-                if let photo {
-                    // The original file, so its EXIF date and place travel as separate fields.
-                    prepared = try await Task.detached(priority: .userInitiated) {
-                        try PhotoPreparer.prepare(photo)
-                    }.value
-                    if let cameraMeta { prepared = PhotoPreparer.Prepared(jpeg: prepared!.jpeg, meta: cameraMeta) }
-                    review.image = try await APIClient.shared.uploadImage(prepared!.jpeg, meta: prepared!.meta)
+                if let prepared {
+                    review.image = try await APIClient.shared.uploadImage(prepared.jpeg, meta: prepared.meta)
                 }
                 if let editing {
                     _ = try await APIClient.shared.updateComment(editing.id, on: fontID, review)

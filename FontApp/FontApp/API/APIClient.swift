@@ -96,6 +96,36 @@ nonisolated struct APIClient: Sendable {
 
     // MARK: Reading
 
+    func places(region: String? = nil, query: String? = nil, limit: Int = 600) async throws -> [PlaceSummary] {
+        var items = [URLQueryItem(name: "limit", value: String(limit))]
+        if let region { items.append(URLQueryItem(name: "region", value: region)) }
+        if let query { items.append(URLQueryItem(name: "q", value: query)) }
+        return try await get("/places", query: items)
+    }
+
+    func place(_ slug: String) async throws -> PlacePage {
+        try await get("/places/\(slug.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? slug)")
+    }
+
+    func sendFeedback(message: String, country: String?, email: String?) async throws {
+        struct FeedbackBody: Encodable {
+            let message: String
+            let country: String?
+            let email: String?
+        }
+        let body = FeedbackBody(message: message, country: country, email: email)
+        let _: Ignored = try await send("POST", "/feedback", body: .json(try JSONEncoder().encode(body)),
+                                        timeout: writeTimeout)
+    }
+
+    func municipalities(named name: String) async throws -> [MunicipalityCandidate] {
+        try await get("/municipalities", query: [URLQueryItem(name: "name", value: name)])
+    }
+
+    func municipality(_ ine: String) async throws -> MunicipalReport {
+        try await get("/municipalities/\(ine)")
+    }
+
     func map(box: MapBox, width: Int, height: Int) async throws -> MapResponse {
         try await get("/fonts/map", query: box.queryItems + [
             URLQueryItem(name: "width", value: String(width)),

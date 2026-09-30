@@ -15,6 +15,7 @@ struct NewFontSheet: View {
     @Environment(LocationService.self) private var location
     @Environment(SessionStore.self) private var session
     @State private var showsCamera = false
+    @State private var readingPhoto = false
     @State private var confirmsDiscard = false
     @State private var placesFullScreen = false
     @State private var help: LegendHelp.Kind?
@@ -190,7 +191,8 @@ struct NewFontSheet: View {
                   canTakePhoto: UIImagePickerController.isSourceTypeAvailable(.camera),
                   onTakePhoto: { showsCamera = true },
                   onChosen: { await usePhoto($0, fromCamera: false) },
-                  onRemove: { model.photo = nil })
+                  onRemove: { model.photo = nil },
+                  onReadingChanged: { readingPhoto = $0 })
             .listRowInsets(EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12))
     }
 
@@ -235,7 +237,7 @@ struct NewFontSheet: View {
     }
 
     private var isBusy: Bool {
-        model.state == .checking || model.state == .sending
+        readingPhoto || model.state == .checking || model.state == .sending
     }
 
     private var duplicateTitle: String {

@@ -11,12 +11,12 @@ project's build settings), translated in `FontApp/InfoPlist.xcstrings`.
 
 | Permission | iOS key / API | Needed for | Asked today | Without it |
 |---|---|---|---|---|
-| Location, while using | `NSLocationWhenInUseUsageDescription` · `CLLocationManager.requestWhenInUseAuthorization` | Map centred on you, "near me", distance and arrow to a fountain, remote-review check, new fountain pin | Opening the map (`MapScreen.locateOnce`), the locate button, missions, placing a fountain | App works; map opens on the time-zone view, no distances, no "near me" |
-| Location, always | `NSLocationAlwaysAndWhenInUseUsageDescription` · `requestAlwaysAuthorization` | "Tell me when I pass a fountain" (region monitoring, `PassingBy`) | Only when that switch is turned on in Settings → Notifications | That feature does not work; the switch shows how to fix it |
-| Notifications | `UNUserNotificationCenter.requestAuthorization` (alert, sound, badge) + APNs | Push (a followed fountain went dry, incidents, someone writing to you) and the local "passing by" notice | After following a fountain or posting an incident (`askIfUseful`), from Settings, and when "passing by" is turned on | Only the in-app bell |
-| Motion & Fitness | `NSMotionUsageDescription` · `CMMotionActivityManager` | Not asking about a fountain when driving past it | Explainer sheet (`MotionExplainer`) when "passing by" is turned on, or its button in Settings for those who had it on before | Speed of the last fix is used instead; the odd notice while driving |
-| Camera | `NSCameraUsageDescription` · `UIImagePickerController` | Taking a fountain's photo | First time "take photo" is used (new fountain, review, gallery, edit) | Choosing from the library still works |
-| Photos, add only | `NSPhotoLibraryAddUsageDescription` · `PHPhotoLibrary.requestAuthorization(for: .addOnly)` | Saving the photo of a queued contribution ("See my data" → Save photo) | First time "Save photo" is tapped; the app cannot read the library | The photo stays in the queue and is still sent; the sheet says how to allow it |
+| Location, while using | `NSLocationWhenInUseUsageDescription` · `CLLocationManager.requestWhenInUseAuthorization` | Map centred on you, "near me", distance and arrow to a fountain, remote-review check, new fountain pin | Optional first-install tutorial; later the locate button, missions, placing a fountain | App works; map opens on the time-zone view, no distances, no "near me" |
+| Location, always | `NSLocationAlwaysAndWhenInUseUsageDescription` · `requestAlwaysAuthorization` | "Tell me when I pass a fountain" (region monitoring, `PassingBy`) | Optional first-install tutorial only after location and notifications are granted; or the switch in Settings → Notifications | That feature does not work; the switch shows how to fix it |
+| Notifications | `UNUserNotificationCenter.requestAuthorization` (alert, sound, badge) + APNs | Push (a followed fountain went dry, incidents, someone writing to you) and the local "passing by" notice | Optional first-install tutorial; later after following a fountain or posting an incident (`askIfUseful`) and from Settings | Only the in-app bell |
+| Motion & Fitness | `NSMotionUsageDescription` · `CMMotionActivityManager` | Not asking about a fountain when driving past it | Optional tutorial after opting into "passing by"; or `MotionExplainer` in Settings | Speed of the last fix is used instead; the odd notice while driving |
+| Camera | `NSCameraUsageDescription` · `UIImagePickerController` | Taking a fountain's photo | Optional first-install tutorial; otherwise first time "take photo" is used | Choosing from the library still works |
+| Photos, add only | `NSPhotoLibraryAddUsageDescription` · `PHPhotoLibrary.requestAuthorization(for: .addOnly)` | Saving the photo of a queued contribution ("See my data" → Save photo) | Optional first-install tutorial; otherwise first time "Save photo" is tapped. The app cannot read the library | The photo stays in the queue and is still sent; the sheet says how to allow it |
 
 ## Not permissions (no prompt)
 
@@ -28,7 +28,14 @@ project's build settings), translated in `FontApp/InfoPlist.xcstrings`.
 - **Background fetch** (`UIBackgroundModes: fetch`) for the outbox: no prompt; the person
   can turn off Background App Refresh in iOS Settings.
 
-## Rules for the onboarding tutorial
+## First-install tutorial
+
+After the six feature pages, a separate optional tutorial explains each permission before
+its native request. Each step has Continue and Not now. Location and notifications are
+first. The "passing by" step (Always location) appears only when both were granted; its
+Motion step appears only after opting in. Camera and add-only Photos follow. An unfinished
+tour remains eligible on the next ordinary launch, while a completed one is shown only
+once. The controls in Settings and each feature still allow later opt-in.
 
 - **Order.** Location "while using" must come before "always": iOS only offers
   "Always" after "While using" has been granted.
@@ -38,14 +45,11 @@ project's build settings), translated in `FontApp/InfoPlist.xcstrings`.
 - **App Review (guideline 5.1.1).** The screen before a prompt may explain, but its button
   must say "Continue" / "Next", never "Allow", and it cannot be skipped by forcing
   a yes. Every permission is optional: "Not now" always lets the person carry on.
-- **Push vs bell** (`FontAppBE/CLAUDE.md`): today notifications are never asked at launch,
-  only after something that makes a notice worth having. Asking them in the tutorial
-  is a product change: decide it there first, and say in the tutorial what will
-  and will not arrive (only what changes what you are about to do).
+- **Push vs bell** (`FontAppBE/CLAUDE.md`): the tutorial describes the narrow set of
+  system notices and the in-app bell. Permission follows only the Continue tap.
 - **"Always" and Motion only matter with "passing by".** Asking them to someone who does
   not want that feature costs trust for nothing. The tutorial should offer the feature
   (one step: "tell me when I pass a fountain?") and ask both only on a yes, reusing
   `PassingBy.setEnabled` and `MotionExplainer`.
-- **Camera** is best left to the first photo: the context explains it by itself.
-- Anyone who skips the tutorial still gets each prompt where it is asked today, so the
-  existing call sites stay.
+- Anyone who skips a step can still opt in from its feature or Settings. Existing call
+  sites stay.

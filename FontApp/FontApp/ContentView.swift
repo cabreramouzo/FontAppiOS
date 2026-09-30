@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Binding var showsWelcome: Bool
     @Environment(Outbox.self) private var outbox
     @State private var tab = AppTab.map
 
@@ -57,10 +58,14 @@ struct ContentView: View {
         }
         // A GPX opened from another app is a route to show on the map.
         .onOpenURL { url in
+            // A link to a specific fountain is the person's immediate intent. An
+            // unfinished welcome can still appear on the next ordinary launch.
+            showsWelcome = false
             if url.isFileURL { tab = .map } else { deepLink = DeepLink(url) }
         }
         .onChange(of: PushNotifications.shared.opened) { _, url in
             guard let url else { return }
+            showsWelcome = false
             deepLink = DeepLink(url)
             PushNotifications.shared.opened = nil
         }
@@ -75,6 +80,12 @@ struct ContentView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) { Button(role: .close) { deepLink = nil } }
                 }
+            }
+        }
+        .fullScreenCover(isPresented: $showsWelcome) {
+            WelcomeFlow {
+                WelcomeGate.complete()
+                showsWelcome = false
             }
         }
     }
@@ -98,7 +109,7 @@ struct ComingSoonView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(showsWelcome: .constant(false))
         .environment(LocationService())
         .environment(SessionStore())
         .environment(Outbox.shared)
