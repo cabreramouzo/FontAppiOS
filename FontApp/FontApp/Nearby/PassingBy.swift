@@ -13,8 +13,7 @@ import UserNotifications
 /// notice. The position is never sent to be stored, and no server push is involved:
 /// on a mountain there is rarely signal for one to arrive anyway.
 ///
-/// Opt-in from Settings only: it needs the "Always" location permission, which is asked
-/// when the person turns it on and never before.
+/// Opt-in from onboarding or Settings: it needs "Always" location and motion permission.
 nonisolated enum PassingByRules {
     /// iOS allows 20 monitored regions per app: 19 fountains and the circle that says
     /// "you have moved on, choose again".
@@ -30,11 +29,11 @@ nonisolated enum PassingByRules {
     static let betweenNotices: TimeInterval = 20 * 60
     static let perDay = 3
     static let quietHours = 22..<24, earlyHours = 0..<7
-    /// Passing in a car or a bus is not passing by: nobody stops to look. Motion
-    /// activity from the last few minutes says so; without it, the speed of a fresh fix.
-    static let travelLookBack: TimeInterval = 3 * 60
-    /// About 30 km/h: faster than anyone on foot or most people cycling in town.
-    static let travellingSpeed: CLLocationSpeed = 8.3
+    /// Core Motion reports changes, not a continuous stream. A drive can start long
+    /// before a region wakes the app, so look back far enough to find its last change.
+    static let travelLookBack: TimeInterval = 2 * 60 * 60
+    /// 12.6 km/h is already too fast to stop and check a fountain while passing it.
+    static let travellingSpeed: CLLocationSpeed = 3.5
     static let freshFix: TimeInterval = 30
 
     /// The fountains worth watching around a point: those where a passer-by's answer
@@ -90,15 +89,15 @@ nonisolated struct MotionSample: Equatable, Sendable {
 }
 
 extension PassingByRules {
-    /// In a vehicle when entering the circle: the latest confident activity says so,
-    /// or, with no activity to go by, a fresh fix is too fast. Parking and walking to
-    /// the fountain counts as on foot, since that is the latest activity.
-    static func isTravelling(motion: [MotionSample], speed: CLLocationSpeed?, now: Date = .now) -> Bool {
-        let recent = motion.filter { $0.confident && now.timeIntervalSince($0.at) <= travelLookBack
+    /// A notice requires positive evidence of moving on foot or by bike. A car can be
+    /// stationary at traffic lights and a missing background fix cannot prove walking.
+    /// Speed takes precedence if it contradicts a lagging activity classification.
+    static func canNotify(motion: [MotionSample], speed: CLLocationSpeed?, now: Date = .now) -> Bool {
+        if let speed, speed >= travellingSpeed { return false }
+        let recent = motion.filter { $0.confident && (0...travelLookBack).contains(now.timeIntervalSince($0.at))
             && ($0.automotive || $0.onFoot) }
-        if let latest = recent.max(by: { $0.at < $1.at }) { return latest.automotive }
-        guard let speed, speed >= 0 else { return false }
-        return speed >= travellingSpeed
+        guard let latest = recent.max(by: { $0.at < $1.at }) else { return false }
+        return latest.onFoot && !latest.automotive
     }
 }
 
@@ -123,6 +122,7 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let log = Logger(subsystem: "net.fontapp.FontApp", category: "passingBy")
     @ObservationIgnored private var locating: [CheckedContinuation<CLLocation?, Never>] = []
+    @ObservationIgnored private var locationRequestID: UUID?
     /// The fountains being watched, for the notice's name and position.
     @ObservationIgnored private var watched: [String: FontSummary] = [:]
 
@@ -170,8 +170,13 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
         CMMotionActivityManager.isActivityAvailable() && CMMotionActivityManager.authorizationStatus() == .notDetermined
     }
 
+    var motionAccessBlocked: Bool {
+        CMMotionActivityManager.authorizationStatus() == .denied
+            || CMMotionActivityManager.authorizationStatus() == .restricted
+    }
+
     /// Asks Motion & Fitness (the first query is what asks) and waits for the answer.
-    /// Optional: with a "no", the speed of a fix still catches most drives.
+    /// If refused, uncertain passage events are skipped rather than risking a car alert.
     func askMotion() async {
         guard needsMotionAsk else { return }
         _ = await recentMotion()
@@ -276,11 +281,20 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
     private func currentLocation() async -> CLLocation? {
         await withCheckedContinuation { continuation in
             locating.append(continuation)
-            if locating.count == 1 { manager.requestLocation() }
+            if locating.count == 1 {
+                let requestID = UUID()
+                locationRequestID = requestID
+                manager.requestLocation()
+                Task {
+                    try? await Task.sleep(for: .seconds(8))
+                    if locationRequestID == requestID { finishLocating(nil) }
+                }
+            }
         }
     }
 
     private func finishLocating(_ location: CLLocation?) {
+        locationRequestID = nil
         let waiting = locating
         locating = []
         for continuation in waiting { continuation.resume(returning: location) }
@@ -313,8 +327,8 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
         }
         // Checked after the cheap rules and before noting it: driving past must not use
         // up the fountain's turn for when the person walks by.
-        if await isTravelling() {
-            log.info("near \(id, privacy: .public): in a vehicle, no notice")
+        if !(await canNotifyForMovement()) {
+            log.info("near \(id, privacy: .public): travel state uncertain or in a vehicle, no notice")
             return
         }
         log.info("near \(id, privacy: .public): notice")
@@ -345,24 +359,33 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
         }
     }
 
-    private func isTravelling() async -> Bool {
-        let fix = manager.location.flatMap { Date.now.timeIntervalSince($0.timestamp) <= PassingByRules.freshFix ? $0 : nil }
-        let speed = fix.flatMap { $0.speedAccuracy >= 0 && $0.speedAccuracy < 5 ? $0.speed : nil }
-        return PassingByRules.isTravelling(motion: await recentMotion(), speed: speed)
+    private func canNotifyForMovement() async -> Bool {
+        // A region event often relaunches the app with no current fix. Ask for one so a
+        // stale cached speed cannot make the decision; no fix means no notice.
+        let cached = manager.location
+        let fix: CLLocation?
+        if let cached, abs(Date.now.timeIntervalSince(cached.timestamp)) <= PassingByRules.freshFix {
+            fix = cached
+        } else {
+            fix = await currentLocation()
+        }
+        guard let fix, abs(Date.now.timeIntervalSince(fix.timestamp)) <= PassingByRules.freshFix else { return false }
+        let speed = fix.speed >= 0 && fix.speedAccuracy >= 0 && fix.speedAccuracy < 5 ? fix.speed : nil
+        if let speed, speed >= PassingByRules.travellingSpeed { return false }
+        return PassingByRules.canNotify(motion: await recentMotion(), speed: speed)
     }
 
-    /// The activity of the last few minutes; empty without the chip or the permission.
+    /// Recent activity changes; empty without the sensor or its permission.
     private func recentMotion() async -> [MotionSample] {
         guard CMMotionActivityManager.isActivityAvailable(),
-              CMMotionActivityManager.authorizationStatus() != .denied,
-              CMMotionActivityManager.authorizationStatus() != .restricted else { return [] }
+              CMMotionActivityManager.authorizationStatus() == .authorized else { return [] }
         let now = Date.now
         return await withCheckedContinuation { continuation in
             motion.queryActivityStarting(from: now.addingTimeInterval(-PassingByRules.travelLookBack), to: now,
                                          to: .main) { activities, _ in
                 let samples = (activities ?? []).map {
                     MotionSample(at: $0.startDate, automotive: $0.automotive,
-                                 onFoot: $0.walking || $0.running || $0.cycling || ($0.stationary && !$0.automotive),
+                                 onFoot: $0.walking || $0.running || $0.cycling,
                                  confident: $0.confidence != .low)
                 }
                 continuation.resume(returning: samples)

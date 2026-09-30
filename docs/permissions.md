@@ -1,8 +1,7 @@
 # iOS permissions
 
 Every permission the app asks the person for, when and where it is asked today, and what
-happens without it. It is the base for the onboarding tutorial still to be built (see the
-last section). Keep it current when a permission is added or moves.
+happens without it. Keep it current when a permission is added or moves.
 
 The purpose strings shown by iOS are in `Info.plist` (and `INFOPLIST_KEY_*` in the
 project's build settings), translated in `FontApp/InfoPlist.xcstrings`.
@@ -14,7 +13,7 @@ project's build settings), translated in `FontApp/InfoPlist.xcstrings`.
 | Location, while using | `NSLocationWhenInUseUsageDescription` · `CLLocationManager.requestWhenInUseAuthorization` | Map centred on you, "near me", distance and arrow to a fountain, remote-review check, new fountain pin | Optional first-install tutorial; later the locate button, missions, placing a fountain | App works; map opens on the time-zone view, no distances, no "near me" |
 | Location, always | `NSLocationAlwaysAndWhenInUseUsageDescription` · `requestAlwaysAuthorization` | "Tell me when I pass a fountain" (region monitoring, `PassingBy`) | Optional first-install tutorial only after location and notifications are granted; or the switch in Settings → Notifications | That feature does not work; the switch shows how to fix it |
 | Notifications | `UNUserNotificationCenter.requestAuthorization` (alert, sound, badge) + APNs | Push (a followed fountain went dry, incidents, someone writing to you) and the local "passing by" notice | Optional first-install tutorial; later after following a fountain or posting an incident (`askIfUseful`) and from Settings | Only the in-app bell |
-| Motion & Fitness | `NSMotionUsageDescription` · `CMMotionActivityManager` | Not asking about a fountain when driving past it | Optional tutorial after opting into "passing by"; or `MotionExplainer` in Settings | Speed of the last fix is used instead; the odd notice while driving |
+| Motion & Fitness | `NSMotionUsageDescription` · `CMMotionActivityManager` | Distinguishing someone on foot from someone driving past | Optional tutorial after opting into "passing by"; or `MotionExplainer` in Settings | Uncertain passing-by events do not notify; the rest of the app works |
 | Camera | `NSCameraUsageDescription` · `UIImagePickerController` | Taking a fountain's photo | Optional first-install tutorial; otherwise first time "take photo" is used | Choosing from the library still works |
 | Photos, add only | `NSPhotoLibraryAddUsageDescription` · `PHPhotoLibrary.requestAuthorization(for: .addOnly)` | Saving the photo of a queued contribution ("See my data" → Save photo) | Optional first-install tutorial; otherwise first time "Save photo" is tapped. The app cannot read the library | The photo stays in the queue and is still sent; the sheet says how to allow it |
 

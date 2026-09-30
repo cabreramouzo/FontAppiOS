@@ -337,6 +337,13 @@ struct NotificationsSettingsScreen: View {
             if passing.isEnabled, passing.needsMotionAsk {
                 Button(L10n.t("ios.passingBy.motionTitle")) { explainingMotion = true }.frame(minHeight: 44)
             }
+            if passing.isEnabled, passing.motionAccessBlocked {
+                Text(L10n.t("ios.passingBy.motionNeeded"))
+                    .font(.subheadline).foregroundStyle(.secondary)
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    Link(L10n.t("ios.push.openSettings"), destination: url).frame(minHeight: 44)
+                }
+            }
             if passing.isBlocked {
                 Text(L10n.t("ios.passingBy.needsAlways")).font(.subheadline).foregroundStyle(.secondary)
                 if let url = URL(string: UIApplication.openSettingsURLString) {

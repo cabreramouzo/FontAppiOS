@@ -68,18 +68,27 @@ struct PassingByTests {
         #expect(item?.review == NewReview(waterStatus: "trickle", confirmIfUnchanged: true, remoteDistanceM: nil))
     }
 
-    @Test func drivingPastIsNotPassingBy() {
+    @Test func aVehicleOrUncertainMovementNeverPostsAPassingByNotice() {
         let now = Date(timeIntervalSince1970: 1_800_000_000)
         func at(_ ago: TimeInterval, car: Bool, confident: Bool = true) -> MotionSample {
             MotionSample(at: now.addingTimeInterval(-ago), automotive: car, onFoot: !car, confident: confident)
         }
-        #expect(PassingByRules.isTravelling(motion: [at(60, car: true)], speed: nil, now: now))
-        // Parked and walked to it.
-        #expect(!PassingByRules.isTravelling(motion: [at(150, car: true), at(30, car: false)], speed: 20, now: now))
-        // Unsure or too old activity: the speed decides.
-        #expect(!PassingByRules.isTravelling(motion: [at(30, car: true, confident: false)], speed: 1.4, now: now))
-        #expect(PassingByRules.isTravelling(motion: [at(600, car: false)], speed: 15, now: now))
-        #expect(!PassingByRules.isTravelling(motion: [], speed: 5, now: now))
-        #expect(!PassingByRules.isTravelling(motion: [], speed: nil, now: now))
+        // The drive began well before the old three-minute query window; even a red
+        // light with speed zero must not override the vehicle classification.
+        #expect(!PassingByRules.canNotify(motion: [at(40 * 60, car: true)], speed: 0, now: now))
+        #expect(!PassingByRules.canNotify(motion: [at(60, car: true)], speed: nil, now: now))
+        // Core Motion can report automotive and stationary/other flags together.
+        #expect(!PassingByRules.canNotify(motion: [MotionSample(at: now, automotive: true,
+                                                               onFoot: true, confident: true)], speed: 0, now: now))
+        // A fast fix takes priority over a lagging walking classification.
+        #expect(!PassingByRules.canNotify(motion: [at(30, car: false)], speed: 8, now: now))
+        // No confident recent movement evidence is not permission to send an alert.
+        #expect(!PassingByRules.canNotify(motion: [at(30, car: true, confident: false)], speed: 0, now: now))
+        #expect(!PassingByRules.canNotify(motion: [], speed: nil, now: now))
+        #expect(!PassingByRules.canNotify(motion: [], speed: 1.4, now: now))
+        #expect(!PassingByRules.canNotify(motion: [at(3 * 60 * 60, car: false)], speed: 0, now: now))
+        // Parking and then walking provides a newer positive signal.
+        #expect(PassingByRules.canNotify(motion: [at(150, car: true), at(30, car: false)], speed: 1.4, now: now))
+        #expect(PassingByRules.canNotify(motion: [at(600, car: false)], speed: nil, now: now))
     }
 }
