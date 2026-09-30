@@ -24,16 +24,20 @@ struct MapControlColumn: View {
             GlassEffectContainer {
                 VStack(spacing: 0) {
                     ColumnButton(systemImage: "square.3.layers.3d", label: L10n.t("map.layers"), action: onLayers)
+                        .mapHelpTarget(.layers)
                     Divider().frame(width: 28)
                     ColumnButton(systemImage: "line.3.horizontal.decrease", label: L10n.t("map.filters"),
                                  badge: activeFilters, action: onFilters)
+                        .mapHelpTarget(.filters)
                     if let onMissions {
                         Divider().frame(width: 28)
                         ColumnButton(systemImage: "figure.walk", label: L10n.t("mission.title"), action: onMissions)
+                            .mapHelpTarget(.missions)
                     }
                     if let onOffline {
                         Divider().frame(width: 28)
                         ColumnButton(systemImage: "arrow.down.circle", label: L10n.t("ios.offline.title"), action: onOffline)
+                            .mapHelpTarget(.offline)
                     }
                     if let onImportGPX, let onExportGPX {
                         Divider().frame(width: 28)
@@ -49,6 +53,7 @@ struct MapControlColumn: View {
                                 .contentShape(Rectangle())
                         }
                         .accessibilityLabel("GPX")
+                        .mapHelpTarget(.gpx)
                     }
                 }
                 .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 24))
@@ -111,6 +116,7 @@ private struct SystemMapButtons: View {
             .buttonStyle(.plain)
             .glassEffect(.regular.interactive(), in: Circle())
             .accessibilityLabel(L10n.t("map.recenter"))
+            .mapHelpTarget(.location)
         }
     }
 

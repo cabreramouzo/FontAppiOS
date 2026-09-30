@@ -48,6 +48,7 @@ struct MapScreen: View {
     @State private var browsing = false
     @State private var followRequest = 0
     @State private var didAutoLocate = false
+    @State private var helpTarget: MapHelpTarget?
 
     var body: some View {
         FontMapView(
@@ -85,6 +86,20 @@ struct MapScreen: View {
                 .padding(.trailing, 12)
                 .padding(.top, 8)
         }
+        .overlay(alignment: .topLeading) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) { helpTarget = .layers }
+            } label: {
+                Image(systemName: "questionmark")
+                    .font(.system(size: 18, weight: .semibold))
+                    .frame(width: 48, height: 48)
+            }
+            .buttonStyle(.plain)
+            .glassEffect(.regular.interactive(), in: Circle())
+            .accessibilityLabel(L10n.t("ios.mapHelp.title"))
+            .padding(.leading, 12)
+            .padding(.top, 8)
+        }
         .overlay(alignment: .top) {
             // What waits to be sent and whether there is signal, above the map's own notices.
             VStack(spacing: 0) {
@@ -104,6 +119,7 @@ struct MapScreen: View {
         .overlay(alignment: .bottomLeading) { attribution }
         .overlay(alignment: .bottomTrailing) {
             AddFountainButton(staff: session.isStaff, action: startNewFont)
+                .mapHelpTarget(.add)
                 .padding(.trailing, 16)
                 .padding(.bottom, 64)
         }
@@ -116,6 +132,16 @@ struct MapScreen: View {
                     .glassEffect(.regular, in: Capsule())
                     .padding(.bottom, 130)
                     .transition(.opacity)
+            }
+        }
+        .overlayPreferenceValue(MapHelpAnchors.self) { anchors in
+            if let helpTarget, let anchor = anchors[helpTarget] {
+                MapHelpOverlay(target: helpTarget, anchor: anchor) {
+                    withAnimation(.easeInOut(duration: 0.2)) { self.helpTarget = helpTarget.next }
+                } onClose: {
+                    withAnimation(.easeInOut(duration: 0.2)) { self.helpTarget = nil }
+                }
+                .transition(.opacity)
             }
         }
         // A result chosen in the Search tab.

@@ -7,6 +7,430 @@
     " → %@" : {
 
     },
+    "ios.mapHelp.add" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afegeix una font que falta al mapa. Si no has iniciat sessió, t’ho demanarem abans."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a fountain missing from the map. We will ask you to sign in first if needed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añade una fuente que falta en el mapa. Si no has iniciado sesión, te lo pediremos antes."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gehitu mapan falta den iturri bat. Saioa hasi ez baduzu, lehenik hori eskatuko dizugu."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez une fontaine manquante sur la carte. Nous vous demanderons de vous connecter si nécessaire."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engade unha fonte que falta no mapa. Se non iniciaches sesión, pedirémoscho antes."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi una fontana che manca sulla mappa. Se necessario, ti chiederemo prima di accedere."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adiciona uma fonte que falta no mapa. Se necessário, pedimos primeiro que inicies sessão."
+          }
+        }
+      }
+    },
+    "ios.mapHelp.filters" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra només les fonts que t’interessen i consulta què vol dir cada color."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show only the fountains you want and see what each colour means."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra solo las fuentes que te interesan y consulta qué significa cada color."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erakutsi interesatzen zaizkizun iturriak eta ikusi kolore bakoitzaren esanahia."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affichez les fontaines qui vous intéressent et découvrez la signification des couleurs."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra só as fontes que che interesan e consulta o que significa cada cor."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra solo le fontane che ti interessano e scopri il significato dei colori."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra só as fontes que te interessam e vê o significado de cada cor."
+          }
+        }
+      }
+    },
+    "ios.mapHelp.gpx" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa una ruta GPX o exporta les fonts que veus al mapa."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import a GPX route or export the fountains in the map view."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa una ruta GPX o exporta las fuentes que ves en el mapa."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inportatu GPX ibilbide bat edo esportatu mapan ikusten dituzun iturriak."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importez un itinéraire GPX ou exportez les fontaines visibles sur la carte."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa unha ruta GPX ou exporta as fontes que ves no mapa."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa un percorso GPX o esporta le fontane visibili sulla mappa."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa um percurso GPX ou exporta as fontes visíveis no mapa."
+          }
+        }
+      }
+    },
+    "ios.mapHelp.layers" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canvia el mapa de fons i consulta les capes disponibles."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the base map and browse the available layers."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia el mapa de fondo y consulta las capas disponibles."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aldatu atzeko mapa eta ikusi eskuragarri dauden geruzak."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changez le fond de carte et consultez les calques disponibles."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia o mapa de fondo e consulta as capas dispoñibles."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia la mappa di base e consulta i livelli disponibili."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muda o mapa de fundo e consulta as camadas disponíveis."
+          }
+        }
+      }
+    },
+    "ios.mapHelp.location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centra el mapa en tu. Torna a tocar-lo per canviar el seguiment."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centre the map on you. Tap again to change tracking mode."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centra el mapa en ti. Tócalo de nuevo para cambiar el seguimiento."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zentratu mapa zure kokapenean. Ukitu berriro jarraipena aldatzeko."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centrez la carte sur vous. Touchez à nouveau pour changer le suivi."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centra o mapa en ti. Tócao de novo para cambiar o seguimento."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centra la mappa su di te. Tocca di nuovo per cambiare la modalità di tracciamento."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centra o mapa em ti. Toca novamente para mudar o seguimento."
+          }
+        }
+      }
+    },
+    "ios.mapHelp.missions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descobreix passejades amb fonts per revisar pel camí."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discover walks with fountains to check along the way."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descubre paseos con fuentes para revisar por el camino."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aurkitu bidean egiaztatzeko iturriak dituzten ibilaldiak."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Découvrez des promenades avec des fontaines à vérifier en chemin."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descubre paseos con fontes para revisar polo camiño."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scopri passeggiate con fontane da controllare lungo il percorso."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descobre passeios com fontes para verificar pelo caminho."
+          }
+        }
+      }
+    },
+    "ios.mapHelp.offline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desa mapes i dades de fonts per consultar-los sense cobertura."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save maps and fountain details to use without a connection."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda mapas y datos de fuentes para consultarlos sin cobertura."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gorde mapak eta iturrien datuak estaldurarik gabe ikusteko."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrez les cartes et les données des fontaines pour les consulter hors ligne."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garda mapas e datos de fontes para consultalos sen cobertura."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salva mappe e dati delle fontane per consultarli senza connessione."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda mapas e dados das fontes para consultar sem rede."
+          }
+        }
+      }
+    },
+    "ios.mapHelp.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajuda del mapa"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Map help"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda del mapa"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maparen laguntza"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aide de la carte"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Axuda do mapa"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aiuto mappa"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajuda do mapa"
+          }
+        }
+      }
+    },
     "ios.permission.cameraBody" : {
       "extractionState" : "manual",
       "localizations" : {
