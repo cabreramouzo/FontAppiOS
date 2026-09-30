@@ -20,7 +20,8 @@ nonisolated struct APIError: Error, Equatable, Sendable {
 /// Simulator Debug builds use the seeded local backend (`swift run App serve` in
 /// FontAppBE). A physical iPhone cannot reach the Mac at 127.0.0.1, so it uses production
 /// by default. `-FontAppAPI <url>` overrides either Debug default and is remembered when
-/// the app is later opened from the home screen. Release always uses production.
+/// the app is later opened from the home screen. Loopback URLs are ignored on a physical
+/// iPhone, including ones saved by older builds. Release always uses production.
 nonisolated enum APIEnvironment {
     static let production = URL(string: "https://fontapp.fly.dev")!
     static let local = URL(string: "http://127.0.0.1:8080")!
@@ -38,7 +39,14 @@ nonisolated enum APIEnvironment {
             else { defaults.set(argument, forKey: rememberedKey) }
         }
         if let remembered = defaults.string(forKey: rememberedKey), let url = URL(string: remembered) {
+            #if targetEnvironment(simulator)
             return url
+            #else
+            if url.host != "127.0.0.1" && url.host != "localhost" && url.host != "::1" {
+                return url
+            }
+            defaults.removeObject(forKey: rememberedKey)
+            #endif
         }
         #if targetEnvironment(simulator)
         return local
