@@ -134,9 +134,9 @@ struct MapScreen: View {
                     .transition(.opacity)
             }
         }
-        .overlayPreferenceValue(MapHelpAnchors.self) { anchors in
-            if let helpTarget, let anchor = anchors[helpTarget] {
-                MapHelpOverlay(target: helpTarget, anchor: anchor) {
+        .overlayPreferenceValue(MapHelpFrames.self) { frames in
+            if let helpTarget, let frame = frames[helpTarget] {
+                MapHelpOverlay(target: helpTarget, globalFrame: frame) {
                     withAnimation(.easeInOut(duration: 0.2)) { self.helpTarget = helpTarget.next }
                 } onClose: {
                     withAnimation(.easeInOut(duration: 0.2)) { self.helpTarget = nil }
