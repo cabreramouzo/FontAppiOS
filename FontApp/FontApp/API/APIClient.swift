@@ -609,6 +609,12 @@ nonisolated struct APIClient: Sendable {
         return try await get("/gamification/collection", query: query)
     }
 
+    /// Your visited fountains of one kind, the most recent first: what tapping a kind in
+    /// the collection shows. On demand, so the summary does not carry the whole history.
+    func collectionFonts(source: WaterSource) async throws -> [CollectionFont] {
+        try await get("/gamification/collection/fonts", query: [URLQueryItem(name: "source", value: source.rawValue)])
+    }
+
     // MARK: Bell
 
     /// The in-app notifications. Reading them does **not** mark them read: that happens

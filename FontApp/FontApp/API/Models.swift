@@ -511,6 +511,16 @@ nonisolated struct VisitedCollection: Decodable, Sendable {
     let local: Local?
 }
 
+/// One visited fountain of a kind (`GET /gamification/collection/fonts?source=`), with
+/// just what its row needs.
+nonisolated struct CollectionFont: Decodable, Identifiable, Sendable {
+    let id: UUID
+    let name: String?
+    let source: WaterSource?
+    let municipality: String?
+    let region: String?
+}
+
 /// `PUT /users/:id`. Name, username and email always travel; each setting only when it
 /// changes, since the server leaves an absent one as it was.
 nonisolated struct ProfileUpdate: Encodable, Sendable {

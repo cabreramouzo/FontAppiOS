@@ -25,15 +25,25 @@ struct CollectionSection: View {
                         .font(.footnote).foregroundStyle(.secondary)
                     HStack(spacing: 0) {
                         ForEach(collection.types, id: \.source) { kind in
-                            VStack(spacing: 2) {
+                            let medal = VStack(spacing: 2) {
                                 Text(WaterSource(rawValue: kind.source)?.emoji ?? "💧").font(.title2)
                                 Text(kind.count, format: .number).font(.caption.bold())
                             }
-                            .frame(maxWidth: .infinity)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .contentShape(Rectangle())
                             // Not yet in the collection: there, but faded.
                             .opacity(kind.count > 0 ? 1 : 0.3)
                             .accessibilityElement(children: .ignore)
                             .accessibilityLabel("\(L10n.lookup("source.\(kind.source)") ?? kind.source): \(kind.count)")
+                            // You see the number and want to know which ones: a kind you have
+                            // opens its list. One you lack has nothing to show.
+                            if kind.count > 0, let source = WaterSource(rawValue: kind.source) {
+                                NavigationLink { CollectionKindScreen(source: source) } label: { medal }
+                                    .buttonStyle(.plain)
+                                    .accessibilityAddTraits(.isButton)
+                            } else {
+                                medal
+                            }
                         }
                     }
                 }
@@ -75,6 +85,44 @@ struct GuardedSection: View {
                     .frame(minHeight: 44)
                 }
             }
+        }
+    }
+}
+
+/// Your visited fountains of one kind, opened from its medal in the collection.
+struct CollectionKindScreen: View {
+    let source: WaterSource
+    @State private var fonts: [CollectionFont]?
+    @State private var error: String?
+
+    var body: some View {
+        List {
+            if let error {
+                Text(error).foregroundStyle(.secondary)
+            } else if let fonts {
+                ForEach(fonts) { font in
+                    NavigationLink(value: font.id) {
+                        HStack(spacing: 12) {
+                            Text(source.emoji).font(.title3).accessibilityHidden(true)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(L10n.fontName(font.name))
+                                if let place = font.municipality ?? font.region {
+                                    Text(place).font(.footnote).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .frame(minHeight: 44)
+                    }
+                }
+            } else {
+                ProgressView().frame(maxWidth: .infinity)
+            }
+        }
+        .navigationTitle("\(source.emoji) \(L10n.t("source.\(source.rawValue)"))")
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            do { fonts = try await APIClient.shared.collectionFonts(source: source) }
+            catch { self.error = ErrorText.describe(error) }
         }
     }
 }
