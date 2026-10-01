@@ -141,12 +141,16 @@ private struct PassingByHoursPicker: View {
 private struct QuietPlacesScreen: View {
     @Bindable private var passing = PassingBy.shared
     @State private var adding = false
+    @State private var editing: QuietPlace?
 
     var body: some View {
         List {
             Section {
                 ForEach(passing.prefs.quietPlaces) { place in
-                    Label(place.name, systemImage: "house").frame(minHeight: 44)
+                    Button { editing = place } label: {
+                        Label(place.name, systemImage: "house").foregroundStyle(.primary)
+                    }
+                    .frame(minHeight: 44)
                 }
                 .onDelete { passing.prefs.quietPlaces.remove(atOffsets: $0) }
                 if passing.prefs.quietPlaces.count < PassingByPrefs.maxQuietPlaces {
@@ -174,12 +178,26 @@ private struct QuietPlacesScreen: View {
                 }
             }
         }
+        .sheet(item: $editing) { place in
+            NavigationStack {
+                QuietPlacePicker(editing: place) { changed in
+                    if let i = passing.prefs.quietPlaces.firstIndex(where: { $0.id == changed.id }) {
+                        passing.prefs.quietPlaces[i] = changed
+                    }
+                    editing = nil
+                } cancel: {
+                    editing = nil
+                }
+            }
+        }
     }
 }
 
-/// Moves the map under a fixed circle, as Find My's "Notify me" does. Starts where the
-/// phone last was, if location is already allowed; it never asks for it.
+/// Moves the map under a fixed circle, as Find My's "Notify me" does. A new place starts
+/// where the phone last was, if location is already allowed (it never asks for it); a saved
+/// one opens on its own circle, to check it, move it or rename it.
 private struct QuietPlacePicker: View {
+    var editing: QuietPlace?
     let save: (QuietPlace) -> Void
     let cancel: () -> Void
 
@@ -187,11 +205,14 @@ private struct QuietPlacePicker: View {
     @State private var center: CLLocationCoordinate2D
     @State private var position: MapCameraPosition
 
-    init(save: @escaping (QuietPlace) -> Void, cancel: @escaping () -> Void) {
+    init(editing: QuietPlace? = nil, save: @escaping (QuietPlace) -> Void, cancel: @escaping () -> Void) {
+        self.editing = editing
         self.save = save
         self.cancel = cancel
+        _name = State(initialValue: editing?.name ?? "")
         // Barcelona when there is no fix: most fountains are in Catalonia.
-        let start = CLLocationManager().location?.coordinate ?? CLLocationCoordinate2D(latitude: 41.3874, longitude: 2.1686)
+        let start = editing.map { CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude) }
+            ?? CLLocationManager().location?.coordinate ?? CLLocationCoordinate2D(latitude: 41.3874, longitude: 2.1686)
         _center = State(initialValue: start)
         _position = State(initialValue: .region(MKCoordinateRegion(center: start, latitudinalMeters: 1500,
                                                                    longitudinalMeters: 1500)))
@@ -217,14 +238,15 @@ private struct QuietPlacePicker: View {
             }
             .frame(maxHeight: 120)
         }
-        .navigationTitle(L10n.t("ios.passingBy.placesAdd"))
+        .navigationTitle(editing?.name ?? L10n.t("ios.passingBy.placesAdd"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button(L10n.t("form.cancel"), action: cancel) }
             ToolbarItem(placement: .confirmationAction) {
                 Button(L10n.t("form.save")) {
                     let trimmed = name.trimmingCharacters(in: .whitespaces)
-                    save(QuietPlace(name: trimmed.isEmpty ? L10n.t("ios.passingBy.placeDefault") : trimmed,
+                    save(QuietPlace(id: editing?.id ?? UUID(),
+                                    name: trimmed.isEmpty ? L10n.t("ios.passingBy.placeDefault") : trimmed,
                                     latitude: center.latitude, longitude: center.longitude))
                 }
             }
