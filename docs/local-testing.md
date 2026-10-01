@@ -4,6 +4,16 @@ Debug builds talk to `http://127.0.0.1:8080` (`swift run App serve` in FontAppBE
 `-FontAppAPI <url>` as a launch argument to point elsewhere. The local database is seeded:
 nothing in it is a real figure, and nothing written here reaches production.
 
+## Choosing the server from the app (Debug builds)
+
+The login sheet and Settings have a **Debug · API server** field that starts with the
+server in use. Type a URL (`http://192.168.1.20:8080`, a bare host works too), or tap
+*Production* / *Local*, then *Apply* and reopen the app: the server is read once at launch,
+and each server keeps its own session token. The choice wins over `-FontAppAPI`, so the
+scheme's launch argument does not undo it; to go back, apply the other one. Release builds
+have no field and always use production. The pins and saved zones on the phone are not
+told apart by server.
+
 ## Accounts (local database only)
 
 | Username | Password | Role | Where it comes from |

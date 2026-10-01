@@ -34,13 +34,11 @@ struct SignInView: View {
                 } footer: {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(L10n.t("login.userOrEmailHint"))
-                        #if DEBUG
-                        // Show the active backend to make Debug connection issues visible.
-                        Text(verbatim: "Debug · \(APIClient.shared.baseURL.absoluteString)")
-                            .font(.caption.monospaced())
-                        #endif
                     }
                 }
+                #if DEBUG
+                ServerPicker()
+                #endif
                 if let error {
                     Section { Text(error).foregroundStyle(.red) }
                 }

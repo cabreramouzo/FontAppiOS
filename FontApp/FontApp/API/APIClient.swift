@@ -22,10 +22,51 @@ nonisolated struct APIError: Error, Equatable, Sendable {
 /// by default. `-FontAppAPI <url>` overrides either Debug default and is remembered when
 /// the app is later opened from the home screen. Loopback URLs are ignored on a physical
 /// iPhone, including ones saved by older builds. Release always uses production.
+///
+/// Debug builds can also choose the server from the app (`ServerPicker`, in the login sheet
+/// and the settings): that choice wins over the launch argument, so a scheme that always
+/// passes `-FontAppAPI` does not undo it on every run. It takes effect on the next launch.
 nonisolated enum APIEnvironment {
     static let production = URL(string: "https://fontapp.fly.dev")!
     static let local = URL(string: "http://127.0.0.1:8080")!
     private static let rememberedKey = "api.server"
+    private static let chosenKey = "api.server.chosen"
+
+    /// The server typed or picked in the app, if any (Debug builds).
+    static var chosen: URL? {
+        UserDefaults.standard.string(forKey: chosenKey).flatMap(URL.init(string:))
+    }
+
+    /// Saves the choice; `nil` goes back to the defaults. Applies from the next launch.
+    static func choose(_ url: URL?) {
+        if let url { UserDefaults.standard.set(url.absoluteString, forKey: chosenKey) }
+        else { UserDefaults.standard.removeObject(forKey: chosenKey) }
+    }
+
+    /// A server from what someone typed: `local`, `production`, a full URL, or a bare host
+    /// (`192.168.1.20:8080` is plain http, as is anything on the local network; the rest is
+    /// https). `nil` when it is not a usable address.
+    static func server(from text: String) -> URL? {
+        var text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch text.lowercased() {
+        case "local": return local
+        case "production", "prod": return production
+        default: break
+        }
+        guard !text.isEmpty else { return nil }
+        if !text.contains("://") {
+            let host = text.split(separator: "/").first.map(String.init)?.split(separator: ":").first.map(String.init) ?? text
+            let isLocal = host == "localhost" || host.hasSuffix(".local") || host.hasPrefix("127.")
+                || host.hasPrefix("10.") || host.hasPrefix("192.168.")
+                || (host.hasPrefix("172.") && (Int(host.split(separator: ".").dropFirst().first ?? "") ?? 0) >= 16
+                    && (Int(host.split(separator: ".").dropFirst().first ?? "") ?? 0) <= 31)
+            text = (isLocal ? "http://" : "https://") + text
+        }
+        while text.hasSuffix("/") { text.removeLast() }
+        guard let url = URL(string: text), let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https", let host = url.host(), !host.isEmpty else { return nil }
+        return url
+    }
 
     static var baseURL: URL {
         #if DEBUG
@@ -34,6 +75,7 @@ nonisolated enum APIEnvironment {
         // So the choice is remembered until another one is passed; `-FontAppAPI local`
         // goes back to the Mac.
         let defaults = UserDefaults.standard
+        if let chosen { return chosen }
         if let argument = ProcessInfo.processInfo.arguments.value(after: "-FontAppAPI") {
             if argument == "local" { defaults.removeObject(forKey: rememberedKey) }
             else { defaults.set(argument, forKey: rememberedKey) }

@@ -59,6 +59,9 @@ struct SettingsScreen: View {
             } else {
                 ProgressView().frame(maxWidth: .infinity)
             }
+            #if DEBUG
+            ServerPicker()
+            #endif
         }
         .navigationTitle(L10n.t("settings.title"))
         .navigationBarTitleDisplayMode(.inline)
