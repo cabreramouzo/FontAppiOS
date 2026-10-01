@@ -73,6 +73,9 @@ const IOS_ONLY = {
     pt: 'Mostra só as fontes que te interessam e vê o significado de cada cor.',
     it: 'Mostra solo le fontane che ti interessano e scopri il significato dei colori.',
   },
+  'ios.mapHelp.legend': {
+    ca: "Què vol dir el color de cada font. Toca per amagar o mostrar la llegenda.", es: "Qué significa el color de cada fuente. Toca para ocultar o mostrar la leyenda.", gl: "Que significa a cor de cada fonte. Toca para ocultar ou amosar a lenda.", eu: "Iturri bakoitzaren koloreak zer esan nahi duen. Ukitu legenda ezkutatzeko edo erakusteko.", en: "What each fountain’s colour means. Tap to hide or show the legend.", fr: "Ce que signifie la couleur de chaque fontaine. Touchez pour masquer ou afficher la légende.", pt: "O que significa a cor de cada fonte. Toque para ocultar ou mostrar a legenda.", it: "Cosa significa il colore di ogni fontana. Tocca per nascondere o mostrare la legenda.",
+  },
   'ios.mapHelp.missions': {
     ca: 'Descobreix passejades amb fonts per revisar pel camí.',
     es: 'Descubre paseos con fuentes para revisar por el camino.',

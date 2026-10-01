@@ -6,13 +6,16 @@ import SwiftUI
 /// is. Search is its own tab.
 ///
 /// The web had nine floating buttons; here they are fewer and grouped, because on a phone
-/// every button covers the map, which is the thing being looked at. The colour legend
-/// lives in the filters sheet, next to what it explains.
+/// every button covers the map, which is the thing being looked at. The colour legend has
+/// its own button: the colours are the first thing seen, and nobody opens "Filters" to
+/// learn what grey means. It is also in the filters sheet, next to what it explains.
 struct MapControlColumn: View {
     let controller: MapController
     let activeFilters: Int
     let onLayers: () -> Void
     let onFilters: () -> Void
+    let legendOpen: Bool
+    let onLegend: () -> Void
     var onMissions: (() -> Void)?
     var onOffline: (() -> Void)?
     var onImportGPX: (() -> Void)?
@@ -29,6 +32,11 @@ struct MapControlColumn: View {
                     ColumnButton(systemImage: "line.3.horizontal.decrease", label: L10n.t("map.filters"),
                                  badge: activeFilters, action: onFilters)
                         .mapHelpTarget(.filters)
+                    Divider().frame(width: 28)
+                    // Same gesture as the web: the palette turns into a cross while open.
+                    ColumnButton(systemImage: legendOpen ? "xmark" : "paintpalette",
+                                 label: L10n.t(legendOpen ? "legend.hide" : "legend.show"), action: onLegend)
+                        .mapHelpTarget(.legend)
                     if let onMissions {
                         Divider().frame(width: 28)
                         ColumnButton(systemImage: "figure.walk", label: L10n.t("mission.title"), action: onMissions)

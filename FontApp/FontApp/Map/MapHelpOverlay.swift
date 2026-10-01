@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Real control frames keep coach marks attached to the buttons on every screen size.
 enum MapHelpTarget: Int, CaseIterable {
-    case layers, filters, missions, offline, gpx, location, add
+    case layers, filters, legend, missions, offline, gpx, location, add
 
     var next: Self? {
         Self(rawValue: rawValue + 1)
@@ -12,6 +12,7 @@ enum MapHelpTarget: Int, CaseIterable {
         switch self {
         case .layers: L10n.t("map.layers")
         case .filters: L10n.t("map.filters")
+        case .legend: L10n.t("legend.show")
         case .missions: L10n.t("mission.title")
         case .offline: L10n.t("ios.offline.title")
         case .gpx: "GPX"
@@ -24,6 +25,7 @@ enum MapHelpTarget: Int, CaseIterable {
         let key: String = switch self {
         case .layers: "ios.mapHelp.layers"
         case .filters: "ios.mapHelp.filters"
+        case .legend: "ios.mapHelp.legend"
         case .missions: "ios.mapHelp.missions"
         case .offline: "ios.mapHelp.offline"
         case .gpx: "ios.mapHelp.gpx"

@@ -49,6 +49,8 @@ struct MapScreen: View {
     @State private var followRequest = 0
     @State private var didAutoLocate = false
     @State private var helpTarget: MapHelpTarget?
+    /// Open the first time; whoever knows the colours closes it once and it stays closed.
+    @AppStorage("map.legendOpen") private var legendOpen = true
 
     var body: some View {
         FontMapView(
@@ -78,6 +80,8 @@ struct MapScreen: View {
         .overlay(alignment: .topTrailing) {
             MapControlColumn(controller: controller, activeFilters: filters.activeCount,
                              onLayers: { sheet = .layers }, onFilters: { sheet = .filters },
+                             legendOpen: legendOpen,
+                             onLegend: { withAnimation(.easeInOut(duration: 0.2)) { legendOpen.toggle() } },
                              onMissions: { sheet = .missions },
                              onOffline: { sheet = .offline },
                              onImportGPX: { if let route { sheet = .route(route) } else { importsGPX = true } },
@@ -116,7 +120,16 @@ struct MapScreen: View {
             try? await Task.sleep(for: .milliseconds(700))
             if !Task.isCancelled, model.isLoading { showsLoading = true }
         }
-        .overlay(alignment: .bottomLeading) { attribution }
+        .overlay(alignment: .bottomLeading) {
+            VStack(alignment: .leading, spacing: 8) {
+                if legendOpen {
+                    MapLegendCard()
+                        .padding(.leading, 12)
+                        .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottomLeading)))
+                }
+                attribution
+            }
+        }
         .overlay(alignment: .bottomTrailing) {
             AddFountainButton(staff: session.isStaff, action: startNewFont)
                 .mapHelpTarget(.add)

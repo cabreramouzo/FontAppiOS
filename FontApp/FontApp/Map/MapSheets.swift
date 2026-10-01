@@ -145,6 +145,31 @@ struct FiltersSheet: View {
     }
 }
 
+/// The pin colours, over the map, in the bottom-left corner as on the web. Every colour a
+/// pin can have, or the legend lies by omission: grey ("gone") was missing once and
+/// people asked what a grey fountain meant.
+struct MapLegendCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(L10n.t("legend.waterStatus")).font(.caption.bold())
+            ForEach(WaterStatus.allCases, id: \.self) { status in
+                dot(status.color, L10n.t(status.labelKey))
+            }
+            dot(WaterStatus.noStatusColor, L10n.t("confidence.unverified"))
+        }
+        .padding(10)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .combine)
+    }
+
+    private func dot(_ color: Color, _ text: String) -> some View {
+        HStack(spacing: 6) {
+            Circle().fill(color).frame(width: 11, height: 11)
+            Text(text).font(.caption)
+        }
+    }
+}
+
 private struct LegendRow: View {
     let color: Color
     let text: String
