@@ -1,0 +1,126 @@
+{
+  "sourceLanguage": "ca",
+  "strings": {
+    "Pausa els avisos de fonts a ${applicationName}": {
+      "localizations": {
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Pausa los avisos de fuentes en ${applicationName}"
+            ]
+          }
+        },
+        "gl": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Pausa os avisos de fontes en ${applicationName}"
+            ]
+          }
+        },
+        "eu": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Pausatu iturrien abisuak ${applicationName} aplikazioan"
+            ]
+          }
+        },
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Pause fountain notices in ${applicationName}"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Suspends les notifications de fontaines dans ${applicationName}"
+            ]
+          }
+        },
+        "pt-PT": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Pausa os avisos de fontes na ${applicationName}"
+            ]
+          }
+        },
+        "it": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Sospendi gli avvisi delle fontane in ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Reprèn els avisos de fonts a ${applicationName}": {
+      "localizations": {
+        "es": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Reanuda los avisos de fuentes en ${applicationName}"
+            ]
+          }
+        },
+        "gl": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Retoma os avisos de fontes en ${applicationName}"
+            ]
+          }
+        },
+        "eu": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Aktibatu berriro iturrien abisuak ${applicationName} aplikazioan"
+            ]
+          }
+        },
+        "en": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Resume fountain notices in ${applicationName}"
+            ]
+          }
+        },
+        "fr": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Réactive les notifications de fontaines dans ${applicationName}"
+            ]
+          }
+        },
+        "pt-PT": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Retoma os avisos de fontes na ${applicationName}"
+            ]
+          }
+        },
+        "it": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Riattiva gli avvisi delle fontane in ${applicationName}"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

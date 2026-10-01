@@ -28,7 +28,11 @@ nonisolated enum PassingByRules {
     /// About one notice per stretch of a walk, and a few a day at most.
     static let betweenNotices: TimeInterval = 20 * 60
     static let perDay = 3
-    static let quietHours = 22..<24, earlyHours = 0..<7
+    /// Never at night: notices only between 7:00 and 22:00, in minutes since midnight. The
+    /// person can narrow this window in Settings, never widen it.
+    static let dayStarts = 7 * 60, dayEnds = 22 * 60
+    /// The days the person wants notices, as `Calendar` weekdays (1 = Sunday … 7 = Saturday).
+    static let allDays: Set<Int> = Set(1...7)
     /// Core Motion reports changes, not a continuous stream. A drive can start long
     /// before a region wakes the app, so look back far enough to find its last change.
     static let travelLookBack: TimeInterval = 2 * 60 * 60
@@ -66,16 +70,67 @@ nonisolated enum PassingByRules {
     }
 
     /// Whether entering a fountain's circle is worth a notice now.
-    static func shouldNotify(_ fontID: UUID, history: [PassingByNotice], now: Date = .now,
+    static func shouldNotify(_ fontID: UUID, at place: CLLocationCoordinate2D? = nil,
+                             history: [PassingByNotice], now: Date = .now,
+                             prefs: PassingByPrefs = .init(), focusMuted: Bool = false,
                              calendar: Calendar = .current) -> Bool {
-        let hour = calendar.component(.hour, from: now)
-        if quietHours.contains(hour) || earlyHours.contains(hour) { return false }
+        if focusMuted || prefs.isPaused(at: now) { return false }
+        if !prefs.days.contains(calendar.component(.weekday, from: now)) { return false }
+        let parts = calendar.dateComponents([.hour, .minute], from: now)
+        let minute = (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
+        if !(max(prefs.from, dayStarts)..<min(prefs.until, dayEnds)).contains(minute) { return false }
+        if let place, prefs.quietPlaces.contains(where: { $0.contains(place) }) { return false }
         if history.contains(where: { $0.fontID == fontID && now.timeIntervalSince($0.at) < sameFountainAgain }) {
             return false
         }
         if let last = history.map(\.at).max(), now.timeIntervalSince(last) < betweenNotices { return false }
         let today = history.filter { calendar.isDate($0.at, inSameDayAs: now) }.count
-        return today < perDay
+        return today < min(max(prefs.perDay, 1), perDay)
+    }
+}
+
+/// What the person chose in Settings for the passing-by notices. Everything here can only
+/// make the app ask less than the rules allow, never more.
+nonisolated struct PassingByPrefs: Codable, Equatable, Sendable {
+    var days: Set<Int> = PassingByRules.allDays
+    /// The window, in minutes since midnight, inside 7:00–22:00.
+    var from = PassingByRules.dayStarts
+    var until = PassingByRules.dayEnds
+    var perDay = PassingByRules.perDay
+    /// Paused until then; `.distantFuture` is "until I resume".
+    var pausedUntil: Date?
+    var quietPlaces: [QuietPlace] = []
+
+    func isPaused(at now: Date) -> Bool { pausedUntil.map { now < $0 } ?? false }
+
+    static let maxQuietPlaces = 5
+}
+
+/// "Not near home": no notice for fountains inside this circle.
+nonisolated struct QuietPlace: Codable, Equatable, Identifiable, Sendable {
+    static let radius: CLLocationDistance = 300
+
+    var id = UUID()
+    var name: String
+    var latitude: Double
+    var longitude: Double
+
+    func contains(_ point: CLLocationCoordinate2D) -> Bool {
+        CLLocation(latitude: latitude, longitude: longitude)
+            .distance(from: CLLocation(latitude: point.latitude, longitude: point.longitude)) <= Self.radius
+    }
+}
+
+/// How long "Pause" lasts, from Settings or from Shortcuts.
+nonisolated enum PassingByPause: String, CaseIterable, Sendable {
+    case day, week, untilResumed
+
+    func until(from now: Date) -> Date {
+        switch self {
+        case .day: now.addingTimeInterval(86_400)
+        case .week: now.addingTimeInterval(7 * 86_400)
+        case .untilResumed: .distantFuture
+        }
     }
 }
 
@@ -115,6 +170,10 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
 
     /// The person's choice in Settings.
     private(set) var isEnabled: Bool
+    /// The person's limits: days, hours, how many, pause and places without notices.
+    var prefs: PassingByPrefs {
+        didSet { defaults.set(try? JSONEncoder().encode(prefs), forKey: Self.prefsKey) }
+    }
     private(set) var authorization: CLAuthorizationStatus = .notDetermined
 
     @ObservationIgnored private let manager = CLLocationManager()
@@ -127,6 +186,9 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
     @ObservationIgnored private var watched: [String: FontSummary] = [:]
 
     private static let enabledKey = "passingBy.enabled"
+    private static let prefsKey = "passingBy.prefs"
+    /// Set by the Focus filter: a Focus that silences these notices is on.
+    static let focusMutedKey = "passingBy.focusMuted"
     private static let historyKey = "passingBy.history"
     private static let watchedKey = "passingBy.watched"
     private static let refreshID = "passingBy.refresh"
@@ -134,6 +196,8 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         isEnabled = defaults.bool(forKey: Self.enabledKey)
+        prefs = defaults.data(forKey: Self.prefsKey)
+            .flatMap { try? JSONDecoder().decode(PassingByPrefs.self, from: $0) } ?? PassingByPrefs()
         super.init()
         watched = (defaults.data(forKey: Self.watchedKey)
             .flatMap { try? JSONDecoder().decode([String: FontSummary].self, from: $0) }) ?? [:]
@@ -181,6 +245,9 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
         guard needsMotionAsk else { return }
         _ = await recentMotion()
     }
+
+    func pause(_ length: PassingByPause) { prefs.pausedUntil = length.until(from: .now) }
+    func resume() { prefs.pausedUntil = nil }
 
     /// Signing out: nothing can be sent without an account, so nothing is asked.
     func signedOut() {
@@ -321,7 +388,10 @@ final class PassingBy: NSObject, CLLocationManagerDelegate {
     private func entered(_ id: String) async {
         guard let font = watched[id], Outbox.shared.currentUserID != nil else { return }
         var history = self.history   // only the last month is kept: all the rules look at
-        guard PassingByRules.shouldNotify(font.id, history: history, now: Self.clock) else {
+        guard PassingByRules.shouldNotify(
+            font.id, at: CLLocationCoordinate2D(latitude: font.latitude, longitude: font.longitude),
+            history: history, now: Self.clock, prefs: prefs,
+            focusMuted: defaults.bool(forKey: Self.focusMutedKey)) else {
             log.info("near \(id, privacy: .public): the rules say not now")
             return
         }

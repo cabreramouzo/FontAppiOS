@@ -344,6 +344,9 @@ struct NotificationsSettingsScreen: View {
                     Link(L10n.t("ios.push.openSettings"), destination: url).frame(minHeight: 44)
                 }
             }
+            if passing.isEnabled {
+                PassingByLimitsRows()
+            }
             if passing.isBlocked {
                 Text(L10n.t("ios.passingBy.needsAlways")).font(.subheadline).foregroundStyle(.secondary)
                 if let url = URL(string: UIApplication.openSettingsURLString) {

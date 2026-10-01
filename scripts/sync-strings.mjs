@@ -486,6 +486,127 @@ const IOS_ONLY = {
   'ios.passingBy.needsAlways': {
     ca: 'Perquè funcioni, a Ajustes > FontApp > Ubicació tria «Sempre».', es: 'Para que funcione, en Ajustes > FontApp > Ubicación elige «Siempre».', gl: 'Para que funcione, en Axustes > FontApp > Localización escolle «Sempre».', eu: 'Funtziona dezan, Ezarpenak > FontApp > Kokapena atalean aukeratu «Beti».', en: 'For this to work, choose “Always” in Settings > FontApp > Location.', fr: 'Pour que cela fonctionne, choisissez « Toujours » dans Réglages > FontApp > Position.', pt: 'Para funcionar, em Definições > FontApp > Localização escolha «Sempre».', it: 'Perché funzioni, in Impostazioni > FontApp > Posizione scegli «Sempre».',
   },
+  'ios.passingBy.days': {
+    ca: 'Dies', es: 'Días', gl: 'Días', eu: 'Egunak', en: 'Days', fr: 'Jours', pt: 'Dias', it: 'Giorni',
+  },
+  'ios.passingBy.daysHint': {
+    ca: 'Tria quins dies vols aquests avisos. Els altres dies no et preguntarem res, encara que passis a prop d’una font.',
+    es: 'Elige qué días quieres estos avisos. Los demás días no te preguntaremos nada, aunque pases cerca de una fuente.',
+    gl: 'Escolle que días queres estes avisos. Os demais días non che preguntaremos nada, aínda que pases preto dunha fonte.',
+    eu: 'Aukeratu zein egunetan nahi dituzun abisu hauek. Beste egunetan ez dizugu ezer galdetuko, iturri baten ondotik pasatu arren.',
+    en: 'Choose which days you want these notices. On the other days we won’t ask you anything, even if you pass a fountain.',
+    fr: 'Choisissez les jours où vous voulez ces notifications. Les autres jours, nous ne vous demanderons rien, même si vous passez près d’une fontaine.',
+    pt: 'Escolha em que dias quer estes avisos. Nos outros dias não lhe perguntamos nada, mesmo que passe perto de uma fonte.',
+    it: 'Scegli in quali giorni vuoi questi avvisi. Negli altri giorni non ti chiederemo nulla, anche se passi vicino a una fontana.',
+  },
+  'ios.passingBy.everyDay': {
+    ca: 'Cada dia', es: 'Todos los días', gl: 'Todos os días', eu: 'Egunero', en: 'Every day', fr: 'Tous les jours', pt: 'Todos os dias', it: 'Ogni giorno',
+  },
+  'ios.passingBy.weekdays': {
+    ca: 'Entre setmana', es: 'Entre semana', gl: 'Entre semana', eu: 'Astegunetan', en: 'Weekdays', fr: 'En semaine', pt: 'Dias úteis', it: 'Giorni feriali',
+  },
+  'ios.passingBy.weekends': {
+    ca: 'Caps de setmana', es: 'Fines de semana', gl: 'Fins de semana', eu: 'Asteburuetan', en: 'Weekends', fr: 'Le week-end', pt: 'Fins de semana', it: 'Fine settimana',
+  },
+  'ios.passingBy.never': {
+    ca: 'Mai', es: 'Nunca', gl: 'Nunca', eu: 'Inoiz ez', en: 'Never', fr: 'Jamais', pt: 'Nunca', it: 'Mai',
+  },
+  'ios.passingBy.hours': {
+    ca: "Horari", es: "Horario", gl: "Horario", eu: "Ordutegia", en: "Hours", fr: "Horaires", pt: "Horário", it: "Orario",
+  },
+  'ios.passingBy.from': {
+    ca: "Des de", es: "Desde", gl: "Desde", eu: "Noiztik", en: "From", fr: "De", pt: "Das", it: "Dalle",
+  },
+  'ios.passingBy.until': {
+    ca: "Fins a", es: "Hasta", gl: "Ata", eu: "Noiz arte", en: "Until", fr: "À", pt: "Até", it: "Alle",
+  },
+  'ios.passingBy.hoursHint': {
+    ca: "Només et preguntarem dins d’aquestes hores. Mai abans de les 7:00 ni després de les 22:00.", es: "Solo te preguntaremos dentro de estas horas. Nunca antes de las 7:00 ni después de las 22:00.", gl: "Só che preguntaremos dentro destas horas. Nunca antes das 7:00 nin despois das 22:00.", eu: "Ordu hauen barruan bakarrik galdetuko dizugu. Inoiz ez 7:00ak baino lehen ezta 22:00ak ondoren ere.", en: "We’ll only ask within these hours. Never before 7:00 or after 22:00.", fr: "Nous ne vous demanderons rien en dehors de ces heures. Jamais avant 7 h ni après 22 h.", pt: "Só perguntamos dentro destas horas. Nunca antes das 7:00 nem depois das 22:00.", it: "Ti chiederemo solo in questa fascia oraria. Mai prima delle 7:00 né dopo le 22:00.",
+  },
+  'ios.passingBy.hoursReset': {
+    ca: "Torna a 7:00–22:00", es: "Volver a 7:00–22:00", gl: "Volver a 7:00–22:00", eu: "Itzuli 7:00–22:00 ordutegira", en: "Back to 7:00–22:00", fr: "Revenir à 7:00–22:00", pt: "Voltar a 7:00–22:00", it: "Torna a 7:00–22:00",
+  },
+  'ios.passingBy.perDay': {
+    ca: "Màxim al dia", es: "Máximo al día", gl: "Máximo ao día", eu: "Egunean gehienez", en: "Most per day", fr: "Maximum par jour", pt: "Máximo por dia", it: "Massimo al giorno",
+  },
+  'ios.passingBy.pause': {
+    ca: "Pausa els avisos", es: "Pausar avisos", gl: "Pausar avisos", eu: "Pausatu abisuak", en: "Pause notices", fr: "Suspendre les notifications", pt: "Pausar avisos", it: "Sospendi gli avvisi",
+  },
+  'ios.passingBy.pauseDay': {
+    ca: "Durant 1 dia", es: "Durante 1 día", gl: "Durante 1 día", eu: "Egun batez", en: "For 1 day", fr: "Pendant 1 jour", pt: "Durante 1 dia", it: "Per 1 giorno",
+  },
+  'ios.passingBy.pauseWeek': {
+    ca: "Durant 1 setmana", es: "Durante 1 semana", gl: "Durante 1 semana", eu: "Aste batez", en: "For 1 week", fr: "Pendant 1 semaine", pt: "Durante 1 semana", it: "Per 1 settimana",
+  },
+  'ios.passingBy.pauseUntilResumed': {
+    ca: "Fins que els reprengui", es: "Hasta que los reanude", gl: "Ata que os retome", eu: "Berriro aktibatu arte", en: "Until I resume them", fr: "Jusqu’à ce que je les réactive", pt: "Até os retomar", it: "Finché non li riattivo",
+  },
+  'ios.passingBy.paused': {
+    ca: "Avisos en pausa", es: "Avisos en pausa", gl: "Avisos en pausa", eu: "Abisuak pausatuta", en: "Notices paused", fr: "Notifications suspendues", pt: "Avisos em pausa", it: "Avvisi in pausa",
+  },
+  'ios.passingBy.pausedUntil': {
+    ca: "Fins {date}", es: "Hasta {date}", gl: "Ata {date}", eu: "Noiz arte: {date}", en: "Until {date}", fr: "Jusqu’au {date}", pt: "Até {date}", it: "Fino a {date}",
+  },
+  'ios.passingBy.pausedUntilResumed': {
+    ca: "Fins que els reprenguis", es: "Hasta que los reanudes", gl: "Ata que os retomes", eu: "Berriro aktibatu arte", en: "Until you resume them", fr: "Jusqu’à ce que vous les réactiviez", pt: "Até os retomar", it: "Finché non li riattivi",
+  },
+  'ios.passingBy.resume': {
+    ca: "Reprèn els avisos", es: "Reanudar avisos", gl: "Retomar avisos", eu: "Berriro aktibatu abisuak", en: "Resume notices", fr: "Réactiver les notifications", pt: "Retomar avisos", it: "Riattiva gli avvisi",
+  },
+  'ios.passingBy.places': {
+    ca: "Llocs sense avisos", es: "Lugares sin avisos", gl: "Lugares sen avisos", eu: "Abisurik gabeko lekuak", en: "Places without notices", fr: "Lieux sans notifications", pt: "Locais sem avisos", it: "Luoghi senza avvisi",
+  },
+  'ios.passingBy.placesNone': {
+    ca: "Cap", es: "Ninguno", gl: "Ningún", eu: "Bat ere ez", en: "None", fr: "Aucun", pt: "Nenhum", it: "Nessuno",
+  },
+  'ios.passingBy.placesAdd': {
+    ca: "Afegeix un lloc", es: "Añadir un lugar", gl: "Engadir un lugar", eu: "Gehitu leku bat", en: "Add a place", fr: "Ajouter un lieu", pt: "Adicionar um local", it: "Aggiungi un luogo",
+  },
+  'ios.passingBy.placesHint': {
+    ca: "Per les fonts del teu barri hi passes cada dia: no et preguntarem per les que siguin a menys de 300 m d’aquests llocs. Es desen només al telèfon.", es: "Por las fuentes de tu barrio pasas cada día: no te preguntaremos por las que estén a menos de 300 m de estos lugares. Se guardan solo en el teléfono.", gl: "Polas fontes do teu barrio pasas cada día: non che preguntaremos polas que estean a menos de 300 m destes lugares. Gárdanse só no teléfono.", eu: "Zure auzoko iturrien ondotik egunero pasatzen zara: leku hauetatik 300 m baino gutxiagora daudenei buruz ez dizugu galdetuko. Telefonoan bakarrik gordetzen dira.", en: "You pass the fountains in your neighbourhood every day: we won’t ask about those within 300 m of these places. They are stored only on your phone.", fr: "Vous passez chaque jour devant les fontaines de votre quartier : nous ne vous demanderons rien sur celles à moins de 300 m de ces lieux. Ils ne sont enregistrés que sur le téléphone.", pt: "Passa todos os dias pelas fontes do seu bairro: não perguntamos pelas que estejam a menos de 300 m destes locais. São guardados apenas no telemóvel.", it: "Passi ogni giorno davanti alle fontane del tuo quartiere: non ti chiederemo di quelle a meno di 300 m da questi luoghi. Sono salvati solo sul telefono.",
+  },
+  'ios.passingBy.placeName': {
+    ca: "Nom (p. ex. Casa)", es: "Nombre (p. ej. Casa)", gl: "Nome (p. ex. Casa)", eu: "Izena (adib. Etxea)", en: "Name (e.g. Home)", fr: "Nom (p. ex. Maison)", pt: "Nome (p. ex. Casa)", it: "Nome (es. Casa)",
+  },
+  'ios.passingBy.placeDefault': {
+    ca: "Lloc", es: "Lugar", gl: "Lugar", eu: "Lekua", en: "Place", fr: "Lieu", pt: "Local", it: "Luogo",
+  },
+  'ios.intent.focusTitle': {
+    ca: "Avisos en passar per fonts", es: "Avisos al pasar por fuentes", gl: "Avisos ao pasar por fontes", eu: "Iturrien ondotik pasatzean abisuak", en: "Notices when passing fountains", fr: "Notifications près des fontaines", pt: "Avisos ao passar por fontes", it: "Avvisi passando vicino alle fontane",
+  },
+  'ios.intent.focusDescription': {
+    ca: "Silencia les preguntes en passar a prop d’una font mentre aquesta concentració estigui activa.", es: "Silencia las preguntas al pasar cerca de una fuente mientras este modo de concentración esté activo.", gl: "Silencia as preguntas ao pasar preto dunha fonte mentres este modo de concentración estea activo.", eu: "Isilarazi iturri baten ondotik pasatzean egiten diren galderak kontzentrazio modu hau aktibo dagoen bitartean.", en: "Silences the questions when you pass a fountain while this Focus is on.", fr: "Coupe les questions près d’une fontaine tant que ce mode de concentration est actif.", pt: "Silencia as perguntas ao passar perto de uma fonte enquanto este modo de foco estiver ativo.", it: "Silenzia le domande vicino a una fontana mentre questa modalità Full immersion è attiva.",
+  },
+  'ios.intent.focusMute': {
+    ca: "Silencia els avisos", es: "Silenciar avisos", gl: "Silenciar avisos", eu: "Isilarazi abisuak", en: "Silence notices", fr: "Couper les notifications", pt: "Silenciar avisos", it: "Silenzia gli avvisi",
+  },
+  'ios.intent.focusMuted': {
+    ca: "Avisos de fonts silenciats", es: "Avisos de fuentes silenciados", gl: "Avisos de fontes silenciados", eu: "Iturrien abisuak isilduta", en: "Fountain notices silenced", fr: "Notifications de fontaines coupées", pt: "Avisos de fontes silenciados", it: "Avvisi delle fontane silenziati",
+  },
+  'ios.intent.focusAllowed': {
+    ca: "Avisos de fonts permesos", es: "Avisos de fuentes permitidos", gl: "Avisos de fontes permitidos", eu: "Iturrien abisuak baimenduta", en: "Fountain notices allowed", fr: "Notifications de fontaines autorisées", pt: "Avisos de fontes permitidos", it: "Avvisi delle fontane consentiti",
+  },
+  'ios.intent.pauseLength': {
+    ca: "Durada", es: "Duración", gl: "Duración", eu: "Iraupena", en: "Duration", fr: "Durée", pt: "Duração", it: "Durata",
+  },
+  'ios.intent.pauseTitle': {
+    ca: "Pausa els avisos de fonts", es: "Pausar avisos de fuentes", gl: "Pausar avisos de fontes", eu: "Pausatu iturrien abisuak", en: "Pause fountain notices", fr: "Suspendre les notifications de fontaines", pt: "Pausar avisos de fontes", it: "Sospendi gli avvisi delle fontane",
+  },
+  'ios.intent.pauseDescription': {
+    ca: "Deixa de preguntar en passar per fonts durant un temps.", es: "Deja de preguntar al pasar por fuentes durante un tiempo.", gl: "Deixa de preguntar ao pasar por fontes durante un tempo.", eu: "Denbora batez, utzi iturrien ondotik pasatzean galdetzeari.", en: "Stops asking when you pass fountains for a while.", fr: "Arrête de demander près des fontaines pendant un moment.", pt: "Deixa de perguntar ao passar por fontes durante algum tempo.", it: "Smette di chiedere vicino alle fontane per un po’.",
+  },
+  'ios.intent.pausedDialog': {
+    ca: "Avisos de fonts en pausa.", es: "Avisos de fuentes en pausa.", gl: "Avisos de fontes en pausa.", eu: "Iturrien abisuak pausatuta.", en: "Fountain notices paused.", fr: "Notifications de fontaines suspendues.", pt: "Avisos de fontes em pausa.", it: "Avvisi delle fontane in pausa.",
+  },
+  'ios.intent.resumeTitle': {
+    ca: "Reprèn els avisos de fonts", es: "Reanudar avisos de fuentes", gl: "Retomar avisos de fontes", eu: "Berriro aktibatu iturrien abisuak", en: "Resume fountain notices", fr: "Réactiver les notifications de fontaines", pt: "Retomar avisos de fontes", it: "Riattiva gli avvisi delle fontane",
+  },
+  'ios.intent.resumeDescription': {
+    ca: "Torna a preguntar en passar per fonts.", es: "Vuelve a preguntar al pasar por fuentes.", gl: "Volve preguntar ao pasar por fontes.", eu: "Berriro galdetu iturrien ondotik pasatzean.", en: "Asks again when you pass fountains.", fr: "Recommence à demander près des fontaines.", pt: "Volta a perguntar ao passar por fontes.", it: "Torna a chiedere vicino alle fontane.",
+  },
+  'ios.intent.resumedDialog': {
+    ca: "Avisos de fonts represos.", es: "Avisos de fuentes reanudados.", gl: "Avisos de fontes retomados.", eu: "Iturrien abisuak berriro aktibatuta.", en: "Fountain notices resumed.", fr: "Notifications de fontaines réactivées.", pt: "Avisos de fontes retomados.", it: "Avvisi delle fontane riattivati.",
+  },
   'ios.passingBy.noticeTitle': {
     ca: 'Passes a prop de: {name}', es: 'Pasas cerca de: {name}', gl: 'Pasas preto de: {name}', eu: 'Hemendik gertu zaude: {name}', en: 'You’re passing near {name}', fr: 'Vous passez près de : {name}', pt: 'Está a passar perto de: {name}', it: 'Stai passando vicino a: {name}',
   },

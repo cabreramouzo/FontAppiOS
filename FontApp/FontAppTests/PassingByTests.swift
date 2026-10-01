@@ -54,6 +54,56 @@ struct PassingByTests {
         #expect(!PassingByRules.shouldNotify(id, history: three, now: noon, calendar: calendar))
     }
 
+    @Test func onlyOnTheChosenDays() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Madrid")!
+        // Friday 2 October 2026, at noon.
+        let friday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 2, hour: 12))!
+        let id = UUID()
+        #expect(PassingByRules.shouldNotify(id, history: [], now: friday, calendar: calendar))
+        func prefs(_ change: (inout PassingByPrefs) -> Void) -> PassingByPrefs {
+            var p = PassingByPrefs(); change(&p); return p
+        }
+        #expect(PassingByRules.shouldNotify(id, history: [], now: friday,
+                                            prefs: prefs { $0.days = [2, 3, 4, 5, 6] }, calendar: calendar))
+        #expect(!PassingByRules.shouldNotify(id, history: [], now: friday,
+                                             prefs: prefs { $0.days = [1, 7] }, calendar: calendar))
+        #expect(!PassingByRules.shouldNotify(id, history: [], now: friday,
+                                             prefs: prefs { $0.days = [] }, calendar: calendar))
+    }
+
+    @Test func thePersonsLimitsOnlyEverAskLess() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Madrid")!
+        let noon = calendar.date(from: DateComponents(year: 2026, month: 10, day: 2, hour: 12))!
+        let id = UUID()
+        var p = PassingByPrefs()
+        // Window: 18:00–21:00 excludes noon; a window reaching into the night stays closed there.
+        p.from = 18 * 60; p.until = 21 * 60
+        #expect(!PassingByRules.shouldNotify(id, history: [], now: noon, prefs: p, calendar: calendar))
+        p.from = 0; p.until = 24 * 60
+        let lateNight = calendar.date(from: DateComponents(year: 2026, month: 10, day: 2, hour: 23))!
+        #expect(!PassingByRules.shouldNotify(id, history: [], now: lateNight, prefs: p, calendar: calendar))
+        // How many a day: one already today.
+        p = PassingByPrefs(); p.perDay = 1
+        let one = [PassingByNotice(fontID: UUID(), at: noon.addingTimeInterval(-3 * 3600))]
+        #expect(!PassingByRules.shouldNotify(id, history: one, now: noon, prefs: p, calendar: calendar))
+        // Paused, and the pause running out.
+        p = PassingByPrefs(); p.pausedUntil = noon.addingTimeInterval(60)
+        #expect(!PassingByRules.shouldNotify(id, history: [], now: noon, prefs: p, calendar: calendar))
+        p.pausedUntil = noon.addingTimeInterval(-60)
+        #expect(PassingByRules.shouldNotify(id, history: [], now: noon, prefs: p, calendar: calendar))
+        // A Focus that silences them.
+        #expect(!PassingByRules.shouldNotify(id, history: [], now: noon, focusMuted: true, calendar: calendar))
+        // Near home (300 m), and a fountain farther away.
+        p = PassingByPrefs()
+        p.quietPlaces = [QuietPlace(name: "Home", latitude: 41.3870, longitude: 2.1700)]
+        #expect(!PassingByRules.shouldNotify(id, at: CLLocationCoordinate2D(latitude: 41.3880, longitude: 2.1700),
+                                             history: [], now: noon, prefs: p, calendar: calendar))
+        #expect(PassingByRules.shouldNotify(id, at: CLLocationCoordinate2D(latitude: 41.3970, longitude: 2.1700),
+                                            history: [], now: noon, prefs: p, calendar: calendar))
+    }
+
     @Test func aChipOnTheNoticeGoesToTheOutbox() {
         let outbox = Outbox(directory: FileManager.default.temporaryDirectory.appending(path: UUID().uuidString))
         let id = UUID()
