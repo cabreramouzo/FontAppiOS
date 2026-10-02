@@ -98,8 +98,7 @@ struct MapScreen: View {
                     .font(.system(size: 18, weight: .semibold))
                     .frame(width: 48, height: 48)
             }
-            .buttonStyle(.plain)
-            .glassEffect(.regular.interactive(), in: Circle())
+            .glassButton(in: Circle())
             .accessibilityLabel(L10n.t("ios.mapHelp.title"))
             .padding(.leading, 12)
             .padding(.top, 8)

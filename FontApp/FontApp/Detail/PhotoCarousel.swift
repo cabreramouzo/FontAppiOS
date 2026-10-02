@@ -230,8 +230,7 @@ struct PhotoViewer: View {
             Button { dismiss() } label: {
                 Image(systemName: "xmark").font(.body.weight(.semibold)).frame(width: 44, height: 44)
             }
-            .buttonStyle(.plain)
-            .glassEffect(.regular.interactive(), in: Circle())
+            .glassButton(in: Circle())
             .padding(.leading, 16)
             .opacity(drag == .zero ? 1 : 0)
             .accessibilityLabel(L10n.t("ios.close"))

@@ -121,8 +121,7 @@ private struct SystemMapButtons: View {
                     .frame(width: 48, height: 48)
                     .contentShape(Circle())
             }
-            .buttonStyle(.plain)
-            .glassEffect(.regular.interactive(), in: Circle())
+            .glassButton(in: Circle())
             .accessibilityLabel(L10n.t("map.recenter"))
             .mapHelpTarget(.location)
         }
@@ -149,7 +148,7 @@ struct AddFountainButton: View {
                 .foregroundStyle(.white)
                 .frame(width: 56, height: 56)
         }
-        .glassEffect(.regular.tint(staff ? Color.staff : Color.accentColor).interactive(), in: Circle())
+        .glassButton(.regular.tint(staff ? Color.staff : Color.accentColor), in: Circle())
         .accessibilityLabel(L10n.plain("map.addFont"))
     }
 }

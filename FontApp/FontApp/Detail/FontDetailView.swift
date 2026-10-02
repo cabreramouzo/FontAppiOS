@@ -267,37 +267,31 @@ struct FontDetailView: View {
                             .frame(maxWidth: .infinity, minHeight: 48)
                             .contentShape(Capsule())
                     }
-                    .buttonStyle(.plain)
-                    .glassEffect(.regular.tint(tint).interactive(), in: Capsule())
+                    .glassButton(.regular.tint(tint), in: Capsule())
                     .accessibilityLabel("\(L10n.t("detail.directions")), \(far)")
                 } else {
                     Button { openDirections(font) } label: { CircleIcon(systemImage: "figure.walk") }
-                        .buttonStyle(.plain)
-                        .glassEffect(.regular.interactive(), in: Circle())
+                        .glassButton(in: Circle())
                         .accessibilityLabel(L10n.t("detail.directions"))
                 }
                 // Away from the map it goes there; over the map it zooms onto the fountain.
                 if let showOnMap {
                     Button { showOnMap(FontSummary(font)) } label: { CircleIcon(systemImage: "map") }
-                        .buttonStyle(.plain)
-                        .glassEffect(.regular.interactive(), in: Circle())
+                        .glassButton(in: Circle())
                         .accessibilityLabel(L10n.t("detail.viewOnMap"))
                 }
                 Button { toggleStar(font) } label: {
                     CircleIcon(systemImage: starred ? "star.fill" : "star", color: starred ? .yellow : .primary)
                 }
-                .buttonStyle(.plain)
-                .glassEffect(.regular.interactive(), in: Circle())
+                .glassButton(in: Circle())
                 .sensoryFeedback(.selection, trigger: starred)
                 .accessibilityLabel(L10n.t(starred ? "favorite.saved" : "favorite.save"))
                 .accessibilityIdentifier("fontDetail.favorite")
                 ShareLink(item: shareText(font)) { CircleIcon(systemImage: "square.and.arrow.up") }
-                    .buttonStyle(.plain)
-                    .glassEffect(.regular.interactive(), in: Circle())
+                    .glassButton(in: Circle())
                     .accessibilityLabel(L10n.t("detail.share"))
                 moreMenu(font)
-                    .buttonStyle(.plain)
-                    .glassEffect(.regular.interactive(), in: Circle())
+                    .glassButton(in: Circle())
             }
         }
     }
