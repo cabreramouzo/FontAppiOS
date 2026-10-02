@@ -21,6 +21,8 @@ struct MapScreen: View {
     /// "+" was tapped signed out: once signed in, the form opens by itself, which is
     /// what was asked for, instead of leaving the person back on the map.
     @State private var addAfterSignIn = false
+    /// A half-filled new fountain found on "+": offered back, never opened by itself.
+    @State private var pendingDraft: NewFontDraft?
     @State private var toast: String?
 
     private enum MapSheet: Identifiable {
@@ -167,6 +169,18 @@ struct MapScreen: View {
                 addAfterSignIn = false
             }
         }) { SignInView() }
+        .confirmationDialog(resumeTitle, isPresented: Binding(get: { pendingDraft != nil },
+                                                              set: { if !$0 { pendingDraft = nil } }),
+                            titleVisibility: .visible, presenting: pendingDraft) { draft in
+            Button(L10n.t("draft.resume")) { sheet = .newFont(NewFontModel(draft: draft)) }
+            Button(L10n.t("draft.discard"), role: .destructive) {
+                NewFontDraft.clear()
+                startNewFont()
+            }
+            Button(L10n.t("form.cancel"), role: .cancel) {}
+        } message: { _ in
+            Text(L10n.t("draft.photoAgain"))
+        }
         .sheet(item: $sheet) { which in
             switch which {
             case .layers:
@@ -304,17 +318,24 @@ struct MapScreen: View {
             showsSignIn = true
             return
         }
-        // A half-filled form comes back as it was left, pin included. One with nothing
-        // written is not a draft: its pin would pin every new fountain to the same spot.
-        if let draft = NewFontDraft.load(), !draft.isEmpty {
-            sheet = .newFont(NewFontModel(draft: draft))
-            return
-        }
         let center = controller.mapView?.centerCoordinate ?? CLLocationCoordinate2D(latitude: 41.8, longitude: 2.1)
-        let start = NewFontPlacement.start(mapCenter: center, me: location.isAuthorized ? location.location : nil)
-        let model = NewFontModel(draft: NewFontDraft(latitude: start.latitude, longitude: start.longitude))
-        if location.isAuthorized { model.followUser(from: start) }
-        sheet = .newFont(model)
+        switch NewFontStart.decide(mapCenter: center, me: location.isAuthorized ? location.location : nil) {
+        case .resume(let draft):
+            // Asked, not restored by itself: a fountain left half-done elsewhere must not
+            // turn up, name and pin included, when starting a new one here.
+            pendingDraft = draft
+        case .fresh(let draft):
+            let model = NewFontModel(draft: draft)
+            if location.isAuthorized { model.followUser(from: model.pin) }
+            sheet = .newFont(model)
+        }
+    }
+
+    private var resumeTitle: String {
+        guard let name = pendingDraft?.name.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else {
+            return L10n.t("draft.newFont")
+        }
+        return L10n.t("draft.newFontNamed", ["name": name])
     }
 
     /// The new fountain, on the map at once and selected: its raised pin stands above

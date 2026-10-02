@@ -111,25 +111,30 @@ struct NewFontSheet: View {
                         }
                     }
                 }
-
-                Section {
-                    Button(L10n.t("draft.discard"), role: .destructive) { confirmsDiscard = true }
-                        .frame(minHeight: 44)
-                        .confirmsDestructive(L10n.t("draft.discard"), isPresented: $confirmsDiscard,
-                                             action: L10n.t("draft.discard")) {
-                            model.discard()
-                            dismiss()
-                        }
-                }
             }
             .navigationTitle(L10n.t("newFont.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    // Closing keeps the draft; discarding is its own, confirmed action.
-                    Button(role: .close) { dismiss() }
+                // Apple's pattern for a modal form: Cancel on the leading side; with
+                // something written, it asks whether to keep it as a draft or discard it.
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .cancel) {
+                        if model.draft.isEmpty && model.photo == nil { dismiss() } else { confirmsDiscard = true }
+                    }
+                    .disabled(isBusy)
+                    .confirmationDialog(L10n.t("draft.newFont"), isPresented: $confirmsDiscard) {
+                        Button(L10n.t("draft.discard"), role: .destructive) {
+                            model.discard()
+                            dismiss()
+                        }
+                        // The draft is already on the phone: saving is closing.
+                        Button(L10n.t("ios.newFont.saveDraft")) { dismiss() }
+                        Button(L10n.t("ios.newFont.keepEditing"), role: .cancel) {}
+                    } message: {
+                        if model.photo != nil { Text(L10n.t("draft.photoAgain")) }
+                    }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .confirmationAction) {
                     if isBusy {
                         ProgressView()
                     } else {

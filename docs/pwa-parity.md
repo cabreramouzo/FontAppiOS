@@ -49,3 +49,18 @@ The install page and prompts, service worker and shell cache, web push transport
 browser safe-area and relayout workarounds, crawler gates, sitemap, and SEO share pages
 are web infrastructure rather than native product features. Native iOS already uses
 APNs, its own offline stores, and universal links.
+
+## Field test — 2 October 2026
+
+1. **A created fountain came back as the next one's draft.** After creating a fountain
+   (online or queued), opening "+" again showed the previous name, choices and pin.
+   Cause: the form's model saved the draft on every change, and after sending it kept
+   receiving changes while the sheet closed (the precise-location fix that follows the
+   user, the small map reporting its centre). The first such write after
+   `NewFontDraft.clear` stored the whole old form again, and "+" restored any non-empty
+   draft silently. Fixed: once sent, queued or discarded the model never writes the draft
+   again; a restored draft is offered (continue / discard, as R2.4 says) instead of
+   opening by itself; the toolbar follows Apple's modal-form pattern — **Cancel** on the
+   leading side asks "Save draft / Discard" when the form has content, **Create** on the
+   trailing side — and the destructive button at the bottom of the form is gone. Covered
+   by `NewFontDraftLifecycleTests`.

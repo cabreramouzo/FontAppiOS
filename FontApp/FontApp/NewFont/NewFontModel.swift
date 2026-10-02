@@ -56,6 +56,21 @@ nonisolated struct NewFontDraft: Codable, Equatable, Sendable {
     }
 }
 
+/// What "+" opens: a half-filled form to offer back, or a fresh one placed for here.
+nonisolated enum NewFontStart {
+    case resume(NewFontDraft)
+    case fresh(NewFontDraft)
+
+    /// A draft with nothing written is not a draft: its pin would pin every new fountain
+    /// to the same spot.
+    static func decide(mapCenter: CLLocationCoordinate2D, me: CLLocation?,
+                       defaults: UserDefaults = .standard) -> NewFontStart {
+        if let draft = NewFontDraft.load(defaults), !draft.isEmpty { return .resume(draft) }
+        let start = NewFontPlacement.start(mapCenter: mapCenter, me: me)
+        return .fresh(NewFontDraft(latitude: start.latitude, longitude: start.longitude))
+    }
+}
+
 @Observable
 final class NewFontModel {
     enum State: Equatable {
@@ -71,8 +86,12 @@ final class NewFontModel {
     }
 
     var draft: NewFontDraft {
-        didSet { if draft != oldValue { draft.save(defaults) } }
+        didSet { if draft != oldValue, !finished { draft.save(defaults) } }
     }
+    /// Sent, queued or discarded: the draft is gone and must stay gone. The sheet keeps
+    /// moving the pin while it closes (a location fix, the map reporting its centre), and
+    /// each of those writes stored the sent fountain again as the next one's draft.
+    @ObservationIgnored private(set) var finished = false
     var photo: PhotoPreparer.Prepared?
     /// New accounts may add a few fountains a day; past that, one can ask for an exception.
     private(set) var limitReached = false
@@ -145,6 +164,12 @@ final class NewFontModel {
 
     /// Deleted on purpose: the draft goes too.
     func discard() {
+        finish()
+    }
+
+    private func finish() {
+        finished = true
+        following = nil
         NewFontDraft.clear(defaults)
     }
 
@@ -175,7 +200,7 @@ final class NewFontModel {
             // The status is the fountain's first update. If it fails the fountain exists
             // anyway; it can be reviewed afterwards.
             if let status = draft.status { try? await api.postStatus(on: created.id, status) }
-            NewFontDraft.clear(defaults)
+            finish()
             state = .created(FontSummary(created))
             NotificationCenter.default.post(name: .fontChanged, object: created.id)
         } catch let error as APIError where error.status == 0 {
@@ -183,7 +208,7 @@ final class NewFontModel {
             do {
                 font.image = nil
                 try outbox.enqueueFont(font, firstStatus: draft.status, jpeg: photo?.jpeg, meta: photo?.meta)
-                NewFontDraft.clear(defaults)
+                finish()
                 state = .queued
             } catch {
                 state = .failed(ErrorText.describe(error))
