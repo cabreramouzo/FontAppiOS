@@ -25,6 +25,10 @@ nonisolated enum WaterSource: String, Codable, Sendable, CaseIterable {
 nonisolated enum Drinkable: String, Codable, Sendable, CaseIterable {
     case yes, no, conditional, untreated
 
+    /// The order a person is asked in (author, 03/10/2026): the plain answers first —
+    /// potable, untreated, not potable — and the qualified one last.
+    static let askOrder: [Drinkable] = [.yes, .untreated, .no, .conditional]
+
     /// The web's (`DRINKABLE_EMOJI`): untreated is a drop, not a warning — no verdict.
     var emoji: String {
         switch self {

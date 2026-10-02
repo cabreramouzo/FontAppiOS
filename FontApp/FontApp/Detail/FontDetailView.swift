@@ -26,7 +26,8 @@ struct FontDetailView: View {
     @State private var creatorTier: String?
     @State private var photoAuthor: String?
     /// The one question asked after a quick review, while it is on screen.
-    @State private var followUp: MissingFact?
+    /// What is still to ask after a quick review, in the chips' slot (`QuickFlow`).
+    @State private var quickSteps: [QuickFlow.Step] = []
     @State private var capabilities: Set<String> = []
     @State private var editingReview: CommentResponse?
     @State private var editingReport: ReportResponse?
@@ -95,15 +96,33 @@ struct FontDetailView: View {
         .toolbar { ToolbarItem(placement: .principal) { Color.clear.frame(width: 1, height: 1) } }
         .toolbarVisibility(onClose == nil ? .automatic : .hidden, for: .navigationBar)
         .task { await model.load() }
-        // Right after a review lands, on the spot: the most valuable thing missing, once
-        // per fountain and person.
-        .onChange(of: model.quickReview?.state) { _, state in
-            guard case .sent = state, let quick = model.quickReview, !quick.lastWasRemote,
-                  let userID = session.userID, let font = loadedFont,
-                  let fact = MissingFact.all(of: font).first,
-                  !FollowUpAsked.contains(font.id, user: userID) else { return }
-            FollowUpAsked.insert(font.id, user: userID)
-            withAnimation { followUp = fact }
+        // Right after a review lands, on the spot: the photo, then what the fountain lacks
+        // (facts once per fountain and person), one at a time in the chips' slot.
+        .onChange(of: model.quickReview?.state) { old, state in
+            switch state {
+            case .sent, .queued:
+                // Only when it lands, not on later changes of the same review.
+                if case .sent = old { return }
+                if case .queued = old { return }
+                guard let quick = model.quickReview, let userID = session.userID,
+                      let font = loadedFont else { return }
+                var queued = false
+                if case .queued = state { queued = true }
+                let asked = FollowUpAsked.contains(font.id, user: userID)
+                quickSteps = QuickFlow.steps(hasPhoto: font.image != nil, missing: MissingFact.all(of: font),
+                                             remote: quick.lastWasRemote, queued: queued, alreadyAsked: asked)
+                if quickSteps.contains(where: { if case .fact = $0 { true } else { false } }) {
+                    FollowUpAsked.insert(font.id, user: userID)
+                }
+            default:
+                // Undone: the chips come back, and the questions go with the review.
+                quickSteps = []
+            }
+        }
+        // The photo step ends when the photo is on its way, uploaded or queued.
+        .onChange(of: model.photoUpload?.state) { _, state in
+            guard quickSteps.first == .photo, state == .done || state == .queued else { return }
+            quickSteps.removeFirst()
         }
         .profileNavigation()
         .onAppear { approach.start(authorized: location.isAuthorized) }
@@ -238,8 +257,13 @@ struct FontDetailView: View {
                     }
                 }
                 statusRow(font)
-                actions(font)
+                // Stepped aside while the chips' slot asks something: the short card has no
+                // room for both, and the question is what the moment is for. Back after.
+                if quickSteps.isEmpty {
+                    actions(font).transition(.opacity)
+                }
             }
+            .animation(.snappy, value: quickSteps.isEmpty)
             .listRowBackground(Color.clear)
             .listRowInsets(EdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4))
         }
@@ -676,18 +700,20 @@ struct FontDetailView: View {
             if let quick = model.quickReview {
                 QuickReviewSection(model: quick, ownRecent: model.ownRecentReport(by: session.user?.id),
                                    onChange: { await model.load() },
-                                   onSignIn: { showsSignIn = true })
-            }
-            if let followUp {
-                FollowUpQuestion(font: font, fact: followUp) { saved in
-                    withAnimation { self.followUp = nil }
-                    // The answer shows in the page's facts at once; a tap of success says
-                    // it landed without another thing to read.
-                    if saved {
-                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                        Task { await model.load() }
-                    }
-                }
+                                   onSignIn: { showsSignIn = true },
+                                   font: font,
+                                   steps: quickSteps,
+                                   photo: model.photoUpload,
+                                   onCamera: { showsCamera = true },
+                                   onStep: { saved in
+                                       if !quickSteps.isEmpty { quickSteps.removeFirst() }
+                                       // The answer shows in the page's facts at once; a tap of
+                                       // success says it landed without another thing to read.
+                                       if saved {
+                                           UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                           Task { await model.load() }
+                                       }
+                                   })
             }
             // Right under the chips, when it shows at all: the chips are what the short
             // card opens for, and a big arrow above them pushed them out of it. The rest of
@@ -720,7 +746,8 @@ struct FontDetailView: View {
                     if font.image != nil { coverControls(font) }
                 }
             }
-            if font.image == nil, let upload = model.photoUpload {
+            // While the chips' slot asks for the photo, it is asked there only, not twice.
+            if font.image == nil, !quickSteps.contains(.photo), let upload = model.photoUpload {
                 PhotoSection(model: upload, onUploaded: { await model.load() },
                              onCamera: { showsCamera = true })
             } else if photos.isEmpty {
@@ -944,22 +971,30 @@ struct FontDetailView: View {
         }
     }
 
+    private func asking(_ fact: MissingFact) -> Bool { quickSteps.contains(.fact(fact)) }
+
     private func factsSection(_ font: FontDetail) -> some View {
         Section {
             // What is missing reads as something to add, in colour, filled in place.
             let reload: () -> Void = { Task { await model.load() } }
             let signIn: (() -> Void)? = session.isSignedIn ? nil : { showsSignIn = true }
-            if font.name?.isEmpty ?? true {
+            // A fact the chips' slot is asking about is not offered here too: the same
+            // question twice on one page reads as a mistake. It comes back after.
+            if font.name?.isEmpty ?? true, !asking(.name) {
                 MissingFactRow(font: font, fact: .name, label: L10n.t("ios.fill.nameLabel"),
                                onSaved: reload, onSignIn: signIn)
             }
             if let source = font.source {
                 LabeledContent(label("detail.type"), value: source.emojiLabel)
+            } else if asking(.source) {
+                LabeledContent(label("detail.type"), value: L10n.t("detail.unknownType"))
             } else {
                 MissingFactRow(font: font, fact: .source, label: label("detail.type"), onSaved: reload, onSignIn: signIn)
             }
             if let drinkable = font.drinkable {
                 LabeledContent(label("detail.drinkability"), value: drinkable.emojiLabel)
+            } else if asking(.drinkable) {
+                LabeledContent(label("detail.drinkability"), value: L10n.t("detail.unknownDrink"))
             } else {
                 MissingFactRow(font: font, fact: .drinkable, label: label("detail.drinkability"),
                                onSaved: reload, onSignIn: signIn)

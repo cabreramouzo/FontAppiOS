@@ -64,3 +64,32 @@ APNs, its own offline stores, and universal links.
    leading side asks "Save draft / Discard" when the form has content, **Create** on the
    trailing side — and the destructive button at the bottom of the form is gone. Covered
    by `NewFontDraftLifecycleTests`.
+2. **No photo offer after the quick review.** The web's map popup, after a chip, offers
+   "No photo yet. Will you take one? +N drops" when the fountain has none (client rule
+   R1.7: status first, then the photo). iOS showed only the thanks. On iOS the chips live
+   in the detail sheet's short card, not in a popup of their own, so the offer goes in
+   the same place, as one row: the thanks with "No photo yet. Will you take one?" under
+   it, the undo beside it, and **Take photo** (prominent: you are in front of it) and
+   **Choose photo** right below, also after a review queued without signal. A first
+   version used three rows and the buttons fell below the short card, out of sight; it
+   also showed "+80 drops", removed so the game does not eclipse the request. It shares the
+   page's `PhotoUploadModel`, so a photo taken here is the same one the "no photo yet"
+   section shows, and the thanks ("It has a photo now") stays after the page reloads with
+   the new cover.
+3. **Questions after the quick review fell out of sight.** Each one (photo, then "is it
+   drinkable?") was a section added under the chips, and the short card has a fixed
+   height: the newest question always landed below its edge. Now the chips' slot is a
+   single slot that changes, as the web's popup replaces its content: after the tap it
+   shows the thanks (with the undo) and **one** question at a time, in the author's order
+   — photo (if none and not reviewed from far away), kind of water, drinkability, name
+   (`QuickFlow`). "Not now" / "I don't know" sit beside the question, not under it, and
+   the options are one row that scrolls sideways, so each step fits in the chips' height.
+   Facts are still asked once per fountain and person; offline only the photo is offered
+   (it queues, facts need signal). While the slot asks something, the page below does
+   not offer it too (the "Add …" row reads "— unknown —", the "no photo yet" section
+   hides): the same question twice looked wrong. To make room in the short card, the
+   round action buttons (directions, map, star, share, more) and the "How is it now?"
+   title step aside while a question is in the slot, and come back when it is done. Closing the sheet drops the slot's
+   state; reopening shows the normal card (chips, "you said so just now"). Raising the
+   sheet automatically was discarded: it jumps, covers the map and moves the person's
+   sheet without being asked. Covered by `QuickFlowTests`.

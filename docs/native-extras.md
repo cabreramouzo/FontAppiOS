@@ -109,3 +109,25 @@ zones). `UIApplicationShortcutItem` handled in the scene. The cheapest item on t
   `apple-app-site-association` file served by the web.
 - **Sign in with Apple**: required by App Store rule 4.8 as soon as Google sign-in is
   offered in the app.
+
+## 6. Later: order the questions with on-device intelligence
+
+**Idea (author, 03/10/2026).** The quick-review questions offer their options in a fixed
+order (drinkability: potable · untreated · not potable · potable with conditions). The
+likely answer could go first instead, guessed on the phone:
+
+- **Am I in a town?** From the position alone, with no network: Core Location plus the
+  map data already on the phone (built-up area, streets), or MapKit's point-of-interest
+  category. In a town, a public mains tap is the likely kind and "potable" the likely
+  answer; in the mountains, a spring and "untreated".
+- **Is this a public mains fountain?** From the photo just taken in the same flow, with a
+  small image classifier run on the device (Vision / Core ML; Apple's foundation models
+  if their image input is enough). A cast-iron urban fountain with a push button is
+  easy to tell from a spring pipe in a wall.
+
+**Rules it must keep.** It only **reorders** the options, never pre-selects or answers for
+the person: a guess shown as a fact would put wrong data in a shared map, and
+drinkability is a health matter (`producto-crecimiento-2026-09.md`, first principle).
+On the device only — the photo is not sent anywhere to be classified. Without a model
+or a fix, the fixed order stays. Measure first whether the first option is chosen more
+often with it than without, before keeping it.

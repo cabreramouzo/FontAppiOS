@@ -51,8 +51,8 @@ enum FollowUpAsked {
     }
 }
 
-/// Right after a quick review, under the chips: one question, answered in one tap, about
-/// the most valuable thing missing. Not a popup — after contributing that feels like a
+/// Right after a quick review, in the chips' slot: one question, answered in one tap,
+/// about something missing. Not a popup — after contributing that feels like a
 /// toll, and it would cover the undo.
 struct FollowUpQuestion: View {
     let font: FontDetail
@@ -64,12 +64,19 @@ struct FollowUpQuestion: View {
     @State private var error: String?
 
     var body: some View {
-        Section {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(L10n.t("ios.fill.ask.\(fact.rawValue)")).font(.headline)
+        VStack(alignment: .leading, spacing: 8) {
+                // The way out beside the question: in the chips' slot, height is scarce.
+                HStack(alignment: .firstTextBaseline) {
+                    Text(L10n.t("ios.fill.ask.\(fact.rawValue)")).font(.subheadline.weight(.semibold))
+                    Spacer(minLength: 8)
+                    Button(L10n.t("ios.fill.dontKnow")) { onAnswered(false) }
+                        .buttonStyle(.borderless)
+                        .foregroundStyle(.secondary)
+                        .frame(minHeight: 44)
+                }
                 switch fact {
                 case .drinkable:
-                    chips(Drinkable.allCases.map { ($0.emojiLabel, $0) }) { value in
+                    chips(Drinkable.askOrder.map { ($0.emojiLabel, $0) }) { value in
                         await save { $0.drinkable = value }
                     }
                 case .source:
@@ -88,28 +95,27 @@ struct FollowUpQuestion: View {
                             .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || saving)
                     }
                 }
-                Button(L10n.t("ios.fill.dontKnow")) { onAnswered(false) }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(.secondary)
-                    .frame(minHeight: 44)
                 if let error { Text(error).font(.footnote).foregroundStyle(.red) }
             }
-            .padding(.vertical, 4)
             .disabled(saving)
-        }
     }
 
+    /// One row that scrolls sideways, not lines that wrap: in the chips' slot a second
+    /// line fell below the short card and only the first option showed.
     private func chips<T>(_ options: [(String, T)], pick: @escaping (T) async -> Void) -> some View {
-        FlowLayout(spacing: 8) {
-            ForEach(options.indices, id: \.self) { i in
-                Button { Task { await pick(options[i].1) } } label: {
-                    Text(options[i].0).font(.subheadline)
-                        .padding(.horizontal, 12).frame(minHeight: 44)
+        ScrollView(.horizontal) {
+            HStack(spacing: 8) {
+                ForEach(options.indices, id: \.self) { i in
+                    Button { Task { await pick(options[i].1) } } label: {
+                        Text(options[i].0).font(.subheadline)
+                            .padding(.horizontal, 12).frame(minHeight: 44)
+                    }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
                 }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.capsule)
             }
         }
+        .scrollIndicators(.hidden)
     }
 
     private func saveName() async {
@@ -151,7 +157,7 @@ struct MissingFactRow: View {
                 switch fact {
                 case .drinkable:
                     Menu(L10n.t("ios.fill.add.drinkable")) {
-                        ForEach(Drinkable.allCases, id: \.self) { d in
+                        ForEach(Drinkable.askOrder, id: \.self) { d in
                             Button(d.emojiLabel) { save { $0.drinkable = d } }
                         }
                     }

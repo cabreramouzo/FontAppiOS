@@ -13,12 +13,21 @@ struct QuickReviewSection: View {
     /// Presented by the page, not from inside the list: a sheet hung on a lazy list
     /// section dismissed the whole fountain sheet instead.
     let onSignIn: () -> Void
+    /// The fountain, for the questions about what it lacks.
+    var font: FontDetail? = nil
+    /// What is still to ask once the status is said, first one showing (`QuickFlow`).
+    var steps: [QuickFlow.Step] = []
+    /// The page's photo model, for the photo step and its thanks.
+    var photo: PhotoUploadModel? = nil
+    var onCamera: () -> Void = {}
+    /// The current step is done: answered (true) or skipped (false).
+    var onStep: (Bool) -> Void = { _ in }
 
     @Environment(SessionStore.self) private var session
     @Environment(LocationService.self) private var location
 
     var body: some View {
-        Section(L10n.t("popup.howIsIt")) {
+        Section {
             // Once said, the chips give way to the thanks, as in the web popup: one tap is
             // one review, and a second tap cannot publish a twin. Undoing brings them back.
             if !model.hasSpoken {
@@ -31,10 +40,25 @@ struct QuickReviewSection: View {
                 }
             }
             if session.isSignedIn {
-                feedback
+                // One slot that changes, not rows added under it: each question used to
+                // land below the short card, where nobody saw it (field test, 02/10/2026).
+                VStack(alignment: .leading, spacing: 10) {
+                    feedback
+                    if showsSteps, let step = steps.first {
+                        stepView(step)
+                            .id(step)
+                            .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity),
+                                                    removal: .opacity))
+                    }
+                }
+                .animation(.snappy, value: steps.first)
+                .sensoryFeedback(.selection, trigger: steps.first)
             } else {
                 Text(L10n.t("ios.signInPrompt")).font(.footnote).foregroundStyle(.secondary)
             }
+        } header: {
+            // Answered, with a question in the slot: the title is a line the card lacks.
+            if !(showsSteps && !steps.isEmpty) { Text(L10n.t("popup.howIsIt")) }
         }
     }
 
@@ -77,8 +101,7 @@ struct QuickReviewSection: View {
         switch model.state {
         case .sent(_, let confirmedInstead, _):
             HStack {
-                Text(L10n.t(confirmedInstead ? "popup.confirmedThanks" : "popup.thanks"))
-                    .font(.subheadline)
+                thanks(L10n.t(confirmedInstead ? "popup.confirmedThanks" : "popup.thanks"))
                 Spacer()
                 if model.canUndo {
                     Button(L10n.t("popup.undo")) {
@@ -90,8 +113,7 @@ struct QuickReviewSection: View {
             }
         case .queued:
             HStack {
-                Label(L10n.t("offline.savedUpdate"), systemImage: "tray.and.arrow.up")
-                    .font(.subheadline)
+                thanks(L10n.t("offline.savedUpdate"))
                 Spacer()
                 if model.canUndo {
                     Button(L10n.t("popup.undo")) { Task { _ = await model.undo() } }
@@ -106,6 +128,64 @@ struct QuickReviewSection: View {
         case .idle, .sending:
             EmptyView()
         }
+    }
+
+    /// After a review that landed or waits in the outbox: the moment to ask more, in front
+    /// of the fountain, often without signal (a photo queues too).
+    private var showsSteps: Bool {
+        switch model.state {
+        case .sent, .queued: true
+        default: false
+        }
+    }
+
+    @ViewBuilder private func stepView(_ step: QuickFlow.Step) -> some View {
+        switch step {
+        case .photo:
+            if let photo {
+                VStack(alignment: .leading, spacing: 6) {
+                    question(L10n.t("popup.addPhoto")) { onStep(false) }
+                    if photo.state == .uploading {
+                        HStack {
+                            ProgressView()
+                            Text(L10n.t("ios.uploading")).foregroundStyle(.secondary)
+                        }
+                        .frame(minHeight: 44)
+                    } else {
+                        if case .failed(let message) = photo.state {
+                            Text(message).font(.footnote).foregroundStyle(.red)
+                        }
+                        PhotoSourceButtons(model: photo, onUploaded: onChange, onCamera: onCamera)
+                    }
+                }
+            }
+        case .fact(let fact):
+            if let font {
+                FollowUpQuestion(font: font, fact: fact, onAnswered: onStep)
+            }
+        }
+    }
+
+    /// The question and its way out on one line: "Not now" beside it costs no height.
+    private func question(_ text: String, skip: @escaping () -> Void) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(text).font(.subheadline.weight(.semibold))
+            Spacer(minLength: 8)
+            Button(L10n.t("ios.quick.notNow"), action: skip)
+                .buttonStyle(.borderless)
+                .foregroundStyle(.secondary)
+                .frame(minHeight: 44)
+        }
+    }
+
+    /// The thanks, which becomes the photo's once one is on its way.
+    private func thanks(_ text: String) -> some View {
+        let shown: String = switch photo?.state {
+        case .done: L10n.t("popup.photoThanks")
+        case .queued: L10n.t("offline.savedPhoto")
+        default: text
+        }
+        return Text(shown).font(.subheadline)
     }
 
     private var ownStatus: WaterStatus? {
@@ -135,3 +215,4 @@ extension View {
         }
     }
 }
+

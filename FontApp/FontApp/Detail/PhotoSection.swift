@@ -10,9 +10,6 @@ struct PhotoSection: View {
     let onCamera: () -> Void
 
     @Environment(SessionStore.self) private var session
-    @State private var pickerItem: PhotosPickerItem?
-
-    private var cameraAvailable: Bool { UIImagePickerController.isSourceTypeAvailable(.camera) }
 
     var body: some View {
         Section {
@@ -42,29 +39,46 @@ struct PhotoSection: View {
             if case .failed(let message) = model.state {
                 Text(message).foregroundStyle(.red)
             }
-            HStack(spacing: 8) {
-                if cameraAvailable {
-                    Button(action: onCamera) {
-                        WideButtonLabel(L10n.t("ios.takePhoto"), systemImage: "camera")
-                    }
-                    .buttonStyle(.borderedProminent)
+            PhotoSourceButtons(model: model, onUploaded: onUploaded, onCamera: onCamera)
+        }
+    }
+}
+
+/// Take a photo or choose one, for a fountain without any: under "no photo yet" and in
+/// the quick review's thanks, so both behave the same.
+struct PhotoSourceButtons: View {
+    @Bindable var model: PhotoUploadModel
+    let onUploaded: () async -> Void
+    let onCamera: () -> Void
+
+    @Environment(SessionStore.self) private var session
+    @State private var pickerItem: PhotosPickerItem?
+
+    private var cameraAvailable: Bool { UIImagePickerController.isSourceTypeAvailable(.camera) }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if cameraAvailable {
+                Button(action: onCamera) {
+                    WideButtonLabel(L10n.t("ios.takePhoto"), systemImage: "camera")
                 }
-                PhotosPicker(selection: $pickerItem, matching: .images) {
-                    WideButtonLabel(L10n.t("ios.choosePhoto"), systemImage: "photo.on.rectangle")
-                }
-                .buttonStyle(.bordered)
-                .onChange(of: pickerItem) { _, item in
-                    guard let item else { return }
-                    pickerItem = nil
-                    Task {
-                        // The original file, EXIF included; a UIImage would have lost it.
-                        guard let data = try? await item.loadTransferable(type: Data.self) else { return }
-                        if await model.upload(original: data) { await onUploaded() }
-                    }
+                .buttonStyle(.borderedProminent)
+            }
+            PhotosPicker(selection: $pickerItem, matching: .images) {
+                WideButtonLabel(L10n.t("ios.choosePhoto"), systemImage: "photo.on.rectangle")
+            }
+            .buttonStyle(.bordered)
+            .onChange(of: pickerItem) { _, item in
+                guard let item else { return }
+                pickerItem = nil
+                Task {
+                    // The original file, EXIF included; a UIImage would have lost it.
+                    guard let data = try? await item.loadTransferable(type: Data.self) else { return }
+                    if await model.upload(original: data) { await onUploaded() }
                 }
             }
-            .tint(session.isStaff ? Color.staff : .accentColor)
         }
+        .tint(session.isStaff ? Color.staff : .accentColor)
     }
 }
 
