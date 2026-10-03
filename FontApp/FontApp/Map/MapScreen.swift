@@ -79,6 +79,10 @@ struct MapScreen: View {
             },
             controller: controller,
             routes: routes.mapRoutes,
+            onSelectRoute: { id in
+                guard let saved = routes.savedRoute(id: id) else { return }
+                sheet = .route(routes.activate(saved))
+            },
             selected: selected
         )
         .ignoresSafeArea(edges: [.top, .bottom])
@@ -117,11 +121,8 @@ struct MapScreen: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ConnectivityNoticeView(serverUnavailable: model.serverUnavailable) { showsSignIn = true }
                     banner
-                    if let route = routes.active {
-                        RouteChip(route: route, color: routes.savedRoute(id: route.savedID)?.color ?? .rose,
-                                  onOpen: { sheet = .route(route) },
-                                  onHide: { withAnimation { if let id = route.savedID { routes.setHidden(true, id: id) } } },
-                                  onClose: { withAnimation { routes.deactivate() } })
+                    if !routes.visibleRoutes.isEmpty {
+                        RoutesOnMapChip(routes: routes.visibleRoutes) { sheet = .routes }
                             .mapHelpTarget(.route)
                             .padding(.top, 2)
                             .transition(.opacity)
@@ -236,7 +237,10 @@ struct MapScreen: View {
                                     importsGPX = true
                                 }
                             },
-                            onShow: { route in controller.show(RouteLibrary.rect(of: route.coordinates)) })
+                            onShow: { route in
+                                controller.show(RouteLibrary.rect(of: route.coordinates), aboveSheet: true)
+                                sheet = .route(route)
+                            })
                     .presentationDetents([.medium, .large])
             case .missions:
                 MissionsSheet(

@@ -5,7 +5,7 @@ import Observation
 import SwiftData
 
 /// The imported routes: every one not hidden is drawn on the map, and one at a time is
-/// open (its fountains loaded, its chip on the map).
+/// open while its sheet is up (its fountains loaded, its corridor and choices editable).
 ///
 /// The routes live in SwiftData, synced through the person's private CloudKit database:
 /// imported on the iPhone, they are on the iPad too. Without iCloud (signed out, or the
@@ -96,7 +96,10 @@ final class RouteLibrary {
         var canSync = false
         if inMemory {
             container = try? ModelContainer(for: schema, configurations: ModelConfiguration(
-                UUID().uuidString, schema: schema, isStoredInMemoryOnly: true))
+                UUID().uuidString, schema: schema, isStoredInMemoryOnly: true,
+                // Explicitly off: with the iCloud entitlement the default is `.automatic`,
+                // and an in-memory store mirrored to CloudKit throws on the first save.
+                cloudKitDatabase: .none))
         } else {
             do {
                 container = try ModelContainer(for: schema, configurations: ModelConfiguration(
@@ -112,10 +115,9 @@ final class RouteLibrary {
         self.container = container
         context = container?.mainContext
         reload()
-        if let id = defaults.string(forKey: Keys.active).flatMap(UUID.init(uuidString:)),
-           let saved = routes.first(where: { $0.id == id }) {
-            activate(saved)
-        }
+        // A route is open only while its sheet is up: nothing to restore. The key of the
+        // versions that remembered it is cleared.
+        defaults.removeObject(forKey: Keys.active)
         // Routes imported or deleted on another device arrive in the background. Only the
         // CloudKit store sends them; an in-memory library has nothing to listen to.
         guard canSync else { return }
@@ -177,7 +179,6 @@ final class RouteLibrary {
             self.save()
         }
         active = model
-        defaults.set(saved.id.uuidString, forKey: Keys.active)
         if loadsFountains { Task { await model.load() } }
         return model
     }
@@ -210,7 +211,6 @@ final class RouteLibrary {
     /// Closed: no chip and no fountains. The line stays if it is visible.
     func deactivate() {
         active = nil
-        defaults.removeObject(forKey: Keys.active)
     }
 
     /// The lines to draw, each in its colour.

@@ -52,6 +52,11 @@ struct RouteSheet: View {
                 ToolbarItem(placement: .topBarTrailing) { Button(role: .close) { dismiss() } }
             }
             .sheet(item: $shared) { ActivityView(items: [$0.url]) }
+            // Open only while this sheet is up: with every visible route drawn and its
+            // fountains on the map, an "open" route outside its sheet named nothing useful.
+            .onDisappear {
+                if library.active === route { library.deactivate() }
+            }
             .confirmationDialog(L10n.t("ios.routes.deleteTitle", ["name": route.name]), isPresented: $confirmsDelete,
                                 titleVisibility: .visible) {
                 Button(L10n.t("ios.routes.delete"), role: .destructive) {

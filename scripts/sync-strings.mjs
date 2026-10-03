@@ -145,14 +145,14 @@ const IOS_ONLY = {
     it: 'Importa un percorso GPX, apri i tuoi percorsi o mostra solo le fontane dei tuoi percorsi. Esporta anche le fontane visibili sulla mappa.',
   },
   'ios.mapHelp.route': {
-    ca: 'La ruta que tens al mapa. Toca-la per veure’n les fonts; l’ull l’amaga i la creu la treu, però queda desada.',
-    es: 'La ruta que tienes en el mapa. Tócala para ver sus fuentes; el ojo la oculta y la cruz la quita, pero queda guardada.',
-    gl: 'A ruta que tes no mapa. Tócaa para ver as súas fontes; o ollo agóchaa e a cruz quítaa, pero queda gardada.',
-    eu: 'Mapan duzun ibilbidea. Ukitu bere iturriak ikusteko; begiak ezkutatu egiten du eta gurutzeak kendu, baina gordeta geratzen da.',
-    en: 'The route on your map. Tap it for its fountains; the eye hides it and the cross removes it, but it stays saved.',
-    fr: 'L’itinéraire sur votre carte. Touchez-le pour voir ses fontaines ; l’œil le masque et la croix le retire, mais il reste enregistré.',
-    pt: 'O percurso que tens no mapa. Toca nele para ver as fontes; o olho oculta-o e a cruz retira-o, mas fica guardado.',
-    it: 'Il percorso sulla tua mappa. Toccalo per vederne le fontane; l’occhio lo nasconde e la croce lo toglie, ma resta salvato.',
+    ca: 'Les rutes que tens al mapa. Toca-ho per veure-les, mostrar-les o amagar-les; toca una línia per veure les fonts d’aquella ruta.',
+    es: 'Las rutas que tienes en el mapa. Tócalo para verlas, mostrarlas u ocultarlas; toca una línea para ver las fuentes de esa ruta.',
+    gl: 'As rutas que tes no mapa. Tócao para velas, amosalas ou agochalas; toca unha liña para ver as fontes desa ruta.',
+    eu: 'Mapan dituzun ibilbideak. Ukitu ikusteko, erakusteko edo ezkutatzeko; ukitu lerro bat ibilbide horretako iturriak ikusteko.',
+    en: 'The routes on your map. Tap to see, show or hide them; tap a line to see that route’s fountains.',
+    fr: 'Les itinéraires sur votre carte. Touchez pour les voir, les afficher ou les masquer ; touchez une ligne pour voir les fontaines de cet itinéraire.',
+    pt: 'Os percursos que tens no mapa. Toca para os ver, mostrar ou ocultar; toca numa linha para ver as fontes desse percurso.',
+    it: 'I percorsi sulla tua mappa. Tocca per vederli, mostrarli o nasconderli; tocca una linea per vedere le fontane di quel percorso.',
   },
   'ios.mapHelp.location': {
     ca: 'Centra el mapa en tu. Torna a tocar-lo per canviar el seguiment.',
@@ -825,6 +825,10 @@ const IOS_ONLY = {
     fr: 'Touchez un itinéraire pour l’ouvrir sur la carte. Balayez ou maintenez-le pour plus d’options.',
     pt: 'Toca num percurso para o abrir no mapa. Desliza ou mantém premido para mais opções.',
     it: 'Tocca un percorso per aprirlo sulla mappa. Scorri o tieni premuto per altre opzioni.',
+  },
+  'ios.routes.onMapCount': {
+    ca: '{n} rutes al mapa', es: '{n} rutas en el mapa', gl: '{n} rutas no mapa', eu: '{n} ibilbide mapan',
+    en: '{n} routes on the map', fr: '{n} itinéraires sur la carte', pt: '{n} percursos no mapa', it: '{n} percorsi sulla mappa',
   },
   'ios.routes.title': {
     ca: 'Les meves rutes', es: 'Mis rutas', gl: 'As miñas rutas', eu: 'Nire ibilbideak',

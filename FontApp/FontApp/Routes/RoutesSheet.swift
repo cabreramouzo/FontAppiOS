@@ -84,9 +84,8 @@ struct RoutesSheet: View {
             .accessibilityLabel(L10n.t("ios.routes.color"))
             .accessibilityValue(L10n.t("ios.routes.color.\(saved.color.key)"))
             Button {
-                let model = library.activate(saved)
-                dismiss()
-                onShow(model)
+                // The route's own sheet takes this one's place, with the map framing it.
+                onShow(library.activate(saved))
             } label: {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(saved.name).foregroundStyle(hidden ? .secondary : .primary)
@@ -156,50 +155,40 @@ struct RoutesSheet: View {
     }
 }
 
-/// The open route, said on the map: a line nobody explains is a surprise (field test,
-/// 03/10/2026). With several lines drawn, the chip names the one whose fountains are
-/// loaded. Its name opens them; the eye hides that line (and closes it); the cross only
-/// closes it — the line stays, as every other visible route does.
-struct RouteChip: View {
-    let route: RouteModel
-    let color: RouteColor
-    let onOpen: () -> Void
-    let onHide: () -> Void
-    let onClose: () -> Void
+/// The routes on the map, said on the map: lines nobody explains are a surprise (field
+/// test, 03/10/2026). It names a route only when there is one — with several stages on
+/// the map, naming one of them was a riddle — and otherwise shows their colours and how
+/// many. It opens My routes; a line itself opens its route's sheet when tapped.
+struct RoutesOnMapChip: View {
+    let routes: [SavedRoute]
+    let action: () -> Void
 
     var body: some View {
-        HStack(spacing: 0) {
-            Button(action: onOpen) {
-                HStack(spacing: 8) {
-                    Image(systemName: "point.bottomleft.forward.to.point.topright.scurvepath")
-                        .foregroundStyle(Color(hex: UInt32(color.rawValue)))
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(route.name).font(.footnote.weight(.semibold)).lineLimit(1)
-                        Text("\(RouteModel.km(route.lengthKm)) km").font(.caption2).foregroundStyle(.secondary)
+        let text = routes.count == 1 ? routes[0].name : L10n.t("ios.routes.onMapCount", ["n": routes.count])
+        Button(action: action) {
+            HStack(spacing: 8) {
+                HStack(spacing: -4) {
+                    ForEach(routes.prefix(4)) { saved in
+                        Circle()
+                            .fill(Color(hex: UInt32(saved.colorHex)))
+                            .frame(width: 12, height: 12)
+                            .overlay(Circle().stroke(.background, lineWidth: 1.5))
                     }
                 }
-                .padding(.leading, 14)
-                .frame(minHeight: 48, alignment: .leading)
-                .contentShape(Rectangle())
-            }
-            .accessibilityLabel(L10n.t("ios.routes.open"))
-            .accessibilityValue(route.name)
-            Button(action: onHide) {
-                Image(systemName: "eye.slash")
-                    .frame(width: 44, height: 48)
-                    .contentShape(Rectangle())
-            }
-            .accessibilityLabel(L10n.t("ios.routes.hide"))
-            Button(action: onClose) {
-                Image(systemName: "xmark")
+                Text(text)
                     .font(.footnote.weight(.semibold))
-                    .frame(width: 44, height: 48)
-                    .contentShape(Rectangle())
+                    .lineLimit(1)
+                Image(systemName: "chevron.right")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.secondary)
             }
-            .accessibilityLabel(L10n.t("ios.routes.close"))
+            .padding(.horizontal, 14)
+            .frame(minHeight: 44)
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .glassEffect(.regular.interactive(), in: Capsule())
-        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityLabel(L10n.t("ios.routes.title"))
+        .accessibilityValue(text)
     }
 }

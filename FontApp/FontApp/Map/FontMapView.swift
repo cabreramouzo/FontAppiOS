@@ -21,6 +21,8 @@ struct FontMapView: UIViewRepresentable {
     let controller: MapController
     /// The saved GPX routes that are not hidden, each in its colour.
     var routes: [MapRoute] = []
+    /// A route line was tapped (and no fountain was under the finger): opens its sheet.
+    var onSelectRoute: ((UUID) -> Void)?
     /// The fountain whose sheet is open: drawn as a larger pin that springs in, so it is
     /// clear which one the sheet is about.
     var selected: FontSummary?
@@ -144,7 +146,7 @@ struct FontMapView: UIViewRepresentable {
                 guard route.coordinates.count >= 2 else { return nil }
                 var coordinates = route.coordinates
                 let line = MLNPolylineFeature(coordinates: &coordinates, count: UInt(coordinates.count))
-                line.attributes = ["color": String(format: "#%06X", route.colorHex)]
+                line.attributes = ["color": String(format: "#%06X", route.colorHex), "route": route.id.uuidString]
                 return line
             })
         }
@@ -318,7 +320,15 @@ struct FontMapView: UIViewRepresentable {
             let nearest = hits.min { a, b in
                 distance(map.convert(a.coordinate, toPointTo: map), point) < distance(map.convert(b.coordinate, toPointTo: map), point)
             }
-            guard let hit = nearest else { return }
+            guard let hit = nearest else {
+                // No fountain there: a route line, if one passes under the finger. Fountains
+                // win: they sit on the line, and the route's sheet is one tap away anyway.
+                let route = map.visibleFeatures(in: rect, styleLayerIdentifiers: ["fa-route-line"])
+                    .compactMap { ($0.attribute(forKey: "route") as? String).flatMap(UUID.init(uuidString:)) }
+                    .first
+                if let route { parent.onSelectRoute?(route) }
+                return
+            }
             if let cluster = hit as? MLNPointFeatureCluster, let source = fontsSource {
                 // Into the group, but never closer than a few streets: two fountains metres
                 // apart used to land the map at building level.

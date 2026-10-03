@@ -15,13 +15,18 @@ how iOS differs from the web is in `docs/pwa-parity.md`.
   stretch (both ends counted, and again counting only water on record), the longest dry
   climb, the elevation profile, the corridor (100 m – 1 km), which fountains go to the GPS
   file, and the export. Also: *Show only fountains on my routes*, hide, delete, and "My routes".
-- **On the map**: every route not hidden is drawn, each in its colour. One at a time is
-  *open*: its fountains are loaded and a **chip** under the (?) names it. Tapping the chip
-  opens the sheet; the eye hides the line; the cross closes it (still saved). A line
-  nobody explains was a surprise in the field (03/10/2026); the chip is the explanation.
+- **On the map**: every route not hidden is drawn, each in its colour. **Tapping a line**
+  opens that route's sheet (a fountain under the finger wins: fountains sit on the line).
+  A **chip** under the (?) says what the lines are: the route's name when there is one,
+  otherwise the colours and "3 routes on the map"; it opens My routes. A line nobody
+  explains was a surprise in the field (03/10/2026); the chip is the explanation.
+  It used to name the one *open* route, with eye and cross; once every visible route was
+  drawn and filtered, naming one of three stages was a riddle and its buttons repeated My
+  routes, so it became the summary. A route is *open* (fountains loaded, corridor and
+  choices editable) only while its sheet is up; nothing is restored at launch.
 - **My routes** (GPX menu, once one is saved; or from the route sheet): every imported
   route, newest first, under a standing hint ("tap a route to open it…"; not a TipKit tip:
-  the list is opened now and then and a dismissed tip never comes back). Tap to open it and frame the map; coloured dot to pick a colour;
+  the list is opened now and then and a dismissed tip never comes back). Tap to open its sheet and frame the map; coloured dot to pick a colour;
   swipe or long press to rename or delete (delete asks first: it removes it from every
   device with the same iCloud). Importing the same track again opens the saved one.
 - **Show only fountains on my routes** (GPX menu while any route is visible, and the
@@ -58,7 +63,7 @@ covers seeing them together.
   file is opened without sync: routes are kept, only not synced. Changes from other
   devices arrive through `NSPersistentStoreRemoteChange`.
 - **Synced** (they belong to the route): name, colour, corridor, excluded fountains,
-  deletion. **Per device** (`UserDefaults`): which route is open, which are hidden, and
+  deletion. **Per device** (`UserDefaults`): which routes are hidden, and
   *show only fountains on my routes*. Hiding a route on the iPad must not take it off the
   iPhone in someone's handlebar mount.
 - CloudKit rules the model keeps: every property has a default, nothing unique, no
@@ -84,8 +89,9 @@ covers seeing them together.
 ## Testing
 
 Unit tests: `RouteLibraryTests` in `FontAppTests` (packing round trip, duplicate import,
-choices stored with the route, deleting the open route). By hand: import, chip (eye,
-cross, long name in Basque on a small iPhone), My routes (open, colour menu shows each
+choices stored with the route, deleting the open route). By hand: import, tapping a line
+(and a fountain on it), the chip with one route (long name in Basque on a small iPhone)
+and with several, My routes (open, colour menu shows each
 colour, rename, delete), *show only fountains on my routes* on and off, relaunch keeps
-everything, two devices on the same Apple ID, and the map help tour with and without a
-route open (the route step appears only when the chip is on screen).
+everything, two devices on the same Apple ID, and the map help tour with and without
+visible routes (the route step appears only when the chip is on screen).

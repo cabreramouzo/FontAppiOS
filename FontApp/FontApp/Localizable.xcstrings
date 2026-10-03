@@ -113,6 +113,59 @@
         }
       }
     },
+    "ios.routes.onMapCount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} rutes al mapa"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} routes on the map"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} rutas en el mapa"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} ibilbide mapan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} itinéraires sur la carte"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} rutas no mapa"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} percorsi sulla mappa"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{n} percursos no mapa"
+          }
+        }
+      }
+    },
     "—" : {
 
     },
@@ -36185,49 +36238,49 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La ruta que tens al mapa. Toca-la per veure’n les fonts; l’ull l’amaga i la creu la treu, però queda desada."
+            "value" : "Les rutes que tens al mapa. Toca-ho per veure-les, mostrar-les o amagar-les; toca una línia per veure les fonts d’aquella ruta."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The route on your map. Tap it for its fountains; the eye hides it and the cross removes it, but it stays saved."
+            "value" : "The routes on your map. Tap to see, show or hide them; tap a line to see that route’s fountains."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La ruta que tienes en el mapa. Tócala para ver sus fuentes; el ojo la oculta y la cruz la quita, pero queda guardada."
+            "value" : "Las rutas que tienes en el mapa. Tócalo para verlas, mostrarlas u ocultarlas; toca una línea para ver las fuentes de esa ruta."
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mapan duzun ibilbidea. Ukitu bere iturriak ikusteko; begiak ezkutatu egiten du eta gurutzeak kendu, baina gordeta geratzen da."
+            "value" : "Mapan dituzun ibilbideak. Ukitu ikusteko, erakusteko edo ezkutatzeko; ukitu lerro bat ibilbide horretako iturriak ikusteko."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L’itinéraire sur votre carte. Touchez-le pour voir ses fontaines ; l’œil le masque et la croix le retire, mais il reste enregistré."
+            "value" : "Les itinéraires sur votre carte. Touchez pour les voir, les afficher ou les masquer ; touchez une ligne pour voir les fontaines de cet itinéraire."
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A ruta que tes no mapa. Tócaa para ver as súas fontes; o ollo agóchaa e a cruz quítaa, pero queda gardada."
+            "value" : "As rutas que tes no mapa. Tócao para velas, amosalas ou agochalas; toca unha liña para ver as fontes desa ruta."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il percorso sulla tua mappa. Toccalo per vederne le fontane; l’occhio lo nasconde e la croce lo toglie, ma resta salvato."
+            "value" : "I percorsi sulla tua mappa. Tocca per vederli, mostrarli o nasconderli; tocca una linea per vedere le fontane di quel percorso."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O percurso que tens no mapa. Toca nele para ver as fontes; o olho oculta-o e a cruz retira-o, mas fica guardado."
+            "value" : "Os percursos que tens no mapa. Toca para os ver, mostrar ou ocultar; toca numa linha para ver as fontes desse percurso."
           }
         }
       }

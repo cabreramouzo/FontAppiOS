@@ -31,9 +31,10 @@ handlebar mount and is used again on the next outing:
 
 - **A library ("My routes")**, in SwiftData synced through the person's private iCloud;
   never sent to FontApp. The same track imported twice opens the saved one.
-- **Every route not hidden is drawn on the map**, each in its colour; one at a time is
-  *open* (fountains along it loaded, a chip on the map). Opening one from the list frames
-  it; showing, hiding or recolouring never moves the map.
+- **Every route not hidden is drawn on the map**, each in its colour; tapping a line opens
+  that route's sheet, and a chip says what the lines are (name, or colours and count) and
+  opens My routes. Opening one from the list frames it; showing, hiding or recolouring
+  never moves the map.
 - **Manage in place:** eye to show/hide (per device; hiding also closes it), coloured dot
   to pick one of six colours (closed palette away from water-status and staff colours),
   rename and delete by swipe or context menu. Corridor and excluded fountains are stored
