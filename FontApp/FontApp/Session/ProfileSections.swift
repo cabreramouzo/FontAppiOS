@@ -209,11 +209,16 @@ struct CappedSection<Item: Identifiable, Row: View>: View {
 }
 
 /// A fountain in one of your lists: its kind, its name and where it is.
+///
+/// The profile's lists are pushed with destination links, so their rows are too. A value
+/// link (`NavigationLink(value:)`) adds to the stack's path, which is drawn *under* the
+/// screens pushed by destination: the fountain opened behind the list, nothing seemed
+/// to happen, and every tap stacked another one (field test, 03/10/2026).
 struct ProfileFontRow: View {
     let font: FontSummary
 
     var body: some View {
-        NavigationLink(value: font.id) {
+        NavigationLink { FontDetailView(fontID: font.id) } label: {
             HStack(spacing: 12) {
                 Text(font.source?.emoji ?? "💧").font(.title3).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
@@ -235,7 +240,7 @@ struct ProfileReviewRow: View {
     let comment: MyComment
 
     var body: some View {
-        NavigationLink(value: comment.fontID) {
+        NavigationLink { FontDetailView(fontID: comment.fontID) } label: {
             VStack(alignment: .leading, spacing: 4) {
                 Text(L10n.fontName(comment.fontName)).font(.subheadline.weight(.semibold))
                 let status = WaterStatus(comment.waterStatus)

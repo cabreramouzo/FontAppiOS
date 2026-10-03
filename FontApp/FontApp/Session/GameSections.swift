@@ -75,7 +75,7 @@ struct GuardedSection: View {
                           intro: stale > 0 ? L10n.t("guard.summaryStale", ["n": fonts.count, "s": stale])
                                            : L10n.t("guard.summaryAllFresh", ["n": fonts.count]),
                           empty: "", items: fonts) { font in
-                NavigationLink(value: font.fontID) {
+                NavigationLink { FontDetailView(fontID: font.fontID) } label: {
                     HStack(spacing: 12) {
                         Text(font.source?.emoji ?? "💧").font(.title3).accessibilityHidden(true)
                         VStack(alignment: .leading, spacing: 2) {
@@ -106,7 +106,7 @@ struct CollectionKindScreen: View {
                 Text(error).foregroundStyle(.secondary)
             } else if let fonts {
                 ForEach(fonts) { font in
-                    NavigationLink(value: font.id) {
+                    NavigationLink { FontDetailView(fontID: font.id) } label: {
                         HStack(spacing: 12) {
                             Text(source.emoji).font(.title3).accessibilityHidden(true)
                             VStack(alignment: .leading, spacing: 2) {

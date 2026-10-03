@@ -110,7 +110,7 @@ struct MunicipalityScreen: View {
                             ForEach(visible) { font in
                                 Annotation(L10n.fontName(font.name), coordinate: CLLocationCoordinate2D(
                                     latitude: font.latitude, longitude: font.longitude)) {
-                                        NavigationLink(value: font.id) {
+                                        NavigationLink { FontDetailView(fontID: font.id) } label: {
                                             Image(systemName: "drop.fill")
                                                 .padding(8)
                                                 .background(.regularMaterial, in: Circle())
@@ -151,13 +151,14 @@ struct MunicipalityScreen: View {
         }
         .searchable(text: $search, prompt: L10n.t("muni.search"))
         .navigationTitle(report.map { L10n.t("muni.title", ["name": $0.municipality]) } ?? L10n.t("muni.inventory"))
-        .navigationDestination(for: UUID.self) { FontDetailView(fontID: $0) }
         .refreshable { await load() }
         .task(id: ine) { await load() }
     }
 
+    /// Destination links, as the link that opens this screen: a value link would open the
+    /// fountain under it, out of sight (see `ProfileFontRow`).
     private func fountainRow(_ font: MunicipalFont) -> some View {
-        NavigationLink(value: font.id) {
+        NavigationLink { FontDetailView(fontID: font.id) } label: {
             VStack(alignment: .leading, spacing: 3) {
                 Text(L10n.fontName(font.name))
                 Text(font.days.map { L10n.t("muni.checkedAgo", ["d": $0]) } ?? L10n.t("muni.neverCheckedRow"))
