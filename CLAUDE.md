@@ -103,6 +103,13 @@ These are decisions, not accidents. Each has its reasoning in `FontAppBE/CLAUDE.
   (`#7c3aed`) so they do not contribute as admin by mistake.
 - **Permissions:** every iOS permission, when it is asked and what works without it, is in
   `docs/permissions.md`. Update it when a permission is added or moves.
+- **Map help tour** (`Map/MapHelpOverlay.swift`): every change to the map's controls
+  (adding, removing, moving or restyling a button) must update the tour in the same
+  change — a `MapHelpTarget` case, its `ios.mapHelp.<key>` text in the 8 languages and
+  the `.mapHelpTarget(...)` marker on the control — and be checked in the simulator:
+  walk the whole tour and confirm each highlight sits on its real button, on a small
+  iPhone and in the longest language (Basque). A control without a marker silently
+  drops out of the tour.
 - Touch targets ≥ 44 pt; the web uses 48 px for thumb controls.
 - Data licence: OpenStreetMap (ODbL) and ICGC/ACA (CC BY 4.0) must be attributed on the
   map; community data is ODbL, photos CC BY-SA 4.0.
