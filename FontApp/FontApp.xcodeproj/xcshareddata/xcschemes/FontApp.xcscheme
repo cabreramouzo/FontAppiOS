@@ -75,6 +75,10 @@
             argument = "-FontAppAPI https://fontapp.fly.dev"
             isEnabled = "NO">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-resetTips"
+            isEnabled = "YES">
+         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
          <AdditionalOption
