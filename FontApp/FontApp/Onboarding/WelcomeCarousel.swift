@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Six short, swipeable introductions. The map underneath remains usable after Skip;
+/// Seven short, swipeable introductions. The map underneath remains usable after Skip;
 /// no permission or sign-in is requested from this screen.
 struct WelcomeCarousel: View {
     let onFinish: () -> Void
@@ -24,6 +24,9 @@ struct WelcomeCarousel: View {
               accent: "arrow.triangle.2.circlepath", color: Color(red: 0.12, green: 0.62, blue: 0.43)),
         .init(title: "welcome.contributeTitle", detail: "welcome.b3", symbol: "camera.fill",
               accent: "plus", color: Color(red: 0.74, green: 0.35, blue: 0.58)),
+        // Open data (ODbL, photos CC BY-SA): a shared world that is never locked.
+        .init(title: "ios.welcome.openTitle", detail: "ios.welcome.openBody", symbol: "globe.europe.africa.fill",
+              accent: "lock.open.fill", color: Color(red: 0.20, green: 0.55, blue: 0.30)),
         .init(title: "welcome.readyTitle", detail: "welcome.offline", symbol: "wifi.slash",
               accent: "tray.and.arrow.up.fill", color: Color(red: 0.80, green: 0.47, blue: 0.17)),
         .init(title: "ios.welcome.routeTitle", detail: "ios.welcome.routeBody", symbol: "figure.walk",

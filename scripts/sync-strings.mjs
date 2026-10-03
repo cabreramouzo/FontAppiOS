@@ -248,10 +248,10 @@ const IOS_ONLY = {
     it: 'Se hai un contributo in attesa di invio, puoi salvare la foto in Foto. Chiediamo solo di aggiungerla; non leggiamo la tua libreria.',
   },
   'ios.welcome.waterTitle': {
-    ca: 'Sàpigues si raja abans d’anar-hi', es: 'Sabe si mana antes de ir',
-    gl: 'Sabe se bota auga antes de ir', eu: 'Jakin ura darion joan aurretik',
-    en: 'Know before you go', fr: 'Sachez si l’eau coule avant de partir',
-    pt: 'Sabe se corre água antes de ir', it: 'Sai se c’è acqua prima di andare',
+    ca: 'Consulta si raja abans d’anar-hi', es: 'Consulta si mana antes de ir',
+    gl: 'Consulta se bota auga antes de ir', eu: 'Begiratu ura dabilen joan aurretik',
+    en: 'Know before you go', fr: 'Vérifiez si l’eau coule avant de partir',
+    pt: 'Veja se corre água antes de ir', it: 'Controlla se c’è acqua prima di andare',
   },
   'ios.welcome.reportTitle': {
     ca: 'Actualitza l’estat en un toc', es: 'Actualiza el estado en un toque',
@@ -274,6 +274,21 @@ const IOS_ONLY = {
     fr: 'Importez un itinéraire GPX pour voir les fontaines du trajet et les derniers signalements avant de partir.',
     pt: 'Importa um percurso GPX para veres as fontes pelo caminho e os avisos recentes antes de saíres.',
     it: 'Importa un percorso GPX per vedere le fontane lungo la strada e le ultime segnalazioni prima di partire.',
+  },
+  'ios.welcome.openTitle': {
+    ca: 'Dades de tothom, per sempre', es: 'Datos de todos, para siempre', gl: 'Datos de todos, para sempre',
+    eu: 'Denon datuak, betiko', en: 'Everyone’s data, for good', fr: 'Des données à tous, pour toujours',
+    pt: 'Dados de todos, para sempre', it: 'Dati di tutti, per sempre',
+  },
+  'ios.welcome.openBody': {
+    ca: "A diferència d'altres apps d'aigua, les dades no són nostres: el mapa i les fotos es comparteixen amb llicència lliure de compartir igual i mai no en bloquejarem l'accés.",
+    es: 'A diferencia de otras apps de agua, los datos no son nuestros: el mapa y las fotos se comparten con licencia libre de compartir igual y nunca bloquearemos su acceso.',
+    gl: 'A diferenza doutras apps de auga, os datos non son nosos: o mapa e as fotos compártense con licenza libre de compartir igual e nunca bloquearemos o seu acceso.',
+    eu: 'Beste ur-aplikazio batzuek ez bezala, datuak ez dira gureak: mapa eta argazkiak berdin partekatzeko lizentzia librearekin partekatzen dira, eta ez dugu inoiz haietarako sarbidea blokeatuko.',
+    en: 'Unlike other water apps, we don’t own the data: the map and the photos are shared under an open share-alike licence, and we will never lock away access to them.',
+    fr: "Contrairement à d'autres apps d'eau, les données ne nous appartiennent pas : la carte et les photos sont partagées sous licence libre de partage à l'identique, et nous n'en bloquerons jamais l'accès.",
+    pt: 'Ao contrário de outras apps de água, os dados não são nossos: o mapa e as fotografias são partilhados com uma licença livre de partilha nos mesmos termos e nunca bloquearemos o acesso a eles.',
+    it: "A differenza di altre app sull'acqua, i dati non sono nostri: la mappa e le foto sono condivise con licenza libera di condivisione allo stesso modo e non ne bloccheremo mai l'accesso.",
   },
   // Under the chips when the latest report is yours and fresh: that chip is already
   // said; the others (it changed) are still there.

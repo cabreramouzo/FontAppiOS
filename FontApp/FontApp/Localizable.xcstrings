@@ -3505,6 +3505,112 @@
         }
       }
     },
+    "ios.welcome.openBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A diferència d'altres apps d'aigua, les dades no són nostres: el mapa i les fotos es comparteixen amb llicència lliure de compartir igual i mai no en bloquejarem l'accés."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlike other water apps, we don’t own the data: the map and the photos are shared under an open share-alike licence, and we will never lock away access to them."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A diferencia de otras apps de agua, los datos no son nuestros: el mapa y las fotos se comparten con licencia libre de compartir igual y nunca bloquearemos su acceso."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beste ur-aplikazio batzuek ez bezala, datuak ez dira gureak: mapa eta argazkiak berdin partekatzeko lizentzia librearekin partekatzen dira, eta ez dugu inoiz haietarako sarbidea blokeatuko."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrairement à d'autres apps d'eau, les données ne nous appartiennent pas : la carte et les photos sont partagées sous licence libre de partage à l'identique, et nous n'en bloquerons jamais l'accès."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A diferenza doutras apps de auga, os datos non son nosos: o mapa e as fotos compártense con licenza libre de compartir igual e nunca bloquearemos o seu acceso."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A differenza di altre app sull'acqua, i dati non sono nostri: la mappa e le foto sono condivise con licenza libera di condivisione allo stesso modo e non ne bloccheremo mai l'accesso."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao contrário de outras apps de água, os dados não são nossos: o mapa e as fotografias são partilhados com uma licença livre de partilha nos mesmos termos e nunca bloquearemos o acesso a eles."
+          }
+        }
+      }
+    },
+    "ios.welcome.openTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dades de tothom, per sempre"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everyone’s data, for good"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datos de todos, para siempre"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denon datuak, betiko"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des données à tous, pour toujours"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datos de todos, para sempre"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dati di tutti, per sempre"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dados de todos, para sempre"
+          }
+        }
+      }
+    },
     "ios.welcome.reportTitle" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3670,7 +3776,7 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sàpigues si raja abans d’anar-hi"
+            "value" : "Consulta si raja abans d’anar-hi"
           }
         },
         "en" : {
@@ -3682,37 +3788,37 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sabe si mana antes de ir"
+            "value" : "Consulta si mana antes de ir"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jakin ura darion joan aurretik"
+            "value" : "Begiratu ura dabilen joan aurretik"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sachez si l’eau coule avant de partir"
+            "value" : "Vérifiez si l’eau coule avant de partir"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sabe se bota auga antes de ir"
+            "value" : "Consulta se bota auga antes de ir"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sai se c’è acqua prima di andare"
+            "value" : "Controlla se c’è acqua prima di andare"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sabe se corre água antes de ir"
+            "value" : "Veja se corre água antes de ir"
           }
         }
       }
