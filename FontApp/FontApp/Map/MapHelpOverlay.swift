@@ -2,10 +2,18 @@ import SwiftUI
 
 /// Real control frames keep coach marks attached to the buttons on every screen size.
 enum MapHelpTarget: Int, CaseIterable {
-    case layers, filters, legend, missions, offline, gpx, location, add
+    case layers, filters, legend, missions, offline, gpx, route, location, add
 
     var next: Self? {
         Self(rawValue: rawValue + 1)
+    }
+
+    /// The next step whose control is on screen: the route chip exists only while a route
+    /// is on the map, and a step without its control would leave the tour stuck.
+    func next(among frames: [MapHelpTarget: CGRect]) -> Self? {
+        var candidate = next
+        while let target = candidate, frames[target] == nil { candidate = target.next }
+        return candidate
     }
 
     var title: String {
@@ -16,6 +24,7 @@ enum MapHelpTarget: Int, CaseIterable {
         case .missions: L10n.t("mission.title")
         case .offline: L10n.t("ios.offline.title")
         case .gpx: "GPX"
+        case .route: L10n.t("ios.routes.title")
         case .location: L10n.t("map.recenter")
         case .add: L10n.t("map.addFont")
         }
@@ -29,6 +38,7 @@ enum MapHelpTarget: Int, CaseIterable {
         case .missions: "ios.mapHelp.missions"
         case .offline: "ios.mapHelp.offline"
         case .gpx: "ios.mapHelp.gpx"
+        case .route: "ios.mapHelp.route"
         case .location: "ios.mapHelp.location"
         case .add: "ios.mapHelp.add"
         }
@@ -61,10 +71,18 @@ extension View {
 struct MapHelpOverlay: View {
     let target: MapHelpTarget
     let globalFrame: CGRect
+    /// Position among the steps on screen, and how many there are.
+    let step: Int
+    let steps: Int
     let onNext: () -> Void
     let onClose: () -> Void
 
     var body: some View {
+        // The dimming covers the whole screen, notch and home indicator included (a field
+        // test saw undimmed strips there); the card and the close button stay inside the
+        // safe area, read from the outer reader before the inner one ignores it.
+        GeometryReader { outer in
+        let insets = outer.safeAreaInsets
         GeometryReader { proxy in
             // The map ignores safe areas while its overlays do not. Convert both from
             // the same global space, rather than resolving an anchor in the overlay's
@@ -73,12 +91,21 @@ struct MapHelpOverlay: View {
             let control = globalFrame.offsetBy(dx: -origin.x, dy: -origin.y)
             let hole = control.insetBy(dx: -5, dy: -5)
             let cardWidth = min(236.0, max(190.0, proxy.size.width - 110))
-            let cardX = max(16.0, control.minX - cardWidth - 38)
+            // Controls on the right get the card to their left; the route chip, on the left
+            // and wide, gets it below.
+            let below = control.midX < proxy.size.width / 2
+            let cardX = below ? 16.0 : max(16.0, control.minX - cardWidth - 38)
             let cardHeight = min(196.0, max(160.0, proxy.size.height * 0.32))
-            let cardY = max(8.0, min(control.midY - cardHeight / 2,
-                                     proxy.size.height - cardHeight - 8))
+            let cardY = below
+                ? min(control.maxY + 44, proxy.size.height - insets.bottom - cardHeight - 8)
+                : max(insets.top + 8, min(control.midY - cardHeight / 2,
+                                          proxy.size.height - insets.bottom - cardHeight - 8))
             let arrowY = max(cardY + 20, min(control.midY, cardY + cardHeight - 20))
-            let closeY = control.midY > proxy.size.height / 2 ? 34.0 : proxy.size.height - 110
+            let arrowFrom = below ? CGPoint(x: cardX + 40, y: cardY - 3) : CGPoint(x: cardX + cardWidth + 3, y: arrowY)
+            let arrowTo = below ? CGPoint(x: cardX + 40, y: control.maxY + 8) : CGPoint(x: control.minX - 8, y: control.midY)
+            let closeY = control.midY > proxy.size.height / 2
+                ? insets.top + 26
+                : proxy.size.height - insets.bottom - 110
 
             ZStack(alignment: .topLeading) {
                 Path { path in
@@ -87,8 +114,7 @@ struct MapHelpOverlay: View {
                 }
                 .fill(.black.opacity(0.68), style: FillStyle(eoFill: true))
 
-                Arrow(from: CGPoint(x: cardX + cardWidth + 3, y: arrowY),
-                      to: CGPoint(x: control.minX - 8, y: control.midY))
+                Arrow(from: arrowFrom, to: arrowTo)
                     .stroke(.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -96,12 +122,12 @@ struct MapHelpOverlay: View {
                     Text(target.detail).font(.subheadline).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 0)
                     HStack {
-                        Text("\(target.rawValue + 1) / \(MapHelpTarget.allCases.count)")
+                        Text("\(step) / \(steps)")
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(.secondary)
                         Spacer()
-                        Button(L10n.t(target.next == nil ? "ios.close" : "welcome.next")) {
-                            if target.next == nil { onClose() } else { onNext() }
+                        Button(L10n.t(step == steps ? "ios.close" : "welcome.next")) {
+                            if step == steps { onClose() } else { onNext() }
                         }
                         .font(.subheadline.bold())
                         .frame(minHeight: 44)
@@ -125,6 +151,8 @@ struct MapHelpOverlay: View {
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
             .contentShape(Rectangle())
+        }
+        .ignoresSafeArea()
         }
         .accessibilityElement(children: .contain)
     }

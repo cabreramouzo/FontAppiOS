@@ -19,8 +19,8 @@ struct FontMapView: UIViewRepresentable {
     let onMove: (MKCoordinateRegion, CGSize, Bool) -> Void
     let onSelect: (FontSummary) -> Void
     let controller: MapController
-    /// An imported GPX route, drawn over the map.
-    var route: [CLLocationCoordinate2D] = []
+    /// The saved GPX routes that are not hidden, each in its colour.
+    var routes: [MapRoute] = []
     /// The fountain whose sheet is open: drawn as a larger pin that springs in, so it is
     /// clear which one the sheet is about.
     var selected: FontSummary?
@@ -60,7 +60,7 @@ struct FontMapView: UIViewRepresentable {
             coordinator.followRequest = followRequest
             if showsUser { coordinator.startFollowing(map) }
         }
-        coordinator.update(map, fonts: fonts, clusters: clusters, route: route)
+        coordinator.update(map, fonts: fonts, clusters: clusters, routes: routes)
         coordinator.select(selected, on: map)
     }
 
@@ -75,7 +75,7 @@ struct FontMapView: UIViewRepresentable {
         private var fonts: [UUID: FontSummary] = [:]
         private var fontsSignature = 0
         private var serverClusters: [MapCluster] = []
-        private var route: [CLLocationCoordinate2D] = []
+        private var routes: [MapRoute] = []
         /// Our sources in the current style; nil until it has loaded.
         private var fontsSource: MLNShapeSource?
         private var clustersSource: MLNShapeSource?
@@ -90,7 +90,7 @@ struct FontMapView: UIViewRepresentable {
         // MARK: Data
 
         func update(_ map: MLNMapView, fonts list: [FontSummary], clusters: [MapCluster],
-                    route newRoute: [CLLocationCoordinate2D]) {
+                    routes newRoutes: [MapRoute]) {
             // Rebuilding the GeoJSON only when what is drawn changed: the parent re-renders
             // with every GPS fix.
             var hasher = Hasher()
@@ -105,10 +105,11 @@ struct FontMapView: UIViewRepresentable {
                 serverClusters = clusters
                 clustersSource?.shape = clusterShape(map)
             }
-            if newRoute.count != route.count {
-                route = newRoute
+            // Framing is the caller's: on import and when one is opened from the list. Here
+            // it would jump the map every time a line is shown, hidden or recoloured.
+            if newRoutes != routes {
+                routes = newRoutes
                 routeSource?.shape = routeShape()
-                if newRoute.count >= 2 { frameRoute(map) }
             }
         }
 
@@ -139,17 +140,13 @@ struct FontMapView: UIViewRepresentable {
         }
 
         private func routeShape() -> MLNShape? {
-            guard route.count >= 2 else { return MLNShapeCollectionFeature(shapes: []) }
-            var coordinates = route
-            return MLNPolylineFeature(coordinates: &coordinates, count: UInt(coordinates.count))
-        }
-
-        private func frameRoute(_ map: MLNMapView) {
-            var coordinates = route
-            let line = MLNPolyline(coordinates: &coordinates, count: UInt(coordinates.count))
-            map.setVisibleCoordinateBounds(line.overlayBounds,
-                                           edgePadding: UIEdgeInsets(top: 110, left: 30, bottom: map.bounds.height * 0.5, right: 70),
-                                           animated: true, completionHandler: nil)
+            MLNShapeCollectionFeature(shapes: routes.compactMap { route in
+                guard route.coordinates.count >= 2 else { return nil }
+                var coordinates = route.coordinates
+                let line = MLNPolylineFeature(coordinates: &coordinates, count: UInt(coordinates.count))
+                line.attributes = ["color": String(format: "#%06X", route.colorHex)]
+                return line
+            })
         }
 
         // MARK: Style
@@ -161,7 +158,8 @@ struct FontMapView: UIViewRepresentable {
             let routeSource = MLNShapeSource(identifier: "fa-route", shape: routeShape(), options: nil)
             style.addSource(routeSource)
             let routeLine = MLNLineStyleLayer(identifier: "fa-route-line", source: routeSource)
-            routeLine.lineColor = NSExpression(forConstantValue: UIColor(Color(hex: 0xE11D48)))
+            // Each line carries its colour as "#RRGGBB", like the pins.
+            routeLine.lineColor = NSExpression(format: "CAST(color, 'UIColor')")
             routeLine.lineWidth = NSExpression(forConstantValue: 5)
             routeLine.lineCap = NSExpression(forConstantValue: "round")
             routeLine.lineJoin = NSExpression(forConstantValue: "round")
@@ -385,6 +383,18 @@ final class LayoutAwareMapView: MLNMapView {
         guard bounds.width > 0, bounds.height > 0, let callback = onFirstLayout else { return }
         onFirstLayout = nil
         callback(self)
+    }
+}
+
+/// A route line as the map needs it: equatable, so a redraw is skipped when nothing moved.
+struct MapRoute: Equatable {
+    let id: UUID
+    let coordinates: [CLLocationCoordinate2D]
+    let colorHex: Int
+
+    static func == (a: MapRoute, b: MapRoute) -> Bool {
+        // Coordinates of a saved route never change; its id and length stand for them.
+        a.id == b.id && a.colorHex == b.colorHex && a.coordinates.count == b.coordinates.count
     }
 }
 

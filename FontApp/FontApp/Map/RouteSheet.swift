@@ -6,10 +6,12 @@ import UIKit
 struct RouteSheet: View {
     @Bindable var route: RouteModel
     let onShow: (FontSummary) -> Void
-    let onForget: () -> Void
+    let onLibrary: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var shared: SharedFile?
+    @State private var library = RouteLibrary.shared
+    @State private var confirmsDelete = false
 
     var body: some View {
         NavigationStack {
@@ -24,20 +26,42 @@ struct RouteSheet: View {
                     stops
                 }
                 Section {
-                    Text(L10n.t("ios.gpx.privacy")).font(.footnote).foregroundStyle(.secondary)
-                    Button(L10n.t("gpxIn.forget"), role: .destructive) {
-                        onForget()
-                        dismiss()
+                    // Saved either way: hiding takes the line off this device's map, the
+                    // route stays in the library to show again.
+                    if let id = route.savedID {
+                        Button(L10n.t("ios.routes.hide"), systemImage: "eye.slash") {
+                            library.setHidden(true, id: id)
+                            dismiss()
+                        }
+                        .frame(minHeight: 44)
                     }
-                    .frame(minHeight: 44)
+                    if route.savedID != nil {
+                        Button(L10n.t("ios.routes.delete"), role: .destructive) { confirmsDelete = true }
+                            .frame(minHeight: 44)
+                    }
+                } footer: {
+                    Text(L10n.t("ios.gpx.privacy"))
                 }
             }
             .navigationTitle(L10n.t("gpxIn.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(L10n.t("ios.routes.title"), systemImage: "list.bullet", action: onLibrary)
+                }
                 ToolbarItem(placement: .topBarTrailing) { Button(role: .close) { dismiss() } }
             }
             .sheet(item: $shared) { ActivityView(items: [$0.url]) }
+            .confirmationDialog(L10n.t("ios.routes.deleteTitle", ["name": route.name]), isPresented: $confirmsDelete,
+                                titleVisibility: .visible) {
+                Button(L10n.t("ios.routes.delete"), role: .destructive) {
+                    if let id = route.savedID { library.delete(id: id) }
+                    dismiss()
+                }
+                Button(L10n.t("form.cancel"), role: .cancel) {}
+            } message: {
+                Text(L10n.t("ios.routes.deleteBody"))
+            }
         }
     }
 
@@ -73,6 +97,9 @@ struct RouteSheet: View {
                     Text("\(Int(meters)) m").tag(meters)
                 }
             }
+            // Next to the corridor it depends on: the map keeps only the fountains inside it.
+            Toggle(L10n.t("ios.routes.onlyRoute"), isOn: $library.onlyRouteFonts)
+                .frame(minHeight: 44)
             if !route.onRoute.isEmpty {
                 // The button says how many go: the GPS unit gets what was chosen.
                 Button {

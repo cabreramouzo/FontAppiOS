@@ -11,24 +11,34 @@ final class RouteModel {
         case failed(String)
     }
 
-    let name: String
+    /// The saved route it shows, in the route library.
+    let savedID: UUID?
+    var name: String
     let points: [GPX.Point]
     let lengthKm: Double
     private(set) var state: State = .loading
     var corridor: Double = GPX.corridor {
-        didSet { recompute() }
+        didSet { recompute(); onChoiceChange?() }
     }
     private(set) var onRoute: [GPX.OnRoute] = []
     /// The ones left out of the GPS file. The EXCLUDED and not the chosen: widening the
     /// corridor brings new fountains, and they must come in chosen. "All" is the empty set.
-    private(set) var excluded = Set<UUID>()
+    private(set) var excluded = Set<UUID>() {
+        didSet { onChoiceChange?() }
+    }
+    /// The corridor or the choice changed: the library stores it with the route.
+    @ObservationIgnored var onChoiceChange: (() -> Void)?
     let profile: [GPX.ProfilePoint]
 
     @ObservationIgnored private var candidates: [FontSummary] = []
     @ObservationIgnored private let api: APIClient
 
-    init(name: String, points: [GPX.Point], api: APIClient = .shared) {
+    init(name: String, points: [GPX.Point], corridor: Double = GPX.corridor, excluded: Set<UUID> = [],
+         savedID: UUID? = nil, api: APIClient = .shared) {
+        self.savedID = savedID
         self.name = name
+        self.corridor = corridor
+        self.excluded = excluded
         self.points = GPX.simplified(points)
         lengthKm = GPX.lengthKm(self.points)
         profile = GPX.profile(self.points)

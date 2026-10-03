@@ -794,3 +794,101 @@ struct RouteExtrasTests {
     }
 }
 }
+
+@MainActor
+struct RouteLibraryTests {
+    private let track = [
+        GPX.Point(latitude: 41.80, longitude: 2.10, elevation: 600),
+        GPX.Point(latitude: 41.81, longitude: 2.11, elevation: nil),
+        GPX.Point(latitude: 41.83, longitude: 2.12, elevation: 655.5),
+    ]
+
+    private func library() -> RouteLibrary {
+        let suite = "routes-test-\(UUID())"
+        return RouteLibrary(inMemory: true, defaults: UserDefaults(suiteName: suite)!)
+    }
+
+    // A missing elevation must come back missing, not as 0 m: flat and unknown differ.
+    @Test func packedPointsRoundTrip() {
+        #expect(RouteCodec.decode(RouteCodec.encode(track)) == track)
+        #expect(RouteCodec.decode(Data([1, 2, 3])).isEmpty)
+    }
+
+    @Test func sameTrackIsOpenedNotDuplicated() {
+        let library = library()
+        let first = library.importRoute(name: "Moià", points: track)
+        let again = library.importRoute(name: "Moià (2)", points: track)
+        #expect(library.routes.count == 1)
+        #expect(first.savedID == again.savedID)
+    }
+
+    @Test func choicesAreStoredWithTheRoute() throws {
+        let library = library()
+        let route = library.importRoute(name: "Moià", points: track)
+        route.corridor = 1000
+        let saved = try #require(library.routes.first)
+        #expect(saved.corridor == 1000)
+    }
+
+    @Test func deletingTheOpenRouteClosesIt() throws {
+        let library = library()
+        library.importRoute(name: "Moià", points: track)
+        #expect(library.active != nil)
+        library.delete(try #require(library.routes.first))
+        #expect(library.active == nil)
+        #expect(library.routes.isEmpty)
+        #expect(library.mapRoutes.isEmpty)
+    }
+
+    // Every saved route is drawn, not only the open one.
+    @Test func everyVisibleRouteIsOnTheMap() throws {
+        let library = library()
+        library.importRoute(name: "Moià", points: track)
+        library.importRoute(name: "Castellcir", points: track.map {
+            GPX.Point(latitude: $0.latitude + 0.1, longitude: $0.longitude, elevation: $0.elevation)
+        })
+        #expect(library.mapRoutes.count == 2)
+        // Two routes, two colours, without anyone choosing.
+        #expect(Set(library.mapRoutes.map(\.colorHex)).count == 2)
+    }
+
+    @Test func hidingTakesOnlyThatLineOffAndClosesIt() throws {
+        let library = library()
+        library.importRoute(name: "Moià", points: track)
+        let open = library.importRoute(name: "Castellcir", points: track.map {
+            GPX.Point(latitude: $0.latitude + 0.1, longitude: $0.longitude, elevation: $0.elevation)
+        })
+        let id = try #require(open.savedID)
+        library.setHidden(true, id: id)
+        #expect(library.mapRoutes.map(\.id) == library.routes.filter { $0.id != id }.map(\.id))
+        #expect(library.active == nil)
+        // Opening it again from the list shows it.
+        library.activate(try #require(library.savedRoute(id: id)))
+        #expect(library.mapRoutes.count == 2)
+    }
+
+    // Hidden is per device and must survive a restart.
+    @Test func hiddenRoutesAreRemembered() throws {
+        let defaults = UserDefaults(suiteName: "routes-test-\(UUID())")!
+        let first = RouteLibrary(inMemory: true, defaults: defaults)
+        let model = first.importRoute(name: "Moià", points: track)
+        first.setHidden(true, id: try #require(model.savedID))
+        let again = RouteLibrary(inMemory: true, defaults: defaults)
+        #expect(again.hiddenIDs == [try #require(model.savedID)])
+    }
+
+    @Test func colourAndNameAreKeptWithTheRoute() throws {
+        let library = library()
+        library.importRoute(name: "Moià", points: track)
+        let saved = try #require(library.routes.first)
+        library.setColor(.slate, saved)
+        library.rename(saved, to: "  Volta  ")
+        #expect(library.mapRoutes.first?.colorHex == RouteColor.slate.rawValue)
+        #expect(library.active?.name == "Volta")
+        library.rename(saved, to: "   ")
+        #expect(saved.name == "Volta")
+        // A colour from a newer app falls back instead of vanishing.
+        saved.colorHex = 0x123456
+        #expect(saved.color == .rose)
+    }
+}

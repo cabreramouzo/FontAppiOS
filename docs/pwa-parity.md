@@ -23,6 +23,31 @@ status, not a second copy of the product rules.
 5. A six-page native feature welcome appears on a fresh installation. It can be skipped,
    and it does not ask for permissions or sign-in. Existing installations are excluded.
 
+## Imported GPX routes — 3 October 2026 (client rule R6.10)
+
+The web keeps **one** route (the last imported, in `localStorage` per account) and shows
+it on `/gpx`. iOS goes further, on purpose, because the phone is what goes in the
+handlebar mount and is used again on the next outing:
+
+- **A library ("My routes")**, in SwiftData synced through the person's private iCloud;
+  never sent to FontApp. The same track imported twice opens the saved one.
+- **Every route not hidden is drawn on the map**, each in its colour; one at a time is
+  *open* (fountains along it loaded, a chip on the map). Opening one from the list frames
+  it; showing, hiding or recolouring never moves the map.
+- **Manage in place:** eye to show/hide (per device; hiding also closes it), coloured dot
+  to pick one of six colours (closed palette away from water-status and staff colours),
+  rename and delete by swipe or context menu. Corridor and excluded fountains are stored
+  with each route.
+- **"Only the route's fountains"** (GPX menu and the route sheet): the map keeps just the
+  fountains in the open route's corridor, without clusters, so the line can be read.
+- Kept the same as the web: the file is read on the device, only the widened box is
+  asked of the server, km order, both ends of the driest stretch, exporting excluded
+  ones out.
+
+Web follow-up, if the field data asks for it: the same library (several routes,
+visibility and colour) on `/gpx` and the main map. Not needed for parity of the rules,
+which R6.10 already states for both.
+
 ## Intentionally kept on the web
 
 - The public Zones page and its country/region coverage, pending-fountain lists, local

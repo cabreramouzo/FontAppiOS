@@ -24,6 +24,10 @@ project's build settings), translated in `FontApp/InfoPlist.xcstrings`.
 - **Keychain** (session token), **Sign in with Apple**, **Associated Domains**
   (`applinks` / `webcredentials:fontapp.net`, passkeys): entitlements, no prompt.
   Passkeys and Sign in with Apple show their own system sheet when the person uses them.
+- **iCloud (CloudKit)** for imported GPX routes (`docs/routes.md`): an entitlement, no
+  prompt. Without an iCloud account the routes stay on the device. The
+  `remote-notification` background mode lets CloudKit's silent pushes bring routes
+  changed on another device; it asks nothing and does not need notification permission.
 - **Background fetch** (`UIBackgroundModes: fetch`) for the outbox: no prompt; the person
   can turn off Background App Refresh in iOS Settings.
 

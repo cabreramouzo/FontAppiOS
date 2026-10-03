@@ -17,5 +17,15 @@
 		<string>applinks:fontapp.net</string>
 		<string>webcredentials:fontapp.net</string>
 	</array>
+	<!-- Imported GPX routes sync through the person's private CloudKit database
+	     (Routes/RouteLibrary.swift). docs/routes.md has the setup. -->
+	<key>com.apple.developer.icloud-container-identifiers</key>
+	<array>
+		<string>iCloud.net.fontapp.FontApp</string>
+	</array>
+	<key>com.apple.developer.icloud-services</key>
+	<array>
+		<string>CloudKit</string>
+	</array>
 </dict>
 </plist>

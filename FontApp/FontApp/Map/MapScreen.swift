@@ -14,7 +14,8 @@ struct MapScreen: View {
     @State private var sheet: MapSheet?
     /// What the Search tab asked to show; cleared once shown.
     @Binding var focus: MapFocus?
-    @State private var route: RouteModel?
+    /// Saved GPX routes and the one on the map; it outlives this view and the app.
+    @State private var routes = RouteLibrary.shared
     @State private var importsGPX = false
     @State private var exported: SharedFile?
     @State private var gpxMessage: String?
@@ -27,7 +28,7 @@ struct MapScreen: View {
     @State private var toast: String?
 
     private enum MapSheet: Identifiable {
-        case layers, filters, offline, missions
+        case layers, filters, offline, missions, routes
         case route(RouteModel)
         /// The model travels with the case: a separate optional state is still nil in the
         /// first render of the sheet, which then shows empty.
@@ -40,6 +41,7 @@ struct MapScreen: View {
             case .offline: "offline"
             case .missions: "missions"
             case .route: "route"
+            case .routes: "routes"
             case .newFont: "newFont"
             }
         }
@@ -57,8 +59,8 @@ struct MapScreen: View {
 
     var body: some View {
         FontMapView(
-            fonts: filters.apply(model.fonts, keep: model.isJustCreated),
-            clusters: model.clusters,
+            fonts: filters.apply(routes.routeFontsOnMap ?? model.fonts, keep: model.isJustCreated),
+            clusters: routes.routeFontsOnMap == nil ? model.clusters : [],
             initialRegion: { size in
                 DefaultMapView.forTimeZone(TimeZone.current.identifier).region(for: size)
             },
@@ -76,7 +78,7 @@ struct MapScreen: View {
                                   covered: PresentationDetent.shortCardHeight)
             },
             controller: controller,
-            route: route?.coordinates ?? [],
+            routes: routes.mapRoutes,
             selected: selected
         )
         .ignoresSafeArea(edges: [.top, .bottom])
@@ -87,8 +89,11 @@ struct MapScreen: View {
                              onLegend: { withAnimation(.easeInOut(duration: 0.2)) { legendOpen.toggle() } },
                              onMissions: { sheet = .missions },
                              onOffline: { sheet = .offline },
-                             onImportGPX: { if let route { sheet = .route(route) } else { importsGPX = true } },
+                             onImportGPX: { importsGPX = true },
                              onExportGPX: exportVisibleFountains,
+                             onRoutes: routes.routes.isEmpty ? nil : { sheet = .routes },
+                             onlyRouteFonts: routes.active == nil ? nil : Binding(get: { routes.onlyRouteFonts },
+                                                                                  set: { routes.onlyRouteFonts = $0 }),
                              staff: session.isStaff)
                 .padding(.trailing, 12)
                 .padding(.top, 8)
@@ -109,9 +114,18 @@ struct MapScreen: View {
                 .accessibilityLabel(L10n.t("ios.mapHelp.title"))
                 .popoverTip(MapHelpTip(), arrowEdge: .top)
                 // What waits to be sent and whether there is signal, above the map's own notices.
-                VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
                     ConnectivityNoticeView(serverUnavailable: model.serverUnavailable) { showsSignIn = true }
                     banner
+                    if let route = routes.active {
+                        RouteChip(route: route, color: routes.savedRoute(id: route.savedID)?.color ?? .rose,
+                                  onOpen: { sheet = .route(route) },
+                                  onHide: { withAnimation { if let id = route.savedID { routes.setHidden(true, id: id) } } },
+                                  onClose: { withAnimation { routes.deactivate() } })
+                            .mapHelpTarget(.route)
+                            .padding(.top, 2)
+                            .transition(.opacity)
+                    }
                 }
                 .frame(maxWidth: .infinity)
             }
@@ -159,8 +173,10 @@ struct MapScreen: View {
         .toolbarVisibility(helpTarget == nil ? .automatic : .hidden, for: .tabBar)
         .overlayPreferenceValue(MapHelpFrames.self) { frames in
             if let helpTarget, let frame = frames[helpTarget] {
-                MapHelpOverlay(target: helpTarget, globalFrame: frame) {
-                    withAnimation(.easeInOut(duration: 0.2)) { self.helpTarget = helpTarget.next }
+                let shown = MapHelpTarget.allCases.filter { frames[$0] != nil }
+                MapHelpOverlay(target: helpTarget, globalFrame: frame,
+                               step: (shown.firstIndex(of: helpTarget) ?? 0) + 1, steps: shown.count) {
+                    withAnimation(.easeInOut(duration: 0.2)) { self.helpTarget = helpTarget.next(among: frames) }
                 } onClose: {
                     withAnimation(.easeInOut(duration: 0.2)) { self.helpTarget = nil }
                 }
@@ -208,7 +224,19 @@ struct MapScreen: View {
                                                meters: 400, aboveSheet: true)
                                selected = font
                            },
-                           onForget: { self.route = nil })
+                           onLibrary: { sheet = .routes })
+                    .presentationDetents([.medium, .large])
+            case .routes:
+                RoutesSheet(library: routes,
+                            onImport: {
+                                // After the sheet has gone: a file picker asked for while a
+                                // sheet is still on screen is silently dropped.
+                                Task {
+                                    try? await Task.sleep(for: .milliseconds(450))
+                                    importsGPX = true
+                                }
+                            },
+                            onShow: { route in controller.show(RouteLibrary.rect(of: route.coordinates)) })
                     .presentationDetents([.medium, .large])
             case .missions:
                 MissionsSheet(
@@ -382,10 +410,9 @@ struct MapScreen: View {
             gpxMessage = L10n.t("gpxIn.notATrack")
             return
         }
-        let model = RouteModel(name: url.deletingPathExtension().lastPathComponent, points: points)
-        route = model
+        let model = routes.importRoute(name: url.deletingPathExtension().lastPathComponent, points: points)
+        controller.show(RouteLibrary.rect(of: model.coordinates), aboveSheet: true)
         sheet = .route(model)
-        Task { await model.load() }
     }
 
     /// The fountains in view as waypoints for a GPS unit. At most 500, the ones nearest the

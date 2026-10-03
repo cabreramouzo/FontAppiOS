@@ -21,6 +21,10 @@ struct MapControlColumn: View {
     var onOffline: (() -> Void)?
     var onImportGPX: (() -> Void)?
     var onExportGPX: (() -> Void)?
+    /// "My routes", once there is one saved.
+    var onRoutes: (() -> Void)?
+    /// "Only the route's fountains", while a route is open.
+    var onlyRouteFonts: Binding<Bool>?
     let staff: Bool
 
     @State private var gpxTip = GPXTip()
@@ -75,6 +79,13 @@ struct MapControlColumn: View {
                             } else {
                                 Menu {
                                     Button(L10n.t("ios.gpx.import"), systemImage: "square.and.arrow.down", action: onImportGPX)
+                                    if let onlyRouteFonts {
+                                        Toggle(L10n.t("ios.routes.onlyRoute"), systemImage: "drop", isOn: onlyRouteFonts)
+                                    }
+                                    if let onRoutes {
+                                        Button(L10n.t("ios.routes.title"), systemImage: "point.bottomleft.forward.to.point.topright.scurvepath",
+                                               action: onRoutes)
+                                    }
                                     Button(L10n.t("ios.gpx.export"), systemImage: "square.and.arrow.up", action: onExportGPX)
                                 } label: { gpxLabel }
                                 .accessibilityLabel("GPX")
