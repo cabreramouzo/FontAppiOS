@@ -115,9 +115,11 @@ struct RouteSheet: View {
                             dismiss()
                             onShow(stop.font)
                         } label: {
-                            StopRow(stop: stop)
+                            StopRow(stop: stop).contentShape(Rectangle())
                         }
-                        .foregroundStyle(.primary)
+                        // Plain, like the tick beside it: a default-style button takes the
+                        // whole row, and a tap on the tick could open the fountain too.
+                        .buttonStyle(.plain)
                     }
                     .swipeActions(edge: .leading) {
                         Button(L10n.t("gpxIn.fromHere")) { route.onlyFrom(stop) }.tint(.accentColor)
