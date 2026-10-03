@@ -1,5 +1,6 @@
 import AuthenticationServices
 import SwiftUI
+import UIKit
 
 /// Username (or email) and password, Apple, Google or a passkey, and the way to create an account. Password
 /// recovery stays on the web: it works through a link sent by email.
@@ -53,11 +54,13 @@ struct SignInView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    SecureField(L10n.t("login.password"), text: $password)
-                        .textContentType(.password)
-                        .focused($field, equals: .password)
-                        .submitLabel(.go)
-                        .onSubmit(submit)
+                    // UIKit, not SecureField: Password AutoFill writes the password into the
+                    // UIKit field and SwiftUI's binding never saw it, so only the username
+                    // arrived (field test, 03/10/2026).
+                    PasswordField(placeholder: L10n.t("login.password"), text: $password,
+                                  isFocused: Binding(get: { field == .password },
+                                                     set: { field = $0 ? .password : nil }),
+                                  onSubmit: submit)
                         .modifier(FieldBox())
                     Button(action: submit) {
                         HStack(spacing: 8) {
@@ -204,6 +207,63 @@ struct SignInView: View {
 
     private func web(_ path: String) -> URL {
         URL(string: "https://fontapp.net/\(path)")!
+    }
+}
+
+/// A secure text field that reports every change, AutoFill's included.
+private struct PasswordField: UIViewRepresentable {
+    let placeholder: String
+    @Binding var text: String
+    @Binding var isFocused: Bool
+    let onSubmit: () -> Void
+
+    func makeUIView(context: Context) -> UITextField {
+        let field = UITextField()
+        field.isSecureTextEntry = true
+        field.textContentType = .password
+        field.returnKeyType = .go
+        field.autocapitalizationType = .none
+        field.autocorrectionType = .no
+        field.placeholder = placeholder
+        field.font = .preferredFont(forTextStyle: .body)
+        field.adjustsFontForContentSizeCategory = true
+        field.delegate = context.coordinator
+        field.addTarget(context.coordinator, action: #selector(Coordinator.changed(_:)), for: .editingChanged)
+        field.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        field.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        return field
+    }
+
+    func updateUIView(_ field: UITextField, context: Context) {
+        context.coordinator.parent = self
+        if field.text != text { field.text = text }
+        if isFocused, !field.isFirstResponder {
+            DispatchQueue.main.async { field.becomeFirstResponder() }
+        }
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    final class Coordinator: NSObject, UITextFieldDelegate {
+        var parent: PasswordField
+        init(_ parent: PasswordField) { self.parent = parent }
+
+        @objc func changed(_ field: UITextField) { parent.text = field.text ?? "" }
+
+        func textFieldDidBeginEditing(_ field: UITextField) {
+            if !parent.isFocused { parent.isFocused = true }
+        }
+
+        func textFieldDidEndEditing(_ field: UITextField) {
+            // AutoFill can fill without an editing event; read the field once more.
+            parent.text = field.text ?? ""
+        }
+
+        func textFieldShouldReturn(_ field: UITextField) -> Bool {
+            parent.text = field.text ?? ""
+            parent.onSubmit()
+            return false
+        }
     }
 }
 
