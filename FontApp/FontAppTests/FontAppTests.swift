@@ -342,9 +342,12 @@ struct QuickReviewTests {
         let json = try #require(try JSONSerialization.jsonObject(with: body) as? [String: Any])
         #expect(json["remoteDistanceM"] as? Int == 47_000)
 
-        // Asked once per fountain: the next tap goes straight through, distance included.
-        #expect(await model.tap(.dry, fix: barcelona))
-        #expect(model.remoteQuestion == nil)
+        // Asked once per fountain: on the page opened again (one tap is one review per
+        // page), the next tap goes straight through, distance included.
+        let again = QuickReviewModel(fontID: font, coordinate: .init(latitude: 41.81, longitude: 2.10),
+                                     api: StubProtocol.client())
+        #expect(await again.tap(.dry, fix: barcelona))
+        #expect(again.remoteQuestion == nil)
         #expect(StubProtocol.sent.count == 2)
     }
 }
