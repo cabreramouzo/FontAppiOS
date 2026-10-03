@@ -14,16 +14,17 @@ how iOS differs from the web is in `docs/pwa-parity.md`.
 - **The route sheet**: fountains along it by kilometre with their detour, the driest
   stretch (both ends counted, and again counting only water on record), the longest dry
   climb, the elevation profile, the corridor (100 m – 1 km), which fountains go to the GPS
-  file, and the export. Also: *Only the route's fountains*, hide, delete, and "My routes".
+  file, and the export. Also: *Show only fountains on the route*, hide, delete, and "My routes".
 - **On the map**: every route not hidden is drawn, each in its colour. One at a time is
   *open*: its fountains are loaded and a **chip** under the (?) names it. Tapping the chip
   opens the sheet; the eye hides the line; the cross closes it (still saved). A line
   nobody explains was a surprise in the field (03/10/2026); the chip is the explanation.
 - **My routes** (GPX menu, once one is saved; or from the route sheet): every imported
-  route, newest first. Tap to open it and frame the map; coloured dot to pick a colour;
+  route, newest first, under a standing hint ("tap a route to open it…"; not a TipKit tip:
+  the list is opened now and then and a dismissed tip never comes back). Tap to open it and frame the map; coloured dot to pick a colour;
   swipe or long press to rename or delete (delete asks first: it removes it from every
   device with the same iCloud). Importing the same track again opens the saved one.
-- **Only the route's fountains** (GPX menu while a route is open, and the route sheet):
+- **Show only fountains on the route** (GPX menu while a route is open, and the route sheet):
   the map shows only the fountains inside the open route's corridor and no cluster
   bubbles, so the line can be read. Filters still apply on top. It is per device and
   remembered for the next route; with no route open it does nothing.
@@ -44,7 +45,7 @@ how iOS differs from the web is in `docs/pwa-parity.md`.
   devices arrive through `NSPersistentStoreRemoteChange`.
 - **Synced** (they belong to the route): name, colour, corridor, excluded fountains,
   deletion. **Per device** (`UserDefaults`): which route is open, which are hidden, and
-  *only the route's fountains*. Hiding a route on the iPad must not take it off the
+  *show only fountains on the route*. Hiding a route on the iPad must not take it off the
   iPhone in someone's handlebar mount.
 - CloudKit rules the model keeps: every property has a default, nothing unique, no
   relationships. A new property must keep those rules, and the schema must be deployed
@@ -71,6 +72,6 @@ how iOS differs from the web is in `docs/pwa-parity.md`.
 Unit tests: `RouteLibraryTests` in `FontAppTests` (packing round trip, duplicate import,
 choices stored with the route, deleting the open route). By hand: import, chip (eye,
 cross, long name in Basque on a small iPhone), My routes (open, colour menu shows each
-colour, rename, delete), *only the route's fountains* on and off, relaunch keeps
+colour, rename, delete), *show only fountains on the route* on and off, relaunch keeps
 everything, two devices on the same Apple ID, and the map help tour with and without a
 route open (the route step appears only when the chip is on screen).

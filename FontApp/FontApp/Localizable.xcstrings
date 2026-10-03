@@ -7,55 +7,108 @@
     " → %@" : {
 
     },
+    "ios.routes.hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca una ruta per obrir-la al mapa. Llisca o mantén-la premuda per a més opcions."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap a route to open it on the map. Swipe or press and hold for more options."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca una ruta para abrirla en el mapa. Desliza o mantenla pulsada para más opciones."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukitu ibilbide bat mapan irekitzeko. Irristatu edo eutsi sakatuta aukera gehiagorako."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez un itinéraire pour l’ouvrir sur la carte. Balayez ou maintenez-le pour plus d’options."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca unha ruta para abrila no mapa. Desliza ou mantena premida para máis opcións."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tocca un percorso per aprirlo sulla mappa. Scorri o tieni premuto per altre opzioni."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca num percurso para o abrir no mapa. Desliza ou mantém premido para mais opções."
+          }
+        }
+      }
+    },
     "ios.routes.onlyRoute" : {
       "extractionState" : "manual",
       "localizations" : {
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Només les fonts de la ruta"
+            "value" : "Veure només les fonts de la ruta"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only fountains on the route"
+            "value" : "Show only fountains on the route"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Solo las fuentes de la ruta"
+            "value" : "Ver solo las fuentes de la ruta"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ibilbideko iturriak bakarrik"
+            "value" : "Ikusi ibilbideko iturriak bakarrik"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seulement les fontaines de l’itinéraire"
+            "value" : "Voir seulement les fontaines de l’itinéraire"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Só as fontes da ruta"
+            "value" : "Ver só as fontes da ruta"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Solo le fontane del percorso"
+            "value" : "Vedi solo le fontane del percorso"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Só as fontes do percurso"
+            "value" : "Ver só as fontes do percurso"
           }
         }
       }

@@ -31,6 +31,10 @@ struct RoutesSheet: View {
                     List {
                         Section {
                             ForEach(library.routes) { saved in row(saved) }
+                        } header: {
+                            // Always there, not a tip dismissed once: this list is opened
+                            // now and then, and by the next time how it works is forgotten.
+                            Text(L10n.t("ios.routes.hint")).textCase(nil)
                         } footer: {
                             Text(L10n.t(library.syncsWithICloud ? "ios.routes.icloud" : "ios.routes.local"))
                         }

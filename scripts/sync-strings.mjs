@@ -812,9 +812,19 @@ const IOS_ONLY = {
     it: 'Il file viene letto sul telefono. Il percorso resta su questo dispositivo e nel tuo iCloud, mai sul server di FontApp: gli si chiedono solo le fontane della zona.',
   },
   'ios.routes.onlyRoute': {
-    ca: 'Només les fonts de la ruta', es: 'Solo las fuentes de la ruta', gl: 'Só as fontes da ruta',
-    eu: 'Ibilbideko iturriak bakarrik', en: 'Only fountains on the route', fr: 'Seulement les fontaines de l’itinéraire',
-    pt: 'Só as fontes do percurso', it: 'Solo le fontane del percorso',
+    ca: 'Veure només les fonts de la ruta', es: 'Ver solo las fuentes de la ruta', gl: 'Ver só as fontes da ruta',
+    eu: 'Ikusi ibilbideko iturriak bakarrik', en: 'Show only fountains on the route', fr: 'Voir seulement les fontaines de l’itinéraire',
+    pt: 'Ver só as fontes do percurso', it: 'Vedi solo le fontane del percorso',
+  },
+  'ios.routes.hint': {
+    ca: 'Toca una ruta per obrir-la al mapa. Llisca o mantén-la premuda per a més opcions.',
+    es: 'Toca una ruta para abrirla en el mapa. Desliza o mantenla pulsada para más opciones.',
+    gl: 'Toca unha ruta para abrila no mapa. Desliza ou mantena premida para máis opcións.',
+    eu: 'Ukitu ibilbide bat mapan irekitzeko. Irristatu edo eutsi sakatuta aukera gehiagorako.',
+    en: 'Tap a route to open it on the map. Swipe or press and hold for more options.',
+    fr: 'Touchez un itinéraire pour l’ouvrir sur la carte. Balayez ou maintenez-le pour plus d’options.',
+    pt: 'Toca num percurso para o abrir no mapa. Desliza ou mantém premido para mais opções.',
+    it: 'Tocca un percorso per aprirlo sulla mappa. Scorri o tieni premuto per altre opzioni.',
   },
   'ios.routes.title': {
     ca: 'Les meves rutes', es: 'Mis rutas', gl: 'As miñas rutas', eu: 'Nire ibilbideak',
