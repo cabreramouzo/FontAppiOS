@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- Merged with the keys Xcode generates (INFOPLIST_KEY_*). Only what cannot be a build
-     setting lives here: the background refresh that sends the outbox, and opening GPX
-     files shared from other apps (Wikiloc, Mail, AirDrop). -->
 <plist version="1.0">
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
@@ -24,17 +21,21 @@
 			</array>
 		</dict>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
-			<key>UTTypeIdentifier</key>
-			<string>com.topografix.gpx</string>
-			<key>UTTypeDescription</key>
-			<string>GPS Exchange Format</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.xml</string>
 			</array>
+			<key>UTTypeDescription</key>
+			<string>GPS Exchange Format</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.topografix.gpx</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
@@ -47,23 +48,6 @@
 				</array>
 			</dict>
 		</dict>
-	</array>
-	<!-- Only HTTPS, which is exempt: without this, every build waits in TestFlight for the
-	     export compliance question. -->
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<!-- Only for the opt-in "tell me when I pass a fountain" (PassingBy): region
-	     monitoring, which needs "Always" and no background location mode. -->
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Only if you turn on “Tell me when I pass a fountain”: FontApp uses your location in the background to ask how a fountain is when you pass near it. It is not stored anywhere.</string>
-	<!-- PassingBy only: no notice when driving past a fountain. -->
-	<key>NSMotionUsageDescription</key>
-	<string>Only if you turn on “Tell me when I pass a fountain”: FontApp checks whether you are in a car so it does not ask when you drive past. It is not stored anywhere.</string>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<false/>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
 	</array>
 </dict>
 </plist>
