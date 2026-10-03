@@ -4,6 +4,10 @@ import SwiftUI
 /// how many of the ones around you. Silent until you have visited one.
 struct CollectionSection: View {
     let collection: VisitedCollection
+    /// A medal you have was tapped: its kind's list opens. Buttons, not one NavigationLink
+    /// per medal: six links in one list row all fire on a tap, pushing every kind's list,
+    /// and Back then walked through each of them (field test, 03/10/2026).
+    let onOpen: (WaterSource) -> Void
 
     var body: some View {
         if collection.visited > 0 {
@@ -38,9 +42,10 @@ struct CollectionSection: View {
                             // You see the number and want to know which ones: a kind you have
                             // opens its list. One you lack has nothing to show.
                             if kind.count > 0, let source = WaterSource(rawValue: kind.source) {
-                                NavigationLink { CollectionKindScreen(source: source) } label: { medal }
-                                    .buttonStyle(.plain)
-                                    .accessibilityAddTraits(.isButton)
+                                // Borderless: a row's own tap would otherwise take the whole row.
+                                Button { onOpen(source) } label: { medal }
+                                    .buttonStyle(.borderless)
+                                    .tint(.primary)
                             } else {
                                 medal
                             }
@@ -131,10 +136,11 @@ struct CollectionKindScreen: View {
 /// levels. One place for both, where the profile used to have two «collections».
 struct CollectionScreen: View {
     let collection: VisitedCollection?
+    @State private var openKind: WaterSource?
 
     var body: some View {
         List {
-            if let collection { CollectionSection(collection: collection) }
+            if let collection { CollectionSection(collection: collection) { openKind = $0 } }
             Section {
                 NavigationLink { BadgesScreen() } label: {
                     Label(L10n.t("gamePage.badges"), systemImage: "rosette").frame(minHeight: 44)
@@ -143,5 +149,7 @@ struct CollectionScreen: View {
         }
         .navigationTitle(L10n.t("badges.title"))
         .navigationBarTitleDisplayMode(.inline)
+        // On the list, not inside it: a destination in a lazy section is ignored.
+        .navigationDestination(item: $openKind) { CollectionKindScreen(source: $0) }
     }
 }
