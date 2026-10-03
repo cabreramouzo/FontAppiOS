@@ -554,7 +554,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Only if you turn on “Tell me when I pass a fountain”: FontApp uses your location in the background to ask how a fountain is when you pass near it. It is not stored anywhere.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "FontApp uses your location to show you the fountains and news near you.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Only if you turn on “Tell me when I pass a fountain”: FontApp checks whether you are in a car so it does not ask when you drive past. It is not stored anywhere.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "FontApp saves to your photos the picture of a fountain that is waiting to be sent.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "FontApp saves to your photos the ones you take with the app's camera, so they are not lost, and the picture of a fountain waiting to be sent.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -596,7 +596,7 @@
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Only if you turn on “Tell me when I pass a fountain”: FontApp uses your location in the background to ask how a fountain is when you pass near it. It is not stored anywhere.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "FontApp uses your location to show you the fountains and news near you.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "Only if you turn on “Tell me when I pass a fountain”: FontApp checks whether you are in a car so it does not ask when you drive past. It is not stored anywhere.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "FontApp saves to your photos the picture of a fountain that is waiting to be sent.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "FontApp saves to your photos the ones you take with the app's camera, so they are not lost, and the picture of a fountain waiting to be sent.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

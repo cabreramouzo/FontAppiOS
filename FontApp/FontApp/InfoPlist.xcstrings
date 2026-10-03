@@ -234,49 +234,49 @@
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FontApp desa a les teves fotos la imatge d'una font pendent d'enviar."
+            "value" : "FontApp desa a les teves fotos les que fas amb la càmera de l'app, perquè no es perdin, i la d'una font pendent d'enviar."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FontApp saves to your photos the picture of a fountain that is waiting to be sent."
+            "value" : "FontApp saves to your photos the ones you take with the app's camera, so they are not lost, and the picture of a fountain waiting to be sent."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FontApp guarda en tus fotos la imagen de una fuente que está pendiente de enviar."
+            "value" : "FontApp guarda en tus fotos las que haces con la cámara de la app, para que no se pierdan, y la de una fuente pendiente de enviar."
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FontApp-ek bidali gabe dagoen iturri baten irudia zure argazkietan gordetzen du."
+            "value" : "FontAppek zure argazkietan gordetzen ditu aplikazioaren kamerarekin ateratakoak, gal ez daitezen, eta bidaltzeko dagoen iturri batena."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FontApp enregistre dans vos photos l’image d’une fontaine en attente d’envoi."
+            "value" : "FontApp enregistre dans vos photos celles que vous prenez avec l'appareil photo de l'app, pour ne pas les perdre, et celle d'une fontaine en attente d'envoi."
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FontApp garda nas túas fotos a imaxe dunha fonte pendente de enviar."
+            "value" : "FontApp garda nas túas fotos as que fas coa cámara da app, para que non se perdan, e a dunha fonte pendente de enviar."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FontApp salva nelle tue foto l'immagine di una fontana in attesa di invio."
+            "value" : "FontApp salva nelle tue foto quelle scattate con la fotocamera dell'app, perché non vadano perse, e quella di una fontana in attesa di invio."
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A FontApp guarda nas suas fotos a imagem de uma fonte por enviar."
+            "value" : "A FontApp guarda nas tuas fotografias as que tiras com a câmara da app, para não se perderem, e a de uma fonte por enviar."
           }
         }
       }

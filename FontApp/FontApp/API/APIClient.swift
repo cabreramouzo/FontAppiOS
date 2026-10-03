@@ -132,6 +132,15 @@ nonisolated struct Ignored: Decodable, Sendable {}
 nonisolated struct APIClient: Sendable {
     static let shared = APIClient(baseURL: APIEnvironment.baseURL, responseCache: .shared)
 
+    /// `ios/<version> (<build>)`: how the server tells this app from the web and, later,
+    /// Android (FontAppBE/docs/clients.md).
+    static let clientID: String = {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return "ios/\(version) (\(build))"
+    }()
+
     let baseURL: URL
     var session: URLSession = .shared
     var credentials: Credentials = .shared
@@ -718,6 +727,7 @@ nonisolated struct APIClient: Sendable {
                                  timeoutInterval: timeout)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(Self.clientID, forHTTPHeaderField: "X-FontApp-Client")
         if queuedOffline { request.setValue("1", forHTTPHeaderField: "X-FontApp-Queued-Offline") }
         let bearer = authorization == nil ? credentials.current : nil
         if let authorization {

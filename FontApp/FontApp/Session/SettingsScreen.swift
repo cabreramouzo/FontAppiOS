@@ -17,6 +17,9 @@ struct SettingsScreen: View {
     @State private var isDeleting = false
     @State private var isSigningOut = false
     @State private var deletionError: String?
+    @AppStorage(PhotoLibrarySaver.savesCameraShotsKey) private var savesCameraShots = true
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var photosDenied = PhotoLibrarySaver.isDenied
 
     var body: some View {
         List {
@@ -38,6 +41,7 @@ struct SettingsScreen: View {
                 } footer: {
                     Text(L10n.t("settings.intro"))
                 }
+                photos
                 // Signing out goes last but one, as in the phone's own Settings.
                 Section {
                     Button(role: .destructive) {
@@ -64,6 +68,10 @@ struct SettingsScreen: View {
             #endif
         }
         .navigationTitle(L10n.t("settings.title"))
+        // Back from iOS Settings: the permission may have changed.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { photosDenied = PhotoLibrarySaver.isDenied }
+        }
         .navigationBarTitleDisplayMode(.inline)
         .task { await PushNotifications.shared.refresh() }
     }
@@ -106,6 +114,26 @@ struct SettingsScreen: View {
 
     /// Apple requires deleting the account from inside the app (App Store rule 5.1.1(v)).
     /// The server anonymises it: personal data goes, contributions stay without a name.
+    /// A device setting, not an account one: whether this phone keeps the app's camera
+    /// photos in Photos.
+    private var photos: some View {
+        Section {
+            Toggle(isOn: $savesCameraShots) {
+                Label(L10n.t("ios.photos.saveShots"), systemImage: "photo.on.rectangle")
+            }
+            .frame(minHeight: 44)
+            if savesCameraShots && photosDenied {
+                Text(L10n.t("ios.photos.denied")).font(.footnote).foregroundStyle(.orange)
+                Button(L10n.t("ios.push.openSettings")) {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                }
+                .frame(minHeight: 44)
+            }
+        } footer: {
+            Text(L10n.t("ios.photos.saveShotsHint"))
+        }
+    }
+
     private var dangerZone: some View {
         Section {
             DisclosureGroup(isExpanded: $showsDangerZone) {

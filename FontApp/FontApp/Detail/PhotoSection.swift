@@ -1,3 +1,4 @@
+import CoreLocation
 import PhotosUI
 import SwiftUI
 import UIKit
@@ -105,7 +106,16 @@ struct CameraPicker: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController,
                                    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
             let image = info[.originalImage] as? UIImage
-            onFinish(image?.jpegData(compressionQuality: 0.95))
+            let jpeg = image?.jpegData(compressionQuality: 0.95)
+            if let jpeg {
+                // Into Photos too, so a failed send never loses it (Settings → Photos).
+                // The last known position, only if location is already allowed.
+                let manager = CLLocationManager()
+                let allowed = [.authorizedWhenInUse, .authorizedAlways].contains(manager.authorizationStatus)
+                let location = allowed ? manager.location : nil
+                Task { await PhotoLibrarySaver.saveCameraShot(jpeg, at: location) }
+            }
+            onFinish(jpeg)
         }
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
