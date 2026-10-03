@@ -795,7 +795,7 @@ struct RouteExtrasTests {
 }
 }
 
-@MainActor
+@MainActor @Suite(.serialized)
 struct RouteLibraryTests {
     private let track = [
         GPX.Point(latitude: 41.80, longitude: 2.10, elevation: 600),

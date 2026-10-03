@@ -92,7 +92,7 @@ struct MapScreen: View {
                              onImportGPX: { importsGPX = true },
                              onExportGPX: exportVisibleFountains,
                              onRoutes: routes.routes.isEmpty ? nil : { sheet = .routes },
-                             onlyRouteFonts: routes.active == nil ? nil : Binding(get: { routes.onlyRouteFonts },
+                             onlyRouteFonts: routes.visibleRoutes.isEmpty ? nil : Binding(get: { routes.onlyRouteFonts },
                                                                                   set: { routes.onlyRouteFonts = $0 }),
                              staff: session.isStaff)
                 .padding(.trailing, 12)
@@ -269,6 +269,8 @@ struct MapScreen: View {
         .onOpenURL { url in
             if url.isFileURL { openGPX(.success(url)) }
         }
+        // "Show only fountains on my routes": the fountains along every visible route.
+        .task(id: routes.routeFontsKey) { await routes.loadRouteFonts() }
         .onAppear(perform: locateOnce)
         .onChange(of: location.isAuthorized) { locateOnce() }
         .onReceive(NotificationCenter.default.publisher(for: .fontChanged)) { _ in model.refresh() }

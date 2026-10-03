@@ -38,8 +38,9 @@ handlebar mount and is used again on the next outing:
   to pick one of six colours (closed palette away from water-status and staff colours),
   rename and delete by swipe or context menu. Corridor and excluded fountains are stored
   with each route.
-- **"Only the route's fountains"** (GPX menu and the route sheet): the map keeps just the
-  fountains in the open route's corridor, without clusters, so the line can be read.
+- **"Show only fountains on my routes"** (GPX menu and the route sheet): the map keeps
+  just the fountains in the corridor of every visible route (stages of one trip are
+  several files), without clusters, so the lines can be read.
 - Kept the same as the web: the file is read on the device, only the widened box is
   asked of the server, km order, both ends of the driest stretch, exporting excluded
   ones out.

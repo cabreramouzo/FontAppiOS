@@ -25,16 +25,38 @@ final class RouteLibrary {
     private(set) var hiddenIDs: Set<UUID> {
         didSet { defaults.set(hiddenIDs.map(\.uuidString), forKey: Keys.hidden) }
     }
-    /// The map shows only the open route's fountains: the line and the water on it, without
-    /// the town's other pins and the cluster bubbles over it. Per device, and only while a
-    /// route is open; it is remembered for the next one.
+    /// The map shows only the fountains along the visible routes: the lines and the water
+    /// on them, without the town's other pins and the cluster bubbles over them. Every
+    /// visible route and not only the open one: a trip in stages is several GPX files, and
+    /// the fountains follow the lines on the map. Per device.
     var onlyRouteFonts: Bool {
         didSet { defaults.set(onlyRouteFonts, forKey: Keys.onlyRouteFonts) }
     }
-    /// The fountains the map shows, or nil for all of them.
+    /// Fountains in each visible route's corridor, by route, for the routes not open (the
+    /// open one uses its live list, which follows the corridor as it changes).
+    private(set) var nearRoute: [UUID: [FontSummary]] = [:]
+
+    /// The fountains the map shows, or nil for all of them. One fountain shared by two
+    /// stages (where one ends and the next starts) is listed once.
     var routeFontsOnMap: [FontSummary]? {
-        guard onlyRouteFonts, let active, case .loaded = active.state else { return nil }
-        return active.onRoute.map(\.font)
+        guard onlyRouteFonts, !visibleRoutes.isEmpty else { return nil }
+        var seen = Set<UUID>()
+        var fonts: [FontSummary] = []
+        for saved in visibleRoutes {
+            let near: [FontSummary]
+            if let active, active.savedID == saved.id, case .loaded = active.state {
+                near = active.onRoute.map(\.font)
+            } else {
+                near = nearRoute[saved.id] ?? []
+            }
+            for font in near where seen.insert(font.id).inserted { fonts.append(font) }
+        }
+        return fonts
+    }
+
+    /// Changes when the fountains along the routes have to be asked for again.
+    var routeFontsKey: String {
+        "\(onlyRouteFonts)|" + visibleRoutes.map(\.id.uuidString).joined(separator: ",")
     }
     /// What the map draws, oldest first so the newest line is on top.
     var visibleRoutes: [SavedRoute] { routes.reversed().filter { !hiddenIDs.contains($0.id) } }
@@ -53,6 +75,9 @@ final class RouteLibrary {
     @ObservationIgnored private let loadsFountains: Bool
     /// Decoded tracks: the map asks for them on every render, which follows the GPS.
     @ObservationIgnored private var coordinateCache: [UUID: [CLLocationCoordinate2D]] = [:]
+    /// What the server answered for each route's box: the corridor can change without
+    /// asking again.
+    @ObservationIgnored private var candidates: [UUID: [FontSummary]] = [:]
     @ObservationIgnored private var remoteChanges: (any NSObjectProtocol)?
 
     private enum Keys {
@@ -70,7 +95,8 @@ final class RouteLibrary {
         var container: ModelContainer?
         var canSync = false
         if inMemory {
-            container = try? ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+            container = try? ModelContainer(for: schema, configurations: ModelConfiguration(
+                UUID().uuidString, schema: schema, isStoredInMemoryOnly: true))
         } else {
             do {
                 container = try ModelContainer(for: schema, configurations: ModelConfiguration(
@@ -146,12 +172,39 @@ final class RouteLibrary {
             guard let self, let model, let saved = self.routes.first(where: { $0.id == model.savedID }) else { return }
             saved.corridor = model.corridor
             saved.excluded = Array(model.excluded)
+            // Computed again with the new corridor when it is no longer the open one.
+            self.nearRoute[saved.id] = nil
             self.save()
         }
         active = model
         defaults.set(saved.id.uuidString, forKey: Keys.active)
         if loadsFountains { Task { await model.load() } }
         return model
+    }
+
+    /// The fountains along each visible route not known yet: one request per route box
+    /// (saved zones without signal), only while the switch is on. A route with no answer
+    /// and nothing saved is tried again on the next change, never in a loop.
+    func loadRouteFonts() async {
+        guard onlyRouteFonts, loadsFountains else { return }
+        for saved in visibleRoutes where nearRoute[saved.id] == nil {
+            let points = saved.points
+            guard let box = GPX.box(of: points) else { continue }
+            let fonts: [FontSummary]
+            if let known = candidates[saved.id] {
+                fonts = known
+            } else {
+                do {
+                    fonts = try await APIClient.shared.fontsInBounds(box)
+                } catch {
+                    let offline = OfflineZones.shared.fonts(in: box)
+                    if offline.isEmpty { continue }
+                    fonts = offline
+                }
+                candidates[saved.id] = fonts
+            }
+            nearRoute[saved.id] = GPX.fountains(fonts, along: points, corridor: saved.corridor).map(\.font)
+        }
     }
 
     /// Closed: no chip and no fountains. The line stays if it is visible.
@@ -201,6 +254,8 @@ final class RouteLibrary {
         if active?.savedID == saved.id { deactivate() }
         hiddenIDs.remove(saved.id)
         coordinateCache[saved.id] = nil
+        candidates[saved.id] = nil
+        nearRoute[saved.id] = nil
         context?.delete(saved)
         save()
         reload()

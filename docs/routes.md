@@ -14,7 +14,7 @@ how iOS differs from the web is in `docs/pwa-parity.md`.
 - **The route sheet**: fountains along it by kilometre with their detour, the driest
   stretch (both ends counted, and again counting only water on record), the longest dry
   climb, the elevation profile, the corridor (100 m – 1 km), which fountains go to the GPS
-  file, and the export. Also: *Show only fountains on the route*, hide, delete, and "My routes".
+  file, and the export. Also: *Show only fountains on my routes*, hide, delete, and "My routes".
 - **On the map**: every route not hidden is drawn, each in its colour. One at a time is
   *open*: its fountains are loaded and a **chip** under the (?) names it. Tapping the chip
   opens the sheet; the eye hides the line; the cross closes it (still saved). A line
@@ -24,14 +24,28 @@ how iOS differs from the web is in `docs/pwa-parity.md`.
   the list is opened now and then and a dismissed tip never comes back). Tap to open it and frame the map; coloured dot to pick a colour;
   swipe or long press to rename or delete (delete asks first: it removes it from every
   device with the same iCloud). Importing the same track again opens the saved one.
-- **Show only fountains on the route** (GPX menu while a route is open, and the route sheet):
-  the map shows only the fountains inside the open route's corridor and no cluster
-  bubbles, so the line can be read. Filters still apply on top. It is per device and
-  remembered for the next route; with no route open it does nothing.
+- **Show only fountains on my routes** (GPX menu while any route is visible, and the
+  route sheet): the map shows only the fountains inside the corridor of **every visible
+  route**, each with its own corridor, and no cluster bubbles, so the lines can be read.
+  Every visible route and not only the open one: a trip in stages is several GPX files,
+  and the fountains follow the lines on the map; to leave a stage out, hide it. One
+  request per route box when the switch is turned on or a route is shown (saved zones
+  without signal), kept in memory; a fountain shared by two stages appears once. Filters
+  still apply on top. Per device, remembered.
   *Why not smaller pins or "hide all fountains":* smaller pins break the 44 pt touch
   target and the cluster numbers stop being legible; hiding every fountain hides the very
   thing the route is for. Why not in Filters: Filters is the map's standing view; this
   is temporary and belongs to the route.
+
+## Future: trips in stages
+
+Each stage is still its own route: its kilometres, driest stretch and profile stop at its
+ends, so the water between the end of stage 1 and the start of stage 2 is counted by
+nobody, and that is what decides one bottle or two. A **trip** would group stages in
+order: kilometres running on, one profile, dry stretches that cross from one stage to
+the next, and one GPS export. Not built: wait until the field asks for it (people
+importing several stages of one trip). Until then, "show only fountains on my routes"
+covers seeing them together.
 
 ## Storage and sync
 
@@ -45,7 +59,7 @@ how iOS differs from the web is in `docs/pwa-parity.md`.
   devices arrive through `NSPersistentStoreRemoteChange`.
 - **Synced** (they belong to the route): name, colour, corridor, excluded fountains,
   deletion. **Per device** (`UserDefaults`): which route is open, which are hidden, and
-  *show only fountains on the route*. Hiding a route on the iPad must not take it off the
+  *show only fountains on my routes*. Hiding a route on the iPad must not take it off the
   iPhone in someone's handlebar mount.
 - CloudKit rules the model keeps: every property has a default, nothing unique, no
   relationships. A new property must keep those rules, and the schema must be deployed
@@ -72,6 +86,6 @@ how iOS differs from the web is in `docs/pwa-parity.md`.
 Unit tests: `RouteLibraryTests` in `FontAppTests` (packing round trip, duplicate import,
 choices stored with the route, deleting the open route). By hand: import, chip (eye,
 cross, long name in Basque on a small iPhone), My routes (open, colour menu shows each
-colour, rename, delete), *show only fountains on the route* on and off, relaunch keeps
+colour, rename, delete), *show only fountains on my routes* on and off, relaunch keeps
 everything, two devices on the same Apple ID, and the map help tour with and without a
 route open (the route step appears only when the chip is on screen).
