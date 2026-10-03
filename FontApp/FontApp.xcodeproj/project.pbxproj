@@ -147,6 +147,7 @@
 				044F28743068858800D0EF7B /* Frameworks */,
 				044F28753068858800D0EF7B /* Resources */,
 				0AB1C2D3E4F5061728394A0B /* Embed Foundation Extensions */,
+				0AB1C2D3E4F5061728394B01 /* Set Build Number */,
 			);
 			buildRules = (
 			);
@@ -217,6 +218,7 @@
 				0AB1C2D3E4F5061728394A05 /* Sources */,
 				0AB1C2D3E4F5061728394A03 /* Frameworks */,
 				0AB1C2D3E4F5061728394A04 /* Resources */,
+				0AB1C2D3E4F5061728394B02 /* Set Build Number */,
 			);
 			buildRules = (
 			);
@@ -320,6 +322,49 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0AB1C2D3E4F5061728394B01 /* Set Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Set Build Number";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/../scripts/set-build-number.sh\"\n";
+			alwaysOutOfDate = 1;
+		};
+		0AB1C2D3E4F5061728394B02 /* Set Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Set Build Number";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/../scripts/set-build-number.sh\"\n";
+			alwaysOutOfDate = 1;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		044F28733068858800D0EF7B /* Sources */ = {
@@ -497,7 +542,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FontApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				DEVELOPMENT_TEAM = 7V6773B2EX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -538,7 +584,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FontApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				DEVELOPMENT_TEAM = 7V6773B2EX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
