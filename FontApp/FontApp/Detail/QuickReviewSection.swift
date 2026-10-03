@@ -40,19 +40,23 @@ struct QuickReviewSection: View {
                 }
             }
             if session.isSignedIn {
-                // One slot that changes, not rows added under it: each question used to
-                // land below the short card, where nobody saw it (field test, 02/10/2026).
-                VStack(alignment: .leading, spacing: 10) {
-                    feedback
-                    if showsSteps, let step = steps.first {
-                        stepView(step)
-                            .id(step)
-                            .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity),
-                                                    removal: .opacity))
+                // Only when there is something to show: an empty slot is still a list row,
+                // a blank strip with a separator under the chips.
+                if hasSlot {
+                    // One slot that changes, not rows added under it: each question used to
+                    // land below the short card, where nobody saw it (field test, 02/10/2026).
+                    VStack(alignment: .leading, spacing: 10) {
+                        feedback
+                        if showsSteps, let step = steps.first {
+                            stepView(step)
+                                .id(step)
+                                .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity),
+                                                        removal: .opacity))
+                        }
                     }
+                    .animation(.snappy, value: steps.first)
+                    .sensoryFeedback(.selection, trigger: steps.first)
                 }
-                .animation(.snappy, value: steps.first)
-                .sensoryFeedback(.selection, trigger: steps.first)
             } else {
                 Text(L10n.t("ios.signInPrompt")).font(.footnote).foregroundStyle(.secondary)
             }
@@ -190,6 +194,14 @@ struct QuickReviewSection: View {
 
     private var ownStatus: WaterStatus? {
         ownRecent?.waterStatus.flatMap(WaterStatus.init(rawValue:))
+    }
+
+    /// The slot under the chips has a thanks, an error or a question to show.
+    private var hasSlot: Bool {
+        switch model.state {
+        case .idle, .sending: false
+        default: true
+        }
     }
 
     private var isSending: Bool {
