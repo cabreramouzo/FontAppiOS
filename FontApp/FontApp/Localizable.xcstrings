@@ -3505,6 +3505,377 @@
         }
       }
     },
+    "ios.tip.gpxBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa una ruta per veure les fonts del camí, o exporta les fonts del mapa al teu GPS o a una altra app."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import a route to see the fountains along it, or export the fountains on the map to your GPS or another app."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa una ruta para ver las fuentes del camino, o exporta las fuentes del mapa a tu GPS o a otra app."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inportatu ibilbide bat bideko iturriak ikusteko, edo esportatu mapako iturriak zure GPSra edo beste aplikazio batera."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importez un itinéraire pour voir les fontaines du parcours, ou exportez celles de la carte vers votre GPS ou une autre app."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa unha ruta para ver as fontes do camiño, ou exporta as fontes do mapa ao teu GPS ou a outra app."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importa un percorso per vedere le fontane lungo il cammino, o esporta quelle della mappa sul tuo GPS o in un'altra app."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importe uma rota para ver as fontes do caminho, ou exporte as fontes do mapa para o seu GPS ou outra app."
+          }
+        }
+      }
+    },
+    "ios.tip.helpBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca aquí i t'ensenyem els controls del mapa d'un en un."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap here and we will show you the map controls one by one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca aquí y te enseñamos los controles del mapa uno a uno."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukitu hemen eta maparen kontrolak banan-banan erakutsiko dizkizugu."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez ici pour découvrir les commandes de la carte une par une."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca aquí e amosámosche os controis do mapa un a un."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tocca qui e ti mostriamo i controlli della mappa uno per uno."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toque aqui e mostramos-lhe os controlos do mapa um a um."
+          }
+        }
+      }
+    },
+    "ios.tip.helpTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Què fa cada botó?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What does each button do?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué hace cada botón?"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zer egiten du botoi bakoitzak?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À quoi sert chaque bouton ?"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que fai cada botón?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa fa ogni pulsante?"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que faz cada botão?"
+          }
+        }
+      }
+    },
+    "ios.tip.offlineBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si a la font no hi ha senyal, l'aportació es desa al mòbil i s'envia quan torna la connexió."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If there is no signal at the fountain, it is kept on the phone and sent when the connection is back."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si en la fuente no hay señal, la aportación se guarda en el móvil y se envía al volver la conexión."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iturrian seinalerik ez badago, ekarpena mugikorrean gordetzen da eta konexioa itzultzean bidaltzen da."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "S'il n'y a pas de réseau à la fontaine, la contribution est gardée sur le téléphone et envoyée au retour de la connexion."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se na fonte non hai sinal, a achega gárdase no móbil e envíase ao volver a conexión."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se alla fontana non c’è campo, il contributo resta sul telefono e parte quando torna la connessione."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se não houver rede na fonte, o contributo fica guardado no telemóvel e é enviado quando voltar a ligação."
+          }
+        }
+      }
+    },
+    "ios.tip.offlineTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "També sense cobertura"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Works without signal too"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "También sin cobertura"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estaldurarik gabe ere bai"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Même sans réseau"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamén sen cobertura"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anche senza campo"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Também sem rede"
+          }
+        }
+      }
+    },
+    "ios.tip.quickBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca com raja ara: n'hi ha prou amb un toc i ajudes qui vingui després."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap how it flows now: one tap is enough, and it helps whoever comes next."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca cómo mana ahora: basta con un toque y ayudas a quien venga después."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukitu nola dabilen orain: ukitu bat nahikoa da, eta atzetik datozenei laguntzen diezu."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez l'état actuel : un seul geste suffit et vous aidez ceux qui viendront après."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca como bota agora: abonda cun toque e axudas a quen veña despois."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tocca com'è adesso: basta un tocco e aiuti chi verrà dopo."
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toque em como corre agora: basta um toque e ajuda quem vier a seguir."
+          }
+        }
+      }
+    },
+    "ios.tip.quickTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acabes de passar-hi?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Just walked past it?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Acabas de pasar por aquí?"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hemendik pasatu berri zara?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous venez de passer devant ?"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acabas de pasar por aquí?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ci sei appena passato?"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acabou de passar por aqui?"
+          }
+        }
+      }
+    },
     "ios.welcome.openBody" : {
       "extractionState" : "manual",
       "localizations" : {

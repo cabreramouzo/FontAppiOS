@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 @main
 struct FontAppApp: App {
@@ -18,6 +19,7 @@ struct FontAppApp: App {
         _showsWelcome = State(initialValue: WelcomeGate.shouldPresent())
         // Before the first map: how much of the map seen is kept for not downloading it again.
         MapTileCache.configure()
+        AppTips.configure()
         let session = SessionStore()
         let outbox = Outbox.shared
         // Before anything is sent, the outbox has to know whose it is.
@@ -76,6 +78,7 @@ struct FontAppApp: App {
             switch phase {
             case .active:
                 sync.flush(reason: "foreground")
+                MapHelpTip.appOpened.sendDonation()
                 Task { await PushNotifications.shared.refresh() }
                 // Opening the app somewhere new: watch the fountains around here.
                 Task { await PassingBy.shared.refresh() }

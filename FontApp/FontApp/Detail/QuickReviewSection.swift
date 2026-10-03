@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 /// "How is it now?" with the three chips, the thanks and a 10-second undo.
 /// Without a session the chips are still there, and tapping one asks to sign in: seeing
@@ -31,7 +32,12 @@ struct QuickReviewSection: View {
             // Once said, the chips give way to the thanks, as in the web popup: one tap is
             // one review, and a second tap cannot publish a twin. Undoing brings them back.
             if !model.hasSpoken {
-                chips
+                // In the chips' row: a tip of its own would leave an empty row once seen.
+                VStack(spacing: 10) {
+                    TipView(QuickReviewTip())
+                    chips
+                }
+                .listRowInsets(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
                 // Your own fresh report: its chip is already said (a twin adds nothing),
                 // but a change is news and stays one tap away, as the full form allows.
                 if let ownRecent, ownStatus != nil {
@@ -47,6 +53,8 @@ struct QuickReviewSection: View {
                     // land below the short card, where nobody saw it (field test, 02/10/2026).
                     VStack(alignment: .leading, spacing: 10) {
                         feedback
+                        // Landed online: the moment to say it would have worked offline too.
+                        if case .sent = model.state { TipView(OfflineReviewTip()) }
                         if showsSteps, let step = steps.first {
                             stepView(step)
                                 .id(step)

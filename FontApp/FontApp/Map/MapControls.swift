@@ -1,5 +1,6 @@
 import MapLibre
 import SwiftUI
+import TipKit
 
 /// The buttons over the map, laid out like Apple Maps: a grouped glass column at the top
 /// right and the one primary action (add a fountain) at the bottom right, where the thumb
@@ -21,6 +22,9 @@ struct MapControlColumn: View {
     var onImportGPX: (() -> Void)?
     var onExportGPX: (() -> Void)?
     let staff: Bool
+
+    @State private var gpxTip = GPXTip()
+    @State private var gpxTipPending = true
 
     var body: some View {
         VStack(spacing: 12) {
@@ -49,18 +53,33 @@ struct MapControlColumn: View {
                     }
                     if let onImportGPX, let onExportGPX {
                         Divider().frame(width: 28)
-                        Menu {
-                            Button(L10n.t("ios.gpx.import"), systemImage: "square.and.arrow.down", action: onImportGPX)
-                            Button(L10n.t("ios.gpx.export"), systemImage: "square.and.arrow.up", action: onExportGPX)
-                        } label: {
-                            // Letters, not an icon: whoever carries a GPS unit on the
-                            // handlebars reads "GPX" at once (web decision, see CLAUDE.md).
-                            Text("GPX")
-                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                .frame(width: 48, height: 48)
-                                .contentShape(Rectangle())
+                        // The first tap shows what the two choices do, with them on the tip;
+                        // from then on it is the plain menu.
+                        Group {
+                            if gpxTipPending {
+                                Button {
+                                    Task { await GPXTip.tapped.donate() }
+                                } label: { gpxLabel }
+                                .popoverTip(gpxTip) { action in
+                                    gpxTip.invalidate(reason: .actionPerformed)
+                                    // After the popover has gone: a file picker asked for while
+                                    // it is still on screen is silently dropped (field test).
+                                    let run = action.id == GPXTip.import_ ? onImportGPX : onExportGPX
+                                    Task {
+                                        try? await Task.sleep(for: .milliseconds(450))
+                                        run()
+                                    }
+                                }
+                                .tipViewStyle(RoomyTipStyle())
+                                .accessibilityLabel("GPX")
+                            } else {
+                                Menu {
+                                    Button(L10n.t("ios.gpx.import"), systemImage: "square.and.arrow.down", action: onImportGPX)
+                                    Button(L10n.t("ios.gpx.export"), systemImage: "square.and.arrow.up", action: onExportGPX)
+                                } label: { gpxLabel }
+                                .accessibilityLabel("GPX")
+                            }
                         }
-                        .accessibilityLabel("GPX")
                         .mapHelpTarget(.gpx)
                     }
                 }
@@ -69,6 +88,20 @@ struct MapControlColumn: View {
             SystemMapButtons(controller: controller)
         }
         .foregroundStyle(staff ? Color.staff : Color.primary)
+        .task {
+            for await status in gpxTip.statusUpdates {
+                if case .invalidated = status { gpxTipPending = false } else { gpxTipPending = true }
+            }
+        }
+    }
+
+    // Letters, not an icon: whoever carries a GPS unit on the handlebars reads "GPX" at
+    // once (web decision, see CLAUDE.md).
+    private var gpxLabel: some View {
+        Text("GPX")
+            .font(.system(size: 13, weight: .bold, design: .rounded))
+            .frame(width: 48, height: 48)
+            .contentShape(Rectangle())
     }
 }
 

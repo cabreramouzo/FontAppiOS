@@ -1,6 +1,7 @@
 import MapKit
 import MapLibre
 import SwiftUI
+import TipKit
 import UniformTypeIdentifiers
 
 struct MapScreen: View {
@@ -93,25 +94,30 @@ struct MapScreen: View {
                 .padding(.top, 8)
         }
         .overlay(alignment: .topLeading) {
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) { helpTarget = .layers }
-            } label: {
-                Image(systemName: "questionmark")
-                    .font(.system(size: 18, weight: .semibold))
-                    .frame(width: 48, height: 48)
+            // The (?) and the notices share one row: stacked in separate overlays, the
+            // offline chip sat on top of the (?) and its tip (field test, 03/10/2026).
+            HStack(alignment: .top, spacing: 8) {
+                Button {
+                    MapHelpTip().invalidate(reason: .actionPerformed)
+                    withAnimation(.easeInOut(duration: 0.2)) { helpTarget = .layers }
+                } label: {
+                    Image(systemName: "questionmark")
+                        .font(.system(size: 18, weight: .semibold))
+                        .frame(width: 48, height: 48)
+                }
+                .glassButton(in: Circle())
+                .accessibilityLabel(L10n.t("ios.mapHelp.title"))
+                .popoverTip(MapHelpTip(), arrowEdge: .top)
+                // What waits to be sent and whether there is signal, above the map's own notices.
+                VStack(spacing: 0) {
+                    ConnectivityNoticeView(serverUnavailable: model.serverUnavailable) { showsSignIn = true }
+                    banner
+                }
+                .frame(maxWidth: .infinity)
             }
-            .glassButton(in: Circle())
-            .accessibilityLabel(L10n.t("ios.mapHelp.title"))
             .padding(.leading, 12)
-            .padding(.top, 8)
-        }
-        .overlay(alignment: .top) {
-            // What waits to be sent and whether there is signal, above the map's own notices.
-            VStack(spacing: 0) {
-                ConnectivityNoticeView(serverUnavailable: model.serverUnavailable) { showsSignIn = true }
-                banner
-            }
             .padding(.trailing, 72)
+            .padding(.top, 8)
         }
         .overlay(alignment: .top) { loadingPill }
         .animation(.easeInOut(duration: 0.25), value: showsLoading)
@@ -148,6 +154,9 @@ struct MapScreen: View {
                     .transition(.opacity)
             }
         }
+        // The tab bar sits above the map and the dimming cannot reach it: out of the way
+        // while the help is open, so the whole screen is dimmed.
+        .toolbarVisibility(helpTarget == nil ? .automatic : .hidden, for: .tabBar)
         .overlayPreferenceValue(MapHelpFrames.self) { frames in
             if let helpTarget, let frame = frames[helpTarget] {
                 MapHelpOverlay(target: helpTarget, globalFrame: frame) {
