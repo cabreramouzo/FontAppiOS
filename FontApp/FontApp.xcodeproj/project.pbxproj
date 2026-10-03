@@ -78,6 +78,11 @@
 			path = FontAppWidget;
 			sourceTree = "<group>";
 		};
+		0AB1C2D3E4F5061728394C01 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +121,7 @@
 		044F286E3068858800D0EF7B = {
 			isa = PBXGroup;
 			children = (
+				0AB1C2D3E4F5061728394C01 /* Shared */,
 				044F28793068858800D0EF7B /* FontApp */,
 				044F28893068858A00D0EF7B /* FontAppTests */,
 				044F28933068858A00D0EF7B /* FontAppUITests */,
@@ -156,6 +162,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				044F28793068858800D0EF7B /* FontApp */,
+				0AB1C2D3E4F5061728394C01 /* Shared */,
 			);
 			name = FontApp;
 			packageProductDependencies = (
@@ -226,6 +233,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				0AB1C2D3E4F5061728394A02 /* FontAppWidget */,
+				0AB1C2D3E4F5061728394C01 /* Shared */,
 			);
 			name = FontAppWidget;
 			packageProductDependencies = (
@@ -703,6 +711,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FontAppWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 7V6773B2EX;
@@ -731,6 +740,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FontAppWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 7V6773B2EX;

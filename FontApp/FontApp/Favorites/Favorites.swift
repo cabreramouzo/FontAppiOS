@@ -88,6 +88,7 @@ final class Favorites {
         pinned = arrangement?.pinned ?? []
         order = arrangement?.order ?? []
         state = .idle
+        publishWidget()
     }
 
     func reload() async {
@@ -127,6 +128,16 @@ final class Favorites {
         }
     }
 
+    private func publishWidget() {
+        guard let account else { WidgetFavoritesStore.write(nil); return }
+        let fonts = items.map {
+            WidgetFavorite(id: $0.id, name: $0.name, lastWaterStatus: $0.lastWaterStatus,
+                           lastUpdate: $0.lastUpdate, conflict: $0.recentStatusConflict ?? false)
+        }
+        WidgetFavoritesStore.write(WidgetFavoritesSnapshot(
+            scope: "\(api.baseURL.absoluteString)|\(account.uuidString)", baseURL: api.baseURL, fountains: fonts))
+    }
+
     private var key: String? { account.map { "favorites.\($0.uuidString)" } }
 
     private struct Arrangement: Codable { var pinned: [UUID]; var order: [UUID] }
@@ -145,6 +156,7 @@ final class Favorites {
     private func save() {
         guard let key else { return }
         defaults.set(try? JSONEncoder().encode(items), forKey: key)
+        publishWidget()
     }
 }
 

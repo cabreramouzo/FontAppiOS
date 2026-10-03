@@ -50,6 +50,7 @@ struct FontAppApp: App {
                 // Right after contributing is when it matters: the fountain is still there.
                 .onReceive(NotificationCenter.default.publisher(for: .fontChanged)) { _ in
                     celebrations.contributed(session.userID)
+                    if session.isSignedIn { Task { await favorites.reload() } }
                 }
                 .task {
                     PushNotifications.shared.sessionChanged(to: session.userID)
@@ -83,7 +84,7 @@ struct FontAppApp: App {
                 // Opening the app somewhere new: watch the fountains around here.
                 Task { await PassingBy.shared.refresh() }
                 celebrations.checkAtLaunch(session.userID)
-                if session.isSignedIn { Task { await bell.reload() } }
+                if session.isSignedIn { Task { await bell.reload(); await favorites.reload() } }
             case .background: sync.scheduleBackgroundFlush()
             default: break
             }

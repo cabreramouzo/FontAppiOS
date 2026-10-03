@@ -13,6 +13,7 @@ import WidgetKit
 struct FontAppWidgets: WidgetBundle {
     var body: some Widget {
         NearbyWidget()
+        FavoriteWidget()
     }
 }
 

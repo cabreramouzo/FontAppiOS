@@ -128,6 +128,7 @@ final class SessionStore {
     }
 
     private func clear() {
+        WidgetFavoritesStore.write(nil)
         // What this account read stays with it, not with whoever signs in next.
         ResponseCache.shared.clear()
         keychain.delete()
