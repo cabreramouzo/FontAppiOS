@@ -49,6 +49,36 @@ const KEYS = [
 ]
 
 const IOS_ONLY = {
+  'ios.newFont.saveDraft': {
+    ca: "Desa l'esborrany",
+    es: "Guardar borrador",
+    gl: "Gardar borrador",
+    eu: "Gorde zirriborroa",
+    en: "Save Draft",
+    fr: "Enregistrer le brouillon",
+    pt: "Guardar rascunho",
+    it: "Salva bozza",
+  },
+  'ios.newFont.keepEditing': {
+    ca: "Continua editant",
+    es: "Seguir editando",
+    gl: "Seguir editando",
+    eu: "Jarraitu editatzen",
+    en: "Keep Editing",
+    fr: "Continuer la saisie",
+    pt: "Continuar a editar",
+    it: "Continua a modificare",
+  },
+  'ios.quick.notNow': {
+    ca: "Ara no",
+    es: "Ahora no",
+    gl: "Agora non",
+    eu: "Orain ez",
+    en: "Not now",
+    fr: "Pas maintenant",
+    pt: "Agora não",
+    it: "Non ora",
+  },
   'ios.mapHelp.title': {
     ca: 'Ajuda del mapa', es: 'Ayuda del mapa', gl: 'Axuda do mapa', eu: 'Maparen laguntza',
     en: 'Map help', fr: 'Aide de la carte', pt: 'Ajuda do mapa', it: 'Aiuto mappa',
