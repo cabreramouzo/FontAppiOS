@@ -48,7 +48,7 @@ struct SettingsScreen: View {
                         }
                     } label: {
                         HStack {
-                            Text(L10n.t("nav.logout"))
+                            Text(L10n.t("logout.confirmTitle"))
                             if isSigningOut { Spacer(); ProgressView() }
                         }
                         .frame(minHeight: 44)

@@ -300,6 +300,13 @@ nonisolated struct APIClient: Sendable {
         return try await send("POST", "/auth/apple", body: .json(try JSONEncoder().encode(body)), timeout: writeTimeout)
     }
 
+    /// Sign in with Google (`POST /auth/google`): Google's ID token, as the web sends it.
+    func googleLogin(credential: String, lang: String?) async throws -> LoginResponse {
+        struct Body: Encodable { let credential: String; let lang: String?; let source = "ios" }
+        let body = Body(credential: credential, lang: lang)
+        return try await send("POST", "/auth/google", body: .json(try JSONEncoder().encode(body)), timeout: writeTimeout)
+    }
+
     // MARK: Passkeys
 
     func passkeyLoginOptions() async throws -> Passkeys.Start<Passkeys.RequestOptions> {

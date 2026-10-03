@@ -66,6 +66,12 @@ final class SessionStore {
                                        lang: SignUpRules.webLanguage()))
     }
 
+    /// Sign in with Google: creates the account the first time, as with Apple.
+    func signInWithGoogle() async throws {
+        let token = try await GoogleSignIn.idToken()
+        start(try await api.googleLogin(credential: token, lang: SignUpRules.webLanguage()))
+    }
+
     private func start(_ response: LoginResponse) {
         keychain.save(response.token)
         api.credentials.set(response.token)

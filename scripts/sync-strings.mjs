@@ -41,7 +41,7 @@ const KEYS = [
   'detail.description', 'detail.lastUpdate', 'detail.currentStatus', 'detail.lastReportedStatus',
   'detail.confirmedByOne', 'detail.confirmedByMany', 'detail.statusReviews', 'detail.beFirst',
   'detail.incidents', 'detail.noIncidents', 'detail.loading', 'detail.directions',
-  'detail.addPhoto', 'detail.firstPhotoNote', 'nav.logout', 'nav.enter', 'staff.tag', 'settings.account', 'photo.failed',
+  'detail.addPhoto', 'detail.firstPhotoNote', 'nav.logout', 'logout.confirmTitle', 'nav.enter', 'staff.tag', 'settings.account', 'photo.failed',
   'profile.deleteAccount', 'profile.confirmDelete', 'profile.dangerZone', 'profile.dangerZoneHint',
   'maintenance.recovered', 'favorite.save', 'favorite.saved',
   'detail.noPhotoYet', 'detail.viewOnMap', 'detail.share', 'detail.shareText', 'detail.nearWaterTitle', 'detail.nearWaterGo', 'form.cancel', 'detail.createdBy', 'detail.pioneerBy', 'detail.mayorBy', 'detail.mayorReviews', 'detail.mayorHelp', 'detail.confirmDeleteFont', 'detail.delete', 'detail.newUpdate', 'detail.confirmDeleteIncident', 'review.confirmDelete', 'detail.useAsMainPhoto', 'detail.photoSetAsMain', 'form.undo', 'form.create', 'detail.municipality', 'footer.legal', 'nav.guide', 'detail.region', 'detail.country', 'detail.stale',
@@ -49,6 +49,14 @@ const KEYS = [
 ]
 
 const IOS_ONLY = {
+  'ios.login.google': {
+    ca: 'Continua amb Google', es: 'Continuar con Google', gl: 'Continuar con Google', eu: 'Jarraitu Googlerekin',
+    en: 'Continue with Google', fr: 'Continuer avec Google', pt: 'Continuar com o Google', it: 'Continua con Google',
+  },
+  'ios.donate.qr': {
+    ca: 'Mostra el codi QR', es: 'Mostrar el código QR', gl: 'Amosar o código QR', eu: 'Erakutsi QR kodea',
+    en: 'Show QR code', fr: 'Afficher le code QR', pt: 'Mostrar o código QR', it: 'Mostra il codice QR',
+  },
   'ios.newFont.saveDraft': {
     ca: "Desa l'esborrany",
     es: "Guardar borrador",
